@@ -20,7 +20,7 @@ class PersonController extends Controller
 
         return view('administrations.people.browse');
     }
-    
+
     public function list(){
 
         $search = request('search') ?? null;
@@ -87,7 +87,7 @@ class PersonController extends Controller
         DB::beginTransaction();
         try {
             $storageController = new StorageController();
-            
+
             $person = Person::find($id);
             $person->ci = $request->ci;
             $person->birth_date = $request->birth_date;
@@ -104,8 +104,8 @@ class PersonController extends Controller
             if ($request->image) {
                 $person->image = $storageController->store_image($request->image, 'people');
             }
-          
-            
+
+
             $person->update();
 
             DB::commit();

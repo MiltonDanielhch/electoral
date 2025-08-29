@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\ErrorController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\UserController;
@@ -11,57 +12,51 @@ use App\Http\Controllers\RoleController;
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
 */
 
+// Redirección raíz y login
+Route::redirect('login', 'admin/login')->name('login');
+Route::redirect('/', 'admin');
 
+// Grupo principal con middleware personalizado
+Route::prefix('admin')->middleware(['loggin', 'system'])->group(function () {
 
-Route::get('login', function () {
-    return redirect('admin/login');
-})->name('login');
-
-Route::get('/', function () {
-    return redirect('admin');
-});
-
-Route::get('/info/{id?}', [ErrorController::class , 'error'])->name('errors');
-// Route::get('/development', [ErrorController::class , 'error503'])->name('development');
-
-Route::group(['prefix' => 'admin', 'middleware' => ['loggin', 'system']], function () {
+    // Rutas de Voyager (no tocar)
     Voyager::routes();
 
-    Route::get('people', [PersonController::class, 'index'])->name('voyager.people.index');
-    Route::get('people/ajax/list', [PersonController::class, 'list']);
-    Route::post('people', [PersonController::class, 'store'])->name('voyager.people.store');
-    Route::put('people/{id}', [PersonController::class, 'update'])->name('voyager.people.update');
+    // ──────────────── PERSONAS ────────────────
+    Route::prefix('people')->group(function () {
+        Route::get('/', [PersonController::class, 'index'])->name('voyager.people.index');
+        Route::get('/ajax/list', [PersonController::class, 'list'])->name('voyager.people.ajax.list');
+        Route::post('/', [PersonController::class, 'store'])->name('voyager.people.store');
+        Route::put('/{id}', [PersonController::class, 'update'])->name('voyager.people.update');
+    });
 
+    // ──────────────── USUARIOS ────────────────
+    Route::prefix('users')->group(function () {
+        Route::get('/ajax/list', [UserController::class, 'list'])->name('voyager.users.ajax.list');
+        Route::post('/store', [UserController::class, 'store'])->name('voyager.users.store');
+        Route::put('/{id}', [UserController::class, 'update'])->name('voyager.users.update');
+        Route::delete('/{id}/deleted', [UserController::class, 'destroy'])->name('voyager.users.destroy');
+    });
 
-    // Users
-    Route::get('users/ajax/list', [UserController::class, 'list']);
-    Route::post('users/store', [UserController::class, 'store'])->name('voyager.users.store');
-    Route::put('users/{id}', [UserController::class, 'update'])->name('voyager.users.update');
-    Route::delete('users/{id}/deleted', [UserController::class, 'destroy'])->name('voyager.users.destroy');
+    // ──────────────── ROLES ────────────────
+    Route::prefix('roles')->group(function () {
+        Route::get('/ajax/list', [RoleController::class, 'list'])->name('voyager.roles.ajax.list');
+    });
 
-    // Roles
-    Route::get('roles/ajax/list', [RoleController::class, 'list']);
+    // ──────────────── AJAX GENÉRICO ────────────────
+    Route::prefix('ajax')->group(function () {
+        Route::get('/personList', [AjaxController::class, 'personList']);
+        Route::post('/person/store', [AjaxController::class, 'personStore']);
+    });
 
-
-    Route::get('ajax/personList', [AjaxController::class, 'personList']);
-    Route::post('ajax/person/store', [AjaxController::class, 'personStore']);
-
+    // ──────────────── UTILIDADES ────────────────
+    Route::get('/clear-cache', function () {
+        Artisan::call('optimize:clear');
+        return redirect('/admin/profile')->with([
+            'message' => 'Cache eliminada.',
+            'alert-type' => 'success'
+        ]);
+    })->name('clear.cache');
 });
-
-
-// Clear cache
-Route::get('/admin/clear-cache', function() {
-    Artisan::call('optimize:clear');
-
-    // Artisan::call('db:seed', ['--class' => 'UpdateBreadSeeder']);
-    // Artisan::call('db:seed', ['--class' => 'UpdatePermissionsSeeder']);
-    
-    return redirect('/admin/profile')->with(['message' => 'Cache eliminada.', 'alert-type' => 'success']);
-})->name('clear.cache');

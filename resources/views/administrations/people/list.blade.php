@@ -5,7 +5,7 @@
                 <tr>
                     <th style="text-align: center">ID</th>
                     <th style="text-align: center">CI/Pasaporte</th>
-                    <th style="text-align: center">Nombre completo</th>                    
+                    <th style="text-align: center">Nombre completo</th>
                     <th style="text-align: center">Fecha nac.</th>
                     <th style="text-align: center">Telefono/Celular</th>
                     <th style="text-align: center">Estado</th>
@@ -31,7 +31,7 @@
                             <tr>
                                 <td><img src="{{ $image }}" alt="{{ $item->first_name }} " style="width: 60px; height: 60px; border-radius: 30px; margin-right: 10px"></td>
                                 <td>
-                                    {{ strtoupper($item->first_name) }} {{ $item->middle_name??strtoupper($item->middle_name) }} {{ strtoupper($item->paternal_surname) }}  {{ strtoupper($item->maternal_surname) }} 
+                                    {{ strtoupper($item->first_name) }} {{ $item->middle_name??strtoupper($item->middle_name) }} {{ strtoupper($item->paternal_surname) }}  {{ strtoupper($item->maternal_surname) }}
                                 </td>
                             </tr>
                         </table>
@@ -40,18 +40,18 @@
                         @if ($item->birth_date)
                             {{ date('d/m/Y', strtotime($item->birth_date)) }} <br> <small>{{ $age }} años</small>
                         @else
-                            Sin Datos                            
+                            Sin Datos
                         @endif
                     </td>
                     <td style="text-align: center">{{ $item->phone?$item->phone:'SN' }}</td>
                     <td style="text-align: center">
-                        @if ($item->status==1)  
+                        @if ($item->status==1)
                             <label class="label label-success">Activo</label>
                         @else
                             <label class="label label-warning">Inactivo</label>
                         @endif
 
-                        
+
                     </td>
                     <td style="width: 18%" class="no-sort no-click bread-actions text-right">
                         @if (auth()->user()->hasPermission('read_people'))
@@ -101,7 +101,7 @@
 </div>
 
 <script>
-   
+
    var page = "{{ request('page') }}";
     $(document).ready(function(){
         $('.page-link').click(function(e){

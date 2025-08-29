@@ -64,19 +64,19 @@
 
 
 
- 
+
 @stop
 
 @section('css')
     <style>
 
-    
+
     </style>
 @stop
 
 @section('javascript')
     <script src="{{ url('js/main.js') }}"></script>
-        
+
     {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> --}}
     <script>
         var countPage = 10, order = 'id', typeOrder = 'desc';
@@ -104,9 +104,9 @@
             });
         });
 
- 
-            
-   
+
+
+
 
         function list(page = 1){
             $('#div-results').loading({message: 'Cargando...'});
@@ -119,7 +119,7 @@
                 url: `${url}?search=${search}&paginate=${countPage}&page=${page}`,
 
                 type: 'get',
-                
+
                 success: function(result){
                     $("#div-results").html(result);
                     $('#div-results').loading('toggle');
@@ -130,8 +130,8 @@
         function deleteItem(url){
             $('#delete_form').attr('action', url);
         }
-       
 
-       
+
+
     </script>
 @stop
