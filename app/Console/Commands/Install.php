@@ -6,37 +6,33 @@ use Illuminate\Console\Command;
 
 class Install extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'example:install';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Install Laravel Example';
-
-    /**
-     * Execute the console command.
-     *
-     * @return int
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     public function handle()
     {
+        $this->info('Iniciando instalación...');
+
+        if (!file_exists('.env')) {
+            copy('.env.example', '.env');
+            $this->info('.env creado desde .env.example');
+        }
+
         $this->call('key:generate');
-        $this->call('migrate:fresh');
-        $this->call('db:seed');
+
+        if ($this->confirm('¿Eliminar y recrear la base de datos?')) {
+            $this->call('migrate:fresh');
+            $this->call('db:seed');
+        }
+
         $this->call('storage:link');
-        // $this->call('vendor:publish', ['--provider' => VoyagerServiceProvider::class, '--tag' => ['config', 'voyager_avatar']]);
-        $this->info('Gracias por instalar LaravelTemplate');
+
+        // Descomenta si usas Voyager
+        // $this->call('vendor:publish', [
+        //     '--provider' => 'TCG\\Voyager\\VoyagerServiceProvider',
+        //     '--tag' => ['config', 'voyager_avatar']
+        // ]);
+
+        $this->info('✅ Instalación completada. ¡Gracias por usar LaravelTemplate!');
     }
 }

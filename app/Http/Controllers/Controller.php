@@ -20,42 +20,34 @@ class Controller extends BaseController
 
     public function payment_alert()
     {
-        $soliciondigital = new SolucionDigitalController();
-        $data = $soliciondigital->settings_code();
+        $controller = new SolucionDigitalController();
+        $data = $controller->settings_code();
+
+        if (!$data || !isset($data->finish, $data->type)) {
+            return null;
+        }
+
         $date = $data->finish;
-
         $now = new DateTime();
-        $value= null;
-        $d = DateTime::createFromFormat('Y-m-d H:i:s', $date.' 23:59:59');
-    
-        if($data->type == 'Demo')// si es demo no tiene restrincion
-        {
-            return $value;
+        $d = DateTime::createFromFormat('Y-m-d H:i:s', $date . ' 23:59:59');
+
+        // Si es Demo, no hay restricción
+        if ($data->type === 'Demo') {
+            return null;
         }
 
-        if($d && $d->format('Y-m-d') === $date )
-        {
-            if($now > $d) //si la fecha actual es mayor a la fecha de finalizacion de del sistema no se puede realizar ningun metodo
-            {
-                $value = "finalizado";
-            }
-            else
-            {
-                $difference = $now->diff($d);
-                if($difference->days <= 3)
-                {
-                    $value = $difference->days;
-                }
-                else
-                {
-                    $value = "vigente";
-                }
-            }
+        // Fecha inválida
+        if (!$d || $d->format('Y-m-d') !== $date) {
+            return null;
         }
-        else
-        {
-            $value = null;
+
+        // Fecha vencida
+        if ($now > $d) {
+            return 'finalizado';
         }
-        return $value;
+
+        // Días restantes si faltan 3 o menos
+        $difference = $now->diff($d);
+        return $difference->days <= 3 ? $difference->days : 'vigente';
     }
 }
