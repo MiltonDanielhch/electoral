@@ -54,12 +54,13 @@
                                     </div>
                                 </div>
                             @endif
-                            
+
                             {{-- <div class="form-group">
                                 <label for="name">{{ __('voyager::generic.name') }}</label>
                                 <input type="text" class="form-control" id="name" name="name" placeholder="{{ __('voyager::generic.name') }}"
                                        value="{{ old('name', $dataTypeContent->name ?? '') }}">
                             </div> --}}
+                            <input type="hidden" name="name" id="name" value="{{ old('name', $dataTypeContent->person->full_name ?? '') }}">
 
                             <div class="form-group">
                                 <label for="email">{{ __('voyager::generic.email') }}</label>
@@ -77,20 +78,21 @@
                             </div>
                             @php
                                 $rol_id = Auth::user()->role->id;
-                                $role = TCG\Voyager\Models\Role::whereRaw($rol_id!=1? 'id != 1':1)
-                                        ->get();
+                                // $role = TCG\Voyager\Models\Role::whereRaw($rol_id!=1? 'id != 1':1)
+                                //         ->get();
+                                $role = TCG\Voyager\Models\Role::whereRaw($rol_id != 1 ? 'id != 1' : 1)->get();
                             @endphp
-                            @can('editRoles', $dataTypeContent)  
-                            
+                            @can('editRoles', $dataTypeContent)
+
                                 <div class="form-group">
                                     <label>Rol predeterminado</label>
                                     <select name="role_id" id="role_id" class="form-control select2" required>
                                         <option value="" disabled selected>Ninguno</option>
                                         @foreach ($role as $item)
-                                            <option value="{{$item->id}}" @if($dataTypeContent) {{$dataTypeContent->role_id==$item->id? 'selected':''}} @endif >{{$item->name}}</option>  
+                                            <option value="{{$item->id}}" @if($dataTypeContent) {{$dataTypeContent->role_id==$item->id? 'selected':''}} @endif >{{$item->name}}</option>
                                         @endforeach
                                     </select>
-                                </div>   
+                                </div>
                                 {{-- <div class="form-group">
                                     <label for="default_role">{{ __('voyager::profile.role_default') }}</label>
                                     @php
@@ -127,18 +129,26 @@
                                     @endforeach
                                 </select>
                             </div>
-                            @if ($dataTypeContent->getKey())
+                            {{-- @if ($dataTypeContent->getKey())
                                 <div class="form-group">
                                     <label for="status">Estado</label> <br>
-                                    <input type="checkbox" name="status" class="toggleswitch" 
+                                    <input type="hidden" name="status" value="0">
+                                    <input type="checkbox" name="status" class="toggleswitch"
                                         @if(isset($dataTypeContent->id))
-                                            {{ $dataTypeContent->status==1 ? 'checked' : '' }} 
-                                        @else 
+                                            {{ $dataTypeContent->status==1 ? 'checked' : '' }}
+                                        @else
                                             checked
                                         @endif
                                         data-on="Habilitado" data-off="Inhabilitado">
                                 </div>
-                            @endif                            
+                            @endif --}}
+                            @if ($dataTypeContent->getKey())
+                                <input type="hidden" name="status" value="0">
+                                <input type="checkbox" name="status" class="toggleswitch"
+                                    data-on="Habilitado" data-off="Inhabilitado"
+                                    value="1"
+                                    {{ $dataTypeContent->status == 1 ? 'checked' : '' }}>
+                            @endif
                         </div>
                     </div>
                 </div>

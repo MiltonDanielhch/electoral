@@ -21,27 +21,46 @@ class PersonController extends Controller
         return view('administrations.people.browse');
     }
 
-    public function list(){
+   public function list()
+    {
+        // Parámetros de entrada
+        $search   = request('search');
+        $paginate = request('paginate', 10);
 
-        $search = request('search') ?? null;
-        $paginate = request('paginate') ?? 10;
+        // Sub-consulta para el nombre completo
+        $fullNameRaw = "TRIM(CONCAT(
+            COALESCE(first_name, ''), ' ',
+            COALESCE(middle_name, ''), ' ',
+            COALESCE(paternal_surname, ''), ' ',
+            COALESCE(maternal_surname, '')
+        ))";
 
-        $data = Person::where(function($query) use ($search){
-                            $query->OrWhereRaw($search ? "id = '$search'" : 1)
-                            ->OrWhereRaw($search ? "ci like '%$search%'" : 1)
-                            ->OrWhereRaw($search ? "phone like '%$search%'" : 1)
-                            ->OrWhereRaw($search ? "first_name like '%$search%'" : 1)
-                            ->OrWhereRaw($search ? "middle_name like '%$search%'" : 1)
-                            ->OrWhereRaw($search ? "paternal_surname like '%$search%'" : 1)
-                            ->OrWhereRaw($search ? "maternal_surname like '%$search%'" : 1)
-                        // ->OrWhereRaw($search ? "CONCAT(first_name, ' ', middle_name, ' ', paternal_surname) like '%$search%'" : 1)
-                            ->orWhere(function ($subQ) use ($search) {
-                                $subQ->whereRaw("CONCAT(COALESCE(first_name, ''), ' ', COALESCE(middle_name, '')) like ?", ["%$search%"])
-                                    ->orWhereRaw("CONCAT(COALESCE(first_name, ''), ' ', COALESCE(paternal_surname, ''), ' ', COALESCE(maternal_surname, '')) like ?", ["%$search%"])
-                                    ->orWhereRaw("CONCAT(COALESCE(first_name, ''), ' ', COALESCE(middle_name, ''), ' ', COALESCE(paternal_surname, ''), ' ', COALESCE(maternal_surname, '')) like ?", ["%$search%"]);
-                            });
-                        })
-                        ->where('deleted_at', NULL)->orderBy('id', 'DESC')->paginate($paginate);
+        // Consulta principal
+        $data = Person::query()
+            ->select('*')
+            ->selectRaw("$fullNameRaw as full_name")
+            ->when($search, function ($q) use ($search, $fullNameRaw) {
+                // Búsqueda numérica exacta (id o ci)
+                if (is_numeric($search)) {
+                    $q->where(function ($sub) use ($search) {
+                        $sub->where('id', $search)
+                            ->orWhere('ci', 'like', "%{$search}%");
+                    });
+                }
+
+                // Búsqueda textual parcial
+                $q->orWhere(function ($sub) use ($search, $fullNameRaw) {
+                    $sub->where('phone', 'like', "%{$search}%")
+                        ->orWhere('first_name', 'like', "%{$search}%")
+                        ->orWhere('middle_name', 'like', "%{$search}%")
+                        ->orWhere('paternal_surname', 'like', "%{$search}%")
+                        ->orWhere('maternal_surname', 'like', "%{$search}%")
+                        ->orWhereRaw("{$fullNameRaw} like ?", ["%{$search}%"]);
+                });
+            })
+            ->whereNull('deleted_at')
+            ->orderByDesc('id')
+            ->paginate($paginate);
 
         return view('administrations.people.list', compact('data'));
     }
@@ -52,6 +71,7 @@ class PersonController extends Controller
         $request->validate([
             'image' => 'image|mimes:jpeg,jpg,png,bmp,webp'
         ]);
+        DB::beginTransaction();
         try {
             // Si envian las imágenes
             $storageController = new StorageController();
@@ -106,7 +126,7 @@ class PersonController extends Controller
             }
 
 
-            $person->update();
+            $person->save();
 
             DB::commit();
             return redirect()->route('voyager.people.index')->with(['message' => 'Actualizada exitosamente', 'alert-type' => 'success']);

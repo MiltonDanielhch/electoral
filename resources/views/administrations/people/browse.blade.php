@@ -45,7 +45,7 @@
                                 </div>
                             </div>
                             <div class="col-sm-3" style="margin-bottom: 10px">
-                                <input type="text" id="input-search" placeholder="🔍 Buscar..." class="form-control">
+                                <input type="text" id="input-search" placeholder="🔍 Buscar..." class="form-control" autocomplete="off">
                             </div>
                         </div>
                         <div class="row" id="div-results" style="min-height: 120px"></div>
@@ -54,17 +54,7 @@
             </div>
         </div>
     </div>
-
-
-
     @include('partials.modal-delete')
-
-
-
-
-
-
-
 @stop
 
 @section('css')
@@ -103,11 +93,6 @@
                 }, 2000); // retardo de 2 segundos cada vez que se escribe algo en el input
             });
         });
-
-
-
-
-
         function list(page = 1){
             $('#div-results').loading({message: 'Cargando...'});
 
@@ -130,8 +115,5 @@
         function deleteItem(url){
             $('#delete_form').attr('action', url);
         }
-
-
-
     </script>
 @stop

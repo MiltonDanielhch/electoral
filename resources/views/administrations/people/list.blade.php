@@ -22,7 +22,9 @@
                             @php
                                 $image = asset('images/default.jpg');
                                 if($item->image){
-                                    $image = asset('storage/'.str_replace('.', '-cropped.', $item->image));
+                                    $image = $item->image
+                                        ? asset('storage/' . $item->image)
+                                        : asset('images/default.jpg');
                                 }
                                 $now = \Carbon\Carbon::now();
                                 $birthday = new \Carbon\Carbon($item->birth_date);
@@ -31,7 +33,8 @@
                             <tr>
                                 <td><img src="{{ $image }}" alt="{{ $item->first_name }} " style="width: 60px; height: 60px; border-radius: 30px; margin-right: 10px"></td>
                                 <td>
-                                    {{ strtoupper($item->first_name) }} {{ $item->middle_name??strtoupper($item->middle_name) }} {{ strtoupper($item->paternal_surname) }}  {{ strtoupper($item->maternal_surname) }}
+                                    {{-- {{ strtoupper($item->first_name) }} {{ $item->middle_name??strtoupper($item->middle_name) }} {{ strtoupper($item->paternal_surname) }}  {{ strtoupper($item->maternal_surname) }} --}}
+                                    {{ strtoupper($item->full_name) }}
                                 </td>
                             </tr>
                         </table>
@@ -45,11 +48,9 @@
                     </td>
                     <td style="text-align: center">{{ $item->phone?$item->phone:'SN' }}</td>
                     <td style="text-align: center">
-                        @if ($item->status==1)
-                            <label class="label label-success">Activo</label>
-                        @else
-                            <label class="label label-warning">Inactivo</label>
-                        @endif
+                       <span class="label label-{{ $item->status == 1 ? 'success' : 'warning' }}">
+                            {{ $item->status == 1 ? 'Activo' : 'Inactivo' }}
+                        </span>
 
 
                     </td>
@@ -106,9 +107,11 @@
     $(document).ready(function(){
         $('.page-link').click(function(e){
             e.preventDefault();
-            let link = $(this).attr('href');
+            // let link = $(this).attr('href');
+            let url = new URL($(this).attr('href'));
             if(link){
-                page = link.split('=')[1];
+                // page = link.split('=')[1];
+                let page = url.searchParams.get('page') || 1;
                 list(page);
             }
         });
