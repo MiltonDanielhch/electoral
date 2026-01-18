@@ -122,25 +122,45 @@ php-exif
 
 ## 🚀 Instalación
 
-### 1. Clonar el Repositorio
+### Opción 1: Instalación Rápida ⚡
+
+Para una instalación rápida usando el instalador automatizado de Laravel:
+
+```bash
+composer install
+cp .env.example .env
+php artisan example:install
+sudo chmod -R 775 storage bootstrap/cache
+sudo chown -R www-data storage bootstrap/cache
+```
+
+> **Nota:** Este método ejecuta el instalador de ejemplo que configura la base de datos, migra y ejecuta los seeders automáticamente.
+
+---
+
+### Opción 2: Instalación Paso a Paso (Recomendado) 📝
+
+Para un control total sobre el proceso de instalación:
+
+#### 1. Clonar el Repositorio
 ```bash
 git clone https://github.com/tu-usuario/electoral.git
 cd electoral
 ```
 
-### 2. Instalar Dependencias
+#### 2. Instalar Dependencias
 ```bash
 composer install
 npm install  # opcional
 ```
 
-### 3. Configurar Entorno
+#### 3. Configurar Entorno
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
-### 4. Configurar Base de Datos
+#### 4. Configurar Base de Datos
 Editar `.env`:
 ```env
 DB_CONNECTION=mysql
@@ -151,27 +171,38 @@ DB_USERNAME=tu_usuario
 DB_PASSWORD=tu_password
 ```
 
-### 5. Ejecutar Migraciones y Seeders
+#### 5. Ejecutar Migraciones y Seeders
 ```bash
 php artisan migrate
 php artisan db:seed --class=VoyagerDatabaseSeeder
 ```
 
-### 6. Crear Enlace de Almacenamiento
+#### 6. Crear Enlace de Almacenamiento
 ```bash
 php artisan storage:link
 ```
 
-### 7. Optimizar la Aplicación
+#### 7. Optimizar la Aplicación
 ```bash
 php artisan optimize:clear
 php artisan optimize
 ```
 
-### 8. Configurar Permisos (Linux/Mac)
+#### 8. Configurar Permisos (Linux/Mac)
 ```bash
 chmod -R 775 storage bootstrap/cache
 ```
+
+> **Nota:** En servidores Apache/Nginx, también necesitas:
+> ```bash
+> chown -R www-data storage bootstrap/cache
+> ```
+
+---
+
+### Opción 3: Instalación con Docker 🐳
+
+Ver la sección de [Docker](#docker) más abajo para la instalación completa con contenedores.
 
 ---
 
@@ -397,31 +428,3 @@ Si encuentras un bug o tienes una sugerencia, por favor:
 Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
 
 ---
-
-## 👥 Autores
-
-- **Tu Nombre** - *Trabajo inicial* - [TuEmpresa](https://github.com/tu-usuario)
-
----
-
-## 🙏 Agradecimientos
-
-- **Laravel Framework** - El framework PHP elegante
-- **TCG Voyager** - Panel de administración para Laravel
-- **Intervention Image** - Manipulación de imágenes
-- **Comunidad Laravel** - Por el soporte continuo
-
----
-
-## 📞 Soporte
-
-Para soporte técnico:
-- 📧 Email: soporte@tudominio.com
-- 📖 Documentación: [docs/documentar/](docs/documentar/)
-- 🐛 Issues: [GitHub Issues](https://github.com/tu-usuario/electoral/issues)
-
----
-
-<p align="center">
-  <strong>Construido con ❤️ usando Laravel</strong>
-</p>
