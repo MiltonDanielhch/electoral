@@ -21,7 +21,7 @@ class UserController extends Controller
     //     $this->custom_authorize('browse_users');
     //     return User::all();
 
-    //     return view('vendor.voyager.users.broswse');
+    // return view('vendor.voyager.users.browse');
     // }
 
 
@@ -32,51 +32,70 @@ class UserController extends Controller
 
         $search = request('search') ?? null;
         $paginate = request('paginate') ?? 10;
-        
+
         $data = User::with(['person'])
-                    ->where(function($query) use ($search){
-                        $query->OrWhereRaw($search ? "id = '$search'" : 1)
-                        ->OrWhereRaw($search ? "name like '%$search%'" : 1)
-                        ->OrWhereRaw($search ? "email like '%$search%'" : 1);
-                    })
-                    // ->where('deleted_at', NULL)
-                    ->whereRaw($rol_id!=1? 'role_id != 1':1)
-                    ->orderBy('id', 'DESC')
-                    ->paginate($paginate);
+            ->where(function($query) use ($search){
+                if ($search) {
+                    if (is_numeric($search)) {
+                        $query->where('id', $search);
+                    } else {
+                        $query->where('name', 'like', "%{$search}%")
+                               ->orWhere('email', 'like', "%{$search}%");
+                    }
+                }
+            })
+            ->when($rol_id != 1, function ($query) {
+                return $query->where('role_id', '!=', 1);
+            })
+            ->orderBy('id', 'DESC')
+            ->paginate($paginate);
+
         return view('vendor.voyager.users.list', compact('data'));
     }
 
 
     public function store(Request $request)
     {
-        $data = User::where('email', $request->email)->first();
-        if($data)
-        {
-            return redirect()->route('voyager.users.index')->with(['message' => 'El correo ya existe.', 'alert-type' => 'warning    ']);
-        }
-        $person = Person::where('deleted_at', null)->where('status', 1)->where('id', $request->person_id)->first();
-    
+        $validated = $request->validate([
+            'person_id' => 'required|exists:people,id,deleted_at,NULL,status,1',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:8',
+            'role_id' => 'required|exists:roles,id',
+        ]);
+
         DB::beginTransaction();
         try {
-            
+            $person = Person::where('deleted_at', null)
+                            ->where('status', 1)
+                            ->where('id', $validated['person_id'])
+                            ->first();
+
+            if (!$person) {
+                throw new \Exception('La persona seleccionada no existe o no está activa.');
+            }
+
             User::create([
-                'person_id' => $request->person_id,
-                'name' =>  $person->first_name,
-                'role_id' => $request->role_id,
-                'email' => $request->email,
+                'person_id' => $validated['person_id'],
+                'name' => $person->first_name,
+                'role_id' => $validated['role_id'],
+                'email' => $validated['email'],
                 'avatar' => 'users/default.png',
-                'password' => bcrypt($request->password),
-                // 'settings' => '{"locale":"es"}'
-
+                'password' => bcrypt($validated['password']),
             ]);
+
             DB::commit();
-            return redirect()->route('voyager.users.index')->with(['message' => 'Registrado exitosamente.', 'alert-type' => 'success']);
+            return redirect()->route('voyager.users.index')->with([
+                'message' => 'Registrado exitosamente.',
+                'alert-type' => 'success'
+            ]);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $th) {
             DB::rollback();
-            return redirect()->route('voyager.users.index')->with(['message' => 'Ocurrió un error.', 'alert-type' => 'error']);
-        }  
-
+            return redirect()->route('voyager.users.index')->with([
+                'message' => $th->getMessage(),
+                'alert-type' => 'error'
+            ]);
+        }
     }
 
     public function update(Request $request, $id)
@@ -87,7 +106,7 @@ class UserController extends Controller
             $user->update([
                 'status'=> $request->status?1:0,
             ]);
-            
+
             if($request->role_id)
             {
                 $user->update([
@@ -107,7 +126,7 @@ class UserController extends Controller
             DB::rollback();
 
             return redirect()->route('voyager.users.index')->with(['message' => 'Ocurrió un error.', 'alert-type' => 'error']);
-        }  
+        }
     }
 
     public function destroy(Request $request, $id)
@@ -121,6 +140,6 @@ class UserController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->route('voyager.users.index')->with(['message' => 'Ocurrió un error.', 'alert-type' => 'error']);
-        }  
+        }
     }
 }

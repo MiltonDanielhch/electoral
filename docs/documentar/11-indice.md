@@ -310,6 +310,34 @@ Esta documentación cubre todo el sistema panel de Voyager y sus personalizacion
 
 ---
 
+### 17. Plan de Ejecución para Dockerfile (NUEVO)
+**Guía paso a paso para optimizar Dockerfile**
+
+- 📅 FASE 1: Bugs Críticos (HOY - Día 1)
+  - Tarea 1.1: Corregir configuración de PHP
+  - Tarea 1.2: Mejorar permisos de directorios
+  - Tarea 1.3: Mejorar manejo de archivo .env
+- 📅 FASE 2: Optimizaciones de Rendimiento (Día 2-3)
+  - Tarea 2.1: Crear archivo .dockerignore
+  - Tarea 2.2: Crear docker-compose.yml
+  - Tarea 2.3: Optimizar copia de archivos (caché de layers)
+- 📅 FASE 3: Optimizaciones de Seguridad (Día 4)
+  - Tarea 3.1: Ejecutar como usuario no-root
+  - Tarea 3.2: Agregar etiquetas de versión
+  - Tarea 3.3: Mejorar seguridad de contraseñas
+- 📅 FASE 4: Optimizaciones de Mantenibilidad (Día 5)
+  - Tarea 4.1: Agregar documentación al Dockerfile
+- 📅 FASE 5: Optimizaciones Avanzadas (Semana 2)
+  - Tarea 5.1: Implementar multi-stage build
+  - Tarea 5.2: Implementar Docker BuildKit
+  - Tarea 5.3: Implementar escaneo de vulnerabilidades
+- 📊 Resumen del plan
+- 🎯 Checklist de ejecución
+- 🔄 Comandos de rollback
+- 🚀 Comandos rápidos de verificación
+
+---
+
 ### 14. Análisis de Bugs, Mejoras y Optimizaciones
 **Análisis completo del sistema**
 
@@ -408,7 +436,7 @@ docs/documentar/
 ├── 13-docker.md                       # Configuración de Docker
 ├── 14-analisis-bugs-mejoras.md        # Análisis de bugs y mejoras
 ├── 15-plan-ejecucion.md               # Plan de ejecución paso a paso
-└── 16-analisis-dockerfile.md          # Análisis y optimizaciones del Dockerfile (NUEVO)
+└── 17-plan-dockerfile.md          # Plan de ejecución para Dockerfile (NUEVO)
 ```
 
 ---
@@ -648,6 +676,6 @@ Para más información sobre el sistema:
 ---
 
 **Última actualización:** 2026-01-18
-**Documentos:** 17 archivos
-**Total de líneas:** 8,707 líneas
-**Total de tamaño:** ~288 KB
+**Documentos:** 18 archivos
+**Total de líneas:** 9,300+ líneas
+**Total de tamaño:** ~310 KB

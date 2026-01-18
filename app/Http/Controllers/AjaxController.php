@@ -12,30 +12,55 @@ class AjaxController extends Controller
         $this->middleware('auth');
     }
 
-    public function personList(){
+    public function personList()
+    {
         $q = request('q');
-        $data = Person::OrWhereRaw($q ? "ci like '%$q%'" : 1)
-                        ->OrWhereRaw($q ? "phone like '%$q%'" : 1)
-                        ->OrWhereRaw($q ? "first_name like '%$q%'" : 1)
-                        ->OrWhereRaw($q ? "middle_name like '%$q%'" : 1)
-                        ->OrWhereRaw($q ? "paternal_surname like '%$q%'" : 1)
-                        ->OrWhereRaw($q ? "maternal_surname like '%$q%'" : 1)
-                        ->orWhere(function ($subQ) use ($q) {
-                            $subQ->whereRaw("CONCAT(COALESCE(first_name, ''), ' ', COALESCE(middle_name, '')) like ?", ["%$q%"])
-                                ->orWhereRaw("CONCAT(COALESCE(first_name, ''), ' ', COALESCE(paternal_surname, ''), ' ', COALESCE(maternal_surname, '')) like ?", ["%$q%"])
-                                ->orWhereRaw("CONCAT(COALESCE(first_name, ''), ' ', COALESCE(middle_name, ''), ' ', COALESCE(paternal_surname, ''), ' ', COALESCE(maternal_surname, '')) like ?", ["%$q%"]);
-                        })
-                        ->where('deleted_at', null)
-                        ->get();
+
+        $query = Person::where('deleted_at', null);
+
+        if ($q) {
+            $query->where('ci', 'like', "%{$q}%")
+                  ->orWhere('phone', 'like', "%{$q}%")
+                  ->orWhere('first_name', 'like', "%{$q}%")
+                  ->orWhere('middle_name', 'like', "%{$q}%")
+                  ->orWhere('paternal_surname', 'like', "%{$q}%")
+                  ->orWhere('maternal_surname', 'like', "%{$q}%")
+                  ->orWhere(function ($subQ) use ($q) {
+                      $fullName = "CONCAT(COALESCE(first_name, ''), ' ', COALESCE(middle_name, ''))";
+                      $subQ->whereRaw("{$fullName} like ?", ["%{$q}%"]);
+                  })
+                  ->orWhere(function ($subQ) use ($q) {
+                      $fullName = "CONCAT(COALESCE(first_name, ''), ' ', COALESCE(paternal_surname, ''), ' ', COALESCE(maternal_surname, ''))";
+                      $subQ->whereRaw("{$fullName} like ?", ["%{$q}%"]);
+                  })
+                  ->orWhere(function ($subQ) use ($q) {
+                      $fullName = "CONCAT(COALESCE(first_name, ''), ' ', COALESCE(middle_name, ''), ' ', COALESCE(paternal_surname, ''), ' ', COALESCE(maternal_surname, ''))";
+                      $subQ->whereRaw("{$fullName} like ?", ["%{$q}%"]);
+                  });
+        }
+
+        $data = $query->get();
+
         return response()->json($data);
     }
 
-    public function personStore(Request $request){
+    public function personStore(Request $request)
+    {
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'paternal_surname' => 'required|string|max:255',
+            'ci' => 'required|string|unique:people',
+            'email' => 'nullable|email|unique:people',
+            'phone' => 'nullable|string|max:20',
+            'gender' => 'nullable|string',
+            'birth_date' => 'nullable|date|before:today',
+        ]);
+
         DB::beginTransaction();
         try {
-            $person =Person::create($request->all());
+            $person = Person::create($validated);
             DB::commit();
-            return response()->json(['person' => $person]);
+            return response()->json(['person' => $person], 201);
         } catch (\Throwable $th) {
             DB::rollback();
             return response()->json(['error' => $th->getMessage()], 500);

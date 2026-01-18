@@ -40,6 +40,47 @@ class User extends \TCG\Voyager\Models\User
         return $this->belongsTo(Person::class, 'person_id');
     }
 
+    /**
+     * Verifica si el usuario tiene un rol específico
+     *
+     * @param string|array $role Nombre del rol o array de roles
+     * @return bool True si tiene el rol, false en caso contrario
+     */
+    public function hasRole($role)
+    {
+        if (!$this->role) {
+            return false;
+        }
+
+        if (is_array($role)) {
+            return in_array($this->role->name, $role);
+        }
+
+        return $this->role->name === $role;
+    }
+
+    /**
+     * Verifica si el usuario tiene un permiso específico
+     *
+     * @param string $permission Llave del permiso
+     * @return bool True si tiene el permiso, false en caso contrario
+     */
+    public function hasPermission($permission)
+    {
+        if (!$this->role) {
+            return false;
+        }
+
+        // Los admins tienen todos los permisos
+        if ($this->role->name === 'admin') {
+            return true;
+        }
+
+        // Verificar si el rol tiene el permiso
+        return $this->role->permissions->contains('key', $permission);
+    }
+
+
 
     protected $hidden = [
         'password',
