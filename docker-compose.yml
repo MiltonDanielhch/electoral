@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: electoral-app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./storage:/var/www/example/storage
+      - ./bootstrap/cache:/var/www/example/bootstrap/cache
+      - ./.env:/var/www/example/.env
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_HOST=mysql
+      - DB_DATABASE=electoral
+      - DB_USERNAME=electoral
+      - DB_PASSWORD=secret
+      - CACHE_DRIVER=redis
+      - QUEUE_CONNECTION=redis
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - electoral-net
+
+  mysql:
+    image: mysql:8.0
+    container_name: electoral-mysql
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=electoral
+      - MYSQL_USER=electoral
+      - MYSQL_PASSWORD=secret
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - electoral-net
+
+  redis:
+    image: redis:alpine
+    container_name: electoral-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - electoral-net
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: electoral-phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_HOST=mysql
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+    depends_on:
+      - mysql
+    networks:
+      - electoral-net
+
+volumes:
+  mysql-data:
+  redis-data:
+
+networks:
+  electoral-net:
+    driver: bridge

@@ -241,31 +241,40 @@ Esta documentación cubre todo el sistema panel de Voyager y sus personalizacion
 ---
 
 ### 13. Docker
-**Configuración de Docker del sistema**
+**Configuración de Docker del sistema (Completamente Optimizado)**
 
-- Dockerfile
-  - Análisis línea por línea
+- Archivos de Docker
+  - Dockerfile (completamente documentado y optimizado)
+  - .dockerignore (archivo nuevo)
+  - docker-compose.yml (archivo nuevo)
+- Optimizaciones Implementadas
+  - 🐛 Bugs Críticos Corregidos (3 bugs)
+  - 🟢 Optimizaciones de Rendimiento (3 optimizaciones)
+  - 🔒 Mejoras de Seguridad (2 mejoras)
+  - 📝 Mejoras de Mantenibilidad (1 mejora)
+- Análisis del Dockerfile Optimizado
+  - Metadatos de versión (etiquetas OCI)
   - Imagen base: NGINX Unit 1.33.0 + PHP 8.2
   - Instalación de extensiones PHP
   - Configuración de OPcache y JIT
   - Instalación de Composer
-  - Permisos de archivos
-  - Comandos de Artisan
+  - Caché de capas optimizado
+  - Permisos completos de archivos
+  - Usuario no-root (seguridad)
 - Configuración de NGINX Unit
   - Archivo unit.json
   - Listeners, Routes, Applications
   - Servir archivos estáticos vs Laravel
 - Comandos de Docker
-  - Construir imagen
+  - Construir imagen (con y sin versión)
   - Ejecutar contenedor
+  - Ejecutar con docker-compose
   - Ver logs
   - Entrar al contenedor
+  - Verificar configuraciones PHP
+  - Verificar usuario y etiquetas
 - Variables de entorno
-- Optimizaciones del Dockerfile
-  - Compilación paralela
-  - OPcache + JIT
-  - Composer optimizado
-  - Imágenes base livianas
+- Comparación de tamaños de imagen
 - Requisitos del sistema
   - Hardware
   - Software
@@ -279,62 +288,7 @@ Esta documentación cubre todo el sistema panel de Voyager y sus personalizacion
   - NGINX Unit vs Apache + mod_php
   - NGINX Unit vs Nginx + PHP-FPM
 - Notas importantes
-
----
-
-### 16. Análisis y Optimizaciones del Dockerfile
-**Mejoras y optimizaciones del Dockerfile**
-
-- 🐛 Problemas y Bugs Encontrados
-  - Bug #1: Error en configuración de PHP (línea 13 usa > en lugar de >>)
-  - Bug #2: Permisos incompletos de directorios
-  - Bug #3: Archivo .env se crea en imagen (problema de seguridad)
-- 🟢 Optimizaciones de Rendimiento
-  - Optimización #4: Falta multi-stage build
-  - Optimización #5: Falta .dockerignore
-  - Optimización #6: Falta docker-compose.yml
-  - Optimización #7: Falta caché de Composer
-  - Optimización #8: Falta uso de BuildKit
-- 🔒 Mejoras de Seguridad
-  - Mejora #9: Falta escaneo de vulnerabilidades
-  - Mejora #10: Falta ejecutar como usuario no-root
-- 📝 Mejoras de Mantenibilidad
-  - Mejora #11: Falta etiquetas de versión
-  - Mejora #12: Falta documentación en Dockerfile
-- 📊 Comparación de tamaños de imagen (tabla)
-- 🎯 Plan de optimización del Dockerfile
-- 📍 Archivos nuevos a crear (.dockerignore, docker-compose.yml)
-- 🚀 Comandos para probar las optimizaciones
-- 📝 Notas importantes
-- 🎯 Checklist de optimizaciones de Docker
-
----
-
-### 17. Plan de Ejecución para Dockerfile (NUEVO)
-**Guía paso a paso para optimizar Dockerfile**
-
-- 📅 FASE 1: Bugs Críticos (HOY - Día 1)
-  - Tarea 1.1: Corregir configuración de PHP
-  - Tarea 1.2: Mejorar permisos de directorios
-  - Tarea 1.3: Mejorar manejo de archivo .env
-- 📅 FASE 2: Optimizaciones de Rendimiento (Día 2-3)
-  - Tarea 2.1: Crear archivo .dockerignore
-  - Tarea 2.2: Crear docker-compose.yml
-  - Tarea 2.3: Optimizar copia de archivos (caché de layers)
-- 📅 FASE 3: Optimizaciones de Seguridad (Día 4)
-  - Tarea 3.1: Ejecutar como usuario no-root
-  - Tarea 3.2: Agregar etiquetas de versión
-  - Tarea 3.3: Mejorar seguridad de contraseñas
-- 📅 FASE 4: Optimizaciones de Mantenibilidad (Día 5)
-  - Tarea 4.1: Agregar documentación al Dockerfile
-- 📅 FASE 5: Optimizaciones Avanzadas (Semana 2)
-  - Tarea 5.1: Implementar multi-stage build
-  - Tarea 5.2: Implementar Docker BuildKit
-  - Tarea 5.3: Implementar escaneo de vulnerabilidades
-- 📊 Resumen del plan
-- 🎯 Checklist de ejecución
-- 🔄 Comandos de rollback
-- 🚀 Comandos rápidos de verificación
+- Optimizaciones futuras (opcionales)
 
 ---
 
@@ -433,10 +387,9 @@ docs/documentar/
 ├── 10-logs.md                         # Sistema de logging
 ├── 11-indice.md                       # Este archivo
 ├── 12-diagramas.md                    # Diagramas de arquitectura
-├── 13-docker.md                       # Configuración de Docker
+├── 13-docker.md                       # Configuración de Docker (Optimizado)
 ├── 14-analisis-bugs-mejoras.md        # Análisis de bugs y mejoras
-├── 15-plan-ejecucion.md               # Plan de ejecución paso a paso
-└── 17-plan-dockerfile.md          # Plan de ejecución para Dockerfile (NUEVO)
+└── 15-plan-ejecucion.md               # Plan de ejecución paso a paso
 ```
 
 ---
@@ -567,31 +520,25 @@ docs/documentar/
                      │
                      └──→ 08-Traits
 
-└── 13-Docker ──────────┬──→ 07-Configuración
-                      │
-                      └──→ 06-Migraciones
+ └── 13-Docker ──────────┬──→ 07-Configuración
+                       │
+                       └──→ 06-Migraciones
 
-└── 14-Análisis ────────┬──→ 01-Modelos
-                      │
-                      ├──→ 02-Controladores
-                      │
-                      ├──→ 04-Middleware
-                      │
-                      ├──→ 03-Rutas
-                      │
-                      ├──→ 13-Docker
-                      │
-                      └──→ Todos los módulos (cross-reference)
+ └── 14-Análisis ────────┬──→ 01-Modelos
+                       │
+                       ├──→ 02-Controladores
+                       │
+                       ├──→ 04-Middleware
+                       │
+                       ├──→ 03-Rutas
+                       │
+                       ├──→ 13-Docker
+                       │
+                       └──→ Todos los módulos (cross-reference)
 
-└── 15-Plan ───────────┬──→ 14-Análisis (implementación)
-                      │
-                      └──→ Todos los módulos (mejoras)
-
-└── 16-Dockerfile ────┬──→ 13-Docker
-                      │
-                      ├──→ 14-Análisis (bugs y mejoras)
-                      │
-                      └──→ 01-Modelos (dependencias)
+ └── 15-Plan ───────────┬──→ 14-Análisis (implementación)
+                       │
+                       └──→ Todos los módulos (mejoras)
 ```
 
 ---
@@ -607,14 +554,12 @@ docs/documentar/
 
 ### Para Mantenimiento y Mejoras
 1. Leer `14-analisis-bugs-mejoras.md` para identificar problemas actuales
-2. Leer `16-analisis-dockerfile.md` para identificar mejoras en Docker
-3. Seguir la prioridad de solución indicada
-4. Revisar ubicación de archivos para modificación
-5. **Leer `15-plan-ejecucion.md` para ejecutar soluciones paso a paso**
-6. Implementar soluciones sugeridas siguiendo el plan
-7. **Leer `16-analisis-dockerfile.md` para optimizar Dockerfile**
-8. Marcar tareas completadas en el checklist
-9. Documentar cambios realizados
+2. Seguir la prioridad de solución indicada
+3. Revisar ubicación de archivos para modificación
+4. **Leer `15-plan-ejecucion.md` para ejecutar soluciones paso a paso**
+5. Implementar soluciones sugeridas siguiendo el plan
+6. Marcar tareas completadas en el checklist
+7. Documentar cambios realizados
 
 ### Para Debugging
 1. Consultar `10-Logs.md` para ver cómo verificar logs
@@ -652,6 +597,7 @@ docs/documentar/
 - **Al solucionar bugs** (actualizar documento 14)
 - **Al implementar mejoras** (actualizar documento 14)
 - **Al completar tareas del plan** (actualizar documento 15)
+- **Al optimizar Dockerfile** (actualizar documento 13)
 
 ### Formato de Actualización
 - Mantener la estructura existente
@@ -661,6 +607,7 @@ docs/documentar/
 - **Marcar bugs solucionados en documento 14**
 - **Documentar nuevas mejoras en documento 14**
 - **Marcar tareas completadas en documento 15**
+- **Documentar optimizaciones de Docker en documento 13**
 
 ---
 
@@ -676,6 +623,6 @@ Para más información sobre el sistema:
 ---
 
 **Última actualización:** 2026-01-18
-**Documentos:** 18 archivos
-**Total de líneas:** 9,300+ líneas
-**Total de tamaño:** ~310 KB
+**Documentos:** 16 archivos
+**Total de líneas:** 9,000+ líneas
+**Total de tamaño:** ~300 KB
