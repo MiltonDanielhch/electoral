@@ -142,7 +142,7 @@ class StorageController extends Controller
             return $original;
 
         } catch (\Throwable $th) {
-            \Log::error('Error al guardar la imagen: ' . $th->getMessage(), [
+            Log::error('Error al guardar la imagen: ' . $th->getMessage(), [
                 'file' => $file ? $file->getClientOriginalName() : 'null',
                 'folder' => $folder,
                 'trace' => $th->getTraceAsString()

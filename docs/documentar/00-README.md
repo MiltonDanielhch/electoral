@@ -119,6 +119,10 @@ php artisan optimize:clear
 
 ## Documentación Detallada
 
+### 📋 Resumen Rápido
+**Nuevo:** Consulte el `16-resumen-ejecutivo.md` para un resumen del estado actual del sistema.
+
+### 📚 Documentación Completa
 Consulte los archivos individuales en `docs/documentar/` para más detalles:
 
 - `01-modelos.md` - Modelos de datos
@@ -131,6 +135,15 @@ Consulte los archivos individuales en `docs/documentar/` para más detalles:
 - `08-traits.md` - Traits reutilizables
 - `09-bread.md` - BREAD de Voyager
 - `10-logs.md` - Sistema de logging
+
+### 🎯 Estado del Sistema
+- `14-analisis-bugs-mejoras.md` - Análisis completo del sistema (actualizado)
+- `15-plan-ejecucion.md` - Plan de ejecución (actualizado)
+
+### 🔧 Documentación Adicional
+- `11-indice.md` - Índice completo de documentación
+- `12-diagramas.md` - Diagramas de arquitectura
+- `13-docker.md` - Configuración de Docker (optimizado)
 
 ## Convenciones de Código
 
