@@ -6,6 +6,8 @@
 **Versión Laravel:** 10.x  
 **Versión PHP:** 8.2+  
 **Framework Admin:** TCG Voyager 1.7+  
+**Versión del Sistema:** 1.2.0  
+**Última Actualización:** 2026-01-18  
 
 ## Descripción General
 
@@ -78,7 +80,7 @@ electoral/
 
 ### 5. Seguridad y Control
 - Middleware personalizados para autenticación y autorización
-- Sistema de licencias integrado
+- Sistema de configuración flexible
 - Modo mantenimiento
 - Control de acceso por roles
 - Verificación de permisos BREAD
@@ -158,7 +160,7 @@ Consulte los archivos individuales en `docs/documentar/` para más detalles:
 1. El sistema usa soft deletes en múltiples modelos
 2. Se registra automáticamente el usuario y rol que crea/elimina registros
 3. Las imágenes se almacenan en formato AVIF optimizado
-4. El sistema tiene integración con un sistema de licencias externo
+4. El sistema tiene configuración flexible para mantenimiento y desarrollo
 5. Los logs de HTTP se almacenan en un canal separado
 
 ## Soporte y Contacto

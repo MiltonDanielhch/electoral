@@ -45,7 +45,7 @@
 El Sistema Electoral es una aplicación web completa para la gestión electoral construida sobre Laravel 10.x con el panel de administración TCG Voyager. El sistema permite gestionar personas, usuarios, roles y permisos con funcionalidades avanzadas de registro, auditoría y eliminación de registros.
 
 ### Versión Actual
-- **Versión:** 1.1.0
+- **Versión:** 1.2.0
 - **Estado:** ✅ Producción Listo
 - **Última actualización:** 2026-01-18
 
@@ -265,9 +265,7 @@ DB_HOST=host.docker.internal
 ```bash
 docker-compose up -d
 ```
-```bash
-docker exec -it electoral-app composer install
-
+```bashs
 docker exec -it electoral-app php artisan example:install
 ```
 

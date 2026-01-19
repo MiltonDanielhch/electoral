@@ -15,8 +15,7 @@
 ├─────────────────────────────────────────────────────────────────┤
 │  1. Authenticate       → Verifica si usuario está autenticado    │
 │  2. Loggin             → Registra petición en logs               │
-│  3. System             → Verifica mantenimiento, desarrollo,     │
-│                         licencias                                 │
+│  3. System             → Verifica mantenimiento, desarrollo      │
 └────────────────────────┬────────────────────────────────────────┘
                          │
                          │ Si todo OK
@@ -423,18 +422,7 @@ PersonController@list() → Filtra por "Juan" → Retorna resultados
 │      - Sí → Solo admins                                         │
 │      - No → Continuar                                            │
 │                                                                  │
-│   4. Verificar licencia                                          │
-│      - $controller = new SolucionDigitalController()            │
-│      - $data = $controller->settings_code()                      │
-│      - $payment = new Controller()                              │
-│      - $status = $payment->payment_alert()                      │
-│                                                                  │
-│      Si $status === 'finalizado':                               │
-│        - Bloquear métodos: POST, PUT, PATCH, DELETE             │
-│        - Permitir rutas: login, logout, settings                │
-│        - Redirigir con mensaje de error                          │
-│                                                                  │
-│   5. Continuar a controlador                                     │
+│   4. Continuar a controlador                                     │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -522,9 +510,7 @@ PersonController@list() → Filtra por "Juan" → Retorna resultados
 
 4. **AJAX:** Los listados usan AJAX para cargar datos sin recargar la página.
 
-5. **Licencias:** El sistema verifica el estado de licencia en cada petición vía middleware System.
-
-6. **Logs:** El middleware Loggin registra todas las peticiones HTTP en el canal requests.
+5. **Logs:** El middleware Loggin registra todas las peticiones HTTP en el canal requests.
 
 7. **Soft Deletes:** Las eliminaciones son lógicas (soft deletes), no físicas.
 

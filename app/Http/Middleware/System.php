@@ -5,8 +5,6 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\SolucionDigitalController;
-use App\Http\Controllers\Controller;
 
 class System
 {
@@ -39,31 +37,7 @@ class System
             }
         }
 
-        // 4. Lógica de licencia (solo si hay datos)
-        $controller = new SolucionDigitalController();
-        $data = $controller->settings_code();
-
-        if ($data) {
-            $payment = new Controller();
-            if ($payment->payment_alert() === 'finalizado') {
-                $blockedMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
-                $allowedRoutes  = ['admin/login', 'admin/logout', 'admin/settings'];
-
-                if (
-                    in_array($request->method(), $blockedMethods) &&
-                    !in_array($request->path(), $allowedRoutes)
-                ) {
-                    return redirect()->back()
-                        ->withInput()
-                        ->with([
-                            'message' => 'Para continuar con el servicio sin interrupciones, contacte al administrador.',
-                            'alert-type' => 'error'
-                        ]);
-                }
-            }
-        }
-
-        // 5. Si todo está bien, continuar
+        // 4. Si todo está bien, continuar
         return $next($request);
     }
 }

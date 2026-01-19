@@ -202,12 +202,6 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-### Base de Datos Externa (Licencias)
-```bash
-# Configuración para conexión a BD de licencias
-# Esta configuración se debe agregar manualmente si es necesaria
-```
-
 ### Sistema de Archivos
 ```bash
 FILESYSTEM_DISK=public
@@ -250,49 +244,7 @@ setting('system.development')
 #### Código de Sistema (Licencia)
 ```php
 setting('system.code-system')
-// Código único del sistema para verificación de licencia
-```
-
----
-
-## Configuración de Licencias (Externa)
-
-### Conexión a BD Externa
-
-El sistema se conecta a una base de datos externa para verificar licencias:
-
-**Uso en `SolucionDigitalController`:**
-```php
-return DB::connection('solucionDigital')
-         ->table('web_systems')
-         ->where('code', setting('system.code-system'))
-         ->first();
-```
-
-**Configuración requerida en `.env` (ejemplo):**
-```bash
-DB_SOLUCION_DIGITAL_CONNECTION=mysql_solucion
-DB_SOLUCION_DIGITAL_HOST=external-host.com
-DB_SOLUCION_DIGITAL_PORT=3306
-DB_SOLUCION_DIGITAL_DATABASE=licencias_db
-DB_SOLUCION_DIGITAL_USERNAME=lic_user
-DB_SOLUCION_DIGITAL_PASSWORD=lic_password
-```
-
-**En `config/database.php`:**
-```php
-'connections' => [
-    // ... otras conexiones ...
-    'solucionDigital' => [
-        'driver' => 'mysql',
-        'host' => env('DB_SOLUCION_DIGITAL_HOST', '127.0.0.1'),
-        'port' => env('DB_SOLUCION_DIGITAL_PORT', '3306'),
-        'database' => env('DB_SOLUCION_DIGITAL_DATABASE'),
-        'username' => env('DB_SOLUCION_DIGITAL_USERNAME'),
-        'password' => env('DB_SOLUCION_DIGITAL_PASSWORD'),
-        // ... otras opciones ...
-    ],
-]
+// Código único del sistema
 ```
 
 ---
@@ -406,14 +358,12 @@ php artisan config:show
 
 4. **Almacenamiento Público:** Las imágenes se sirven a través del enlace simbólico `public/storage`.
 
-5. **BD Externa:** La verificación de licencias requiere conexión a BD externa configurada en `config/database.php`.
+5. **Imágenes AVIF:** El sistema convierte todas las imágenes a AVIF para optimización de tamaño.
 
-6. **Imágenes AVIF:** El sistema convierte todas las imágenes a AVIF para optimización de tamaño.
+6. **Multilenguaje:** El multilenguaje de Voyager está desactivado por defecto.
 
-7. **Multilenguaje:** El multilenguaje de Voyager está desactivado por defecto.
+7. **Soft Deletes:** Configurado en nivel de modelo, no en config.
 
-8. **Soft Deletes:** Configurado en nivel de modelo, no en config.
+8. **Middleware de Sistema:** El middleware `System` usa settings para controlar mantenimiento y desarrollo.
 
-9. **Middleware de Sistema:** El middleware `System` usa settings para controlar mantenimiento y desarrollo.
-
-10. **Logs de Compass:** Se excluyen logs de `/admin/compass` para evitar bucles infinitos.
+9. **Logs de Compass:** Se excluyen logs de `/admin/compass` para evitar bucles infinitos.

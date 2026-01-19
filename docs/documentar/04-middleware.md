@@ -102,7 +102,7 @@ Para configurar el canal, ver `config/logging.php`:
 
 **Archivo:** `app/Http/Middleware/System.php`
 
-**Propósito:** Controlar acceso al sistema según mantenimiento, modo desarrollo y estado de licencia.
+**Propósito:** Controlar acceso al sistema según mantenimiento y modo desarrollo.
 
 ### Funcionalidad
 
@@ -136,31 +136,7 @@ public function handle(Request $request, Closure $next)
         }
     }
 
-    // 4. Lógica de licencia
-    $controller = new SolucionDigitalController();
-    $data = $controller->settings_code();
-
-    if ($data) {
-        $payment = new Controller();
-        if ($payment->payment_alert() === 'finalizado') {
-            $blockedMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
-            $allowedRoutes  = ['admin/login', 'admin/logout', 'admin/settings'];
-
-            if (
-                in_array($request->method(), $blockedMethods) &&
-                !in_array($request->path(), $allowedRoutes)
-            ) {
-                return redirect()->back()
-                    ->withInput()
-                    ->with([
-                        'message' => 'Para continuar con el servicio sin interrupciones, contacte al administrador.',
-                        'alert-type' => 'error'
-                    ]);
-            }
-        }
-    }
-
-    // 5. Si todo está bien, continuar
+    // 4. Si todo está bien, continuar
     return $next($request);
 }
 ```
@@ -203,32 +179,6 @@ setting(['configuracion.maintenance' => '1']);
 setting(['system.development' => true]);
 ```
 
-### 4. Verificación de Licencia
-
-**Integración:** `SolucionDigitalController` → `Controller@payment_alert()`
-
-**Lógica:**
-1. Obtiene datos de licencia de BD externa
-2. Verifica estado de pago
-3. Si la licencia está **finalizada**:
-   - Bloquea métodos: `POST`, `PUT`, `PATCH`, `DELETE`
-   - Permite rutas: `login`, `logout`, `settings`
-   - Redirige con mensaje de error
-4. Si la licencia está **vigente**: Permite acceso normal
-
-**Mensaje de error:**
-```
-"Para continuar con el servicio sin interrupciones, contacte al administrador."
-```
-
-### Estados de Licencia
-
-Ver `02-controladores.md` → `Controller@payment_alert()`:
-- `'finalizado'` - Licencia vencida
-- `0-3` - Días restantes (si <= 3)
-- `'vigente'` - Sistema activo
-- `null` - Sin configuración o demo
-
 ---
 
 ## Registro de Middlewares
@@ -268,10 +218,9 @@ Para una petición típica:
    - No modifica la petición
 
 3. **System** (`\App\Http\Middleware\System::class`)
-   - Verifica mantenimiento
-   - Verifica modo desarrollo
-   - Verifica licencia
-   - Puede bloquear la petición
+    - Verifica mantenimiento
+    - Verifica modo desarrollo
+    - Puede bloquear la petición
 
 4. **Controlador**
    - Ejecuta la lógica del controlador
@@ -317,14 +266,7 @@ Resultado:
 - Solo admins pueden acceder
 - Útil para pruebas sin afectar usuarios
 
-### 3. Licencia Vencida
-
-Si `Controller@payment_alert()` retorna `'finalizado'`:
-- Se bloquean peticiones POST, PUT, PATCH, DELETE
-- Solo GET permitido en rutas excepto login, logout, settings
-- Se muestra mensaje de contacto con administrador
-
-### 4. Ver Logs de Auditoría
+### 3. Ver Logs de Auditoría
 
 ```bash
 tail -f storage/logs/requests-2026-01-18.log
@@ -345,16 +287,14 @@ Formato del log:
 
 3. **Logs de Compass:** Se excluyen logs de `/admin/compass` para evitar bucles infinitos.
 
-4. **Soft Deletes:** Los middlewares no impiden soft deletes, solo bloquean peticiones cuando la licencia está vencida.
+4. **Soft Deletes:** Los middlewares no impiden soft deletes en las rutas de eliminación.
 
 5. **Rutas Abiertas:** Login, logout y assets siempre pasan sin restricciones.
 
 6. **Mantenimiento vs Desarrollo:** Son dos modos distintos con diferentes niveles de restricción.
 
-7. **Licencia Externa:** La verificación de licencia se hace contra una BD externa vía `SolucionDigitalController`.
+7. **Admin Role:** Los roles permitidos en mantenimiento son `'admin'` y `'Administrador'` (ambos).
 
-8. **Admin Role:** Los roles permitidos en mantenimiento son `'admin'` y `'Administrador'` (ambos).
+8. **IP Logging:** Se registra la IP de cada petición para auditoría completa.
 
-9. **IP Logging:** Se registra la IP de cada petición para auditoría completa.
-
-10. **Input Filtering:** En los logs se excluyen datos sensibles (password, tokens).
+9. **Input Filtering:** En los logs se excluyen datos sensibles (password, tokens).

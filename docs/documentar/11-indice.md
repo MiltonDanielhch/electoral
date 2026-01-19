@@ -61,13 +61,9 @@ Esta documentación cubre todo el sistema panel de Voyager y sus personalizacion
 - RoleController
   - list()
 - ErrorController
-  - (Pendiente de implementación)
-- SolucionDigitalController
-  - settings_code()
-  - Integración con sistema de licencias
+  - (Aún no implementados)
 - Controller Base
   - custom_authorize()
-  - payment_alert()
 - Patrones comunes
 - Notas importantes
 
@@ -107,7 +103,6 @@ Esta documentación cubre todo el sistema panel de Voyager y sus personalizacion
   - Rutas siempre abiertas
   - Modo mantenimiento
   - Modo desarrollo
-  - Verificación de licencia
 - Registro de middlewares
 - Orden de ejecución
 - Middlewares de Laravel (no modificados)
@@ -164,7 +159,6 @@ Esta documentación cubre todo el sistema panel de Voyager y sus personalizacion
 - Variables de entorno (.env)
 - Settings de Voyager
   - Mantenimiento, desarrollo, código de sistema
-- Configuración de licencias (externa)
 - Configuración de imágenes
 - Configuración de multipartes
 - Configuración de timezone, locale

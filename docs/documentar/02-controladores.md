@@ -187,19 +187,12 @@ Controlador para manejo de errores personalizados.
 
 ---
 
-### 7. SolucionDigitalController (`app/Http/Controllers/SolucionDigitalController.php`)
+### 7. ErrorController (`app/Http/Controllers/ErrorController.php`)
 
-Controlador para integración con sistema de licencias.
+Controlador para manejo de errores personalizados.
 
 **Métodos:**
-
-#### `settings_code()`
-- **Descripción:** Obtiene configuración de licencia
-- **Proceso:**
-  1. Conecta a base de datos externa `solucionDigital`
-  2. Busca registro en tabla `web_systems`
-  3. Filtra por código del sistema
-- **Retorna:** Objeto con datos de licencia o null
+- (Aún no implementados)
 
 ---
 
@@ -216,18 +209,6 @@ Controlador base con funcionalidades compartidas.
 $this->custom_authorize('browse_people');
 // Aborta con 403 si no tiene permiso
 ```
-
-#### `payment_alert()`
-- **Descripción:** Verifica estado de licencia de pago
-- **Retorna:**
-  - `'finalizado'`: Licencia vencida
-  - `0-3`: Días restantes (si <= 3)
-  - `'vigente'`: Sistema activo
-  - `null`: Sin configuración o demo
-- **Lógica:**
-  - Si es tipo "Demo", no hay restricción
-  - Compara fecha de vencimiento con fecha actual
-  - Retorna días restantes si faltan 3 o menos
 
 ---
 
@@ -293,4 +274,4 @@ Ver `03-rutas.md` para detalle completo de rutas.
 
 7. **Soft Deletes:** Las eliminaciones son lógicas (soft deletes), no físicas.
 
-8. **Sistema de Licencias:** Controller base incluye lógica para verificar estado de licencia externo.
+8. **Sistema de Autorización:** Controller base incluye método custom_authorize() para verificación de permisos.

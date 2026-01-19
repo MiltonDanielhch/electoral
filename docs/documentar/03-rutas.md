@@ -16,7 +16,7 @@ Route::prefix('admin')->middleware(['loggin', 'system'])->group(function () {
 
 **Middlewares:**
 - `loggin`: Registra todas las peticiones HTTP en logs
-- `system`: Controla acceso, mantenimiento y licencias
+- `system`: Controla acceso, mantenimiento y desarrollo
 - `auth`: Verifica autenticación (en controladores)
 
 ---
@@ -232,19 +232,12 @@ Estas incluyen:
    - Retorna error 503 para otros usuarios
 
 3. **Modo desarrollo:**
-   - Si `setting('system.development')`
-   - Solo permite acceso a admins
-   - Retorna error 503 para otros usuarios
+    - Si `setting('system.development')`
+    - Solo permite acceso a admins
+    - Retorna error 503 para otros usuarios
 
-4. **Verificación de licencia:**
-   - Obtiene datos de licencia vía `SolucionDigitalController`
-   - Si la licencia está finalizada:
-     - Bloquea métodos POST, PUT, PATCH, DELETE
-     - Permite acceso solo a: login, logout, settings
-     - Redirige con mensaje de error
-
-5. **Continuar:**
-   - Si todo está bien, permite acceso normal
+4. **Continuar:**
+    - Si todo está bien, permite acceso normal
 
 ---
 
@@ -252,7 +245,7 @@ Estas incluyen:
 
 1. `auth` - Verifica si usuario está autenticado
 2. `loggin` - Registra la petición en logs
-3. `system` - Verifica mantenimiento, desarrollo y licencia
+3. `system` - Verifica mantenimiento y desarrollo
 4. Controlador - Ejecuta la lógica del controlador
 
 ---
@@ -309,16 +302,14 @@ return redirect()->route('voyager.people.index')
 
 3. **Logs:** Se registran TODAS las peticiones (excepto compass) para auditoría.
 
-4. **Licencia:** El sistema puede bloquear acciones si la licencia está vencida.
+4. **Mantenimiento:** Se puede activar modo mantenimiento desde settings.
 
-5. **Mantenimiento:** Se puede activar modo mantenimiento desde settings.
+5. **Desarrollo:** Se puede activar modo desarrollo para solo admins.
 
-6. **Desarrollo:** Se puede activar modo desarrollo para solo admins.
+6. **AJAX:** Las rutas AJAX retornan vistas parciales o JSON para actualizaciones dinámicas sin recargar página.
 
-7. **AJAX:** Las rutas AJAX retornan vistas parciales o JSON para actualizaciones dinámicas sin recargar página.
+7. **Voyager:** Se preservan todas las rutas nativas de Voyager para compatibilidad.
 
-8. **Voyager:** Se preservan todas las rutas nativas de Voyager para compatibilidad.
+8. **Redirecciones:** La raíz `/` y `/login` redirigen a `/admin` y `/admin/login` respectivamente.
 
-9. **Redirecciones:** La raíz `/` y `/login` redirigen a `/admin` y `/admin/login` respectivamente.
-
-10. **Soft Deletes:** Las rutas de eliminación ejecutan soft deletes, no borrado físico.
+9. **Soft Deletes:** Las rutas de eliminación ejecutan soft deletes, no borrado físico.

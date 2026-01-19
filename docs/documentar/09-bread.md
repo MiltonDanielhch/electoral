@@ -158,7 +158,6 @@ DELETE /admin/users/{id}      # Delete
 **Settings del Sistema:**
 - `configuracion.maintenance` - Modo mantenimiento
 - `system.development` - Modo desarrollo
-- `system.code-system` - Código de sistema (licencia)
 
 ---
 
