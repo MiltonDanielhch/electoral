@@ -36,7 +36,7 @@
                         <div class="row">
                             <div class="col-sm-9">
                                 <div class="dataTables_length" id="dataTable_length">
-                                    <label>Mostrar <select id="select-paginate" class="form-control input-sm">
+                                    <label>Mostrar <select id="select-paginate" class="form-control input-sm" wire:model="paginate">
                                         <option value="10">10</option>
                                         <option value="25">25</option>
                                         <option value="50">50</option>
@@ -45,10 +45,12 @@
                                 </div>
                             </div>
                             <div class="col-sm-3" style="margin-bottom: 10px">
-                                <input type="text" id="input-search" placeholder="🔍 Buscar..." class="form-control" autocomplete="off">
+                                <input type="text" id="input-search" placeholder="🔍 Buscar..." class="form-control" wire:model="search" autocomplete="off">
                             </div>
                         </div>
-                        <div class="row" id="div-results" style="min-height: 120px"></div>
+                        <div class="row" id="div-results" style="min-height: 120px">
+                            <livewire:components.people.person-table />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -62,6 +64,7 @@
 
 
     </style>
+    @livewireStyles
 @stop
 
 @section('javascript')
@@ -71,11 +74,13 @@
     <script>
         var countPage = 10, order = 'id', typeOrder = 'desc';
         var timeout = null;
+        var isLoading = false;
+        
         $(document).ready(() => {
             list();
+            
             $('#input-search').on('keyup', function(e){
                 if(e.keyCode == 13) {
-                    // Cancelar el timeout del evento input si existe
                     clearTimeout(timeout);
                     list();
                 }
@@ -90,28 +95,40 @@
                 clearTimeout(timeout);
                 timeout = setTimeout(function() {
                     list();
-                }, 2000); // retardo de 2 segundos cada vez que se escribe algo en el input
+                }, 500); // Reducido de 2000ms a 500ms para mejor UX
             });
         });
+        
         function list(page = 1){
+            if(isLoading) return;
+            
+            isLoading = true;
             $('#div-results').loading({message: 'Cargando...'});
 
             let url = '{{ url("admin/people/ajax/list") }}';
             let search = $('#input-search').val() ? $('#input-search').val() : '';
 
             $.ajax({
-                // url: `${url}/${search}?paginate=${countPage}&page=${page}`,
                 url: `${url}?search=${search}&paginate=${countPage}&page=${page}`,
-
                 type: 'get',
-
+                timeout: 10000, // Timeout de 10 segundos
+                
                 success: function(result){
                     $("#div-results").html(result);
                     $('#div-results').loading('toggle');
+                },
+                
+                error: function(xhr, status, error){
+                    $('#div-results').loading('toggle');
+                    $('#div-results').html('<div class="alert alert-danger">Error al cargar los datos: ' + error + '</div>');
+                },
+                
+                complete: function(){
+                    isLoading = false;
                 }
             });
-
         }
+        
         function deleteItem(url){
             $('#delete_form').attr('action', url);
         }

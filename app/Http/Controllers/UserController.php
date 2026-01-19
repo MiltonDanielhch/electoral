@@ -27,28 +27,30 @@ class UserController extends Controller
 
     public function list()
     {
-        // $this->custom_authorize('browse_users');
         $rol_id = Auth::user()->role->id;
 
-        $search = request('search') ?? null;
-        $paginate = request('paginate') ?? 10;
+        $search = request('search');
+        $paginate = request('paginate', 10);
 
-        $data = User::with(['person'])
-            ->where(function($query) use ($search){
-                if ($search) {
-                    if (is_numeric($search)) {
-                        $query->where('id', $search);
-                    } else {
-                        $query->where('name', 'like', "%{$search}%")
-                               ->orWhere('email', 'like', "%{$search}%");
-                    }
-                }
-            })
-            ->when($rol_id != 1, function ($query) {
-                return $query->where('role_id', '!=', 1);
-            })
-            ->orderBy('id', 'DESC')
-            ->paginate($paginate);
+        $query = User::with(['person:id,first_name,paternal_surname,maternal_surname,image'])
+            ->whereNull('deleted_at');
+
+        if ($search) {
+            if (is_numeric($search)) {
+                $query->where('id', $search);
+            } else {
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            }
+        }
+
+        if ($rol_id != 1) {
+            $query->where('role_id', '!=', 1);
+        }
+
+        $data = $query->orderBy('id', 'DESC')->paginate($paginate);
 
         return view('vendor.voyager.users.list', compact('data'));
     }

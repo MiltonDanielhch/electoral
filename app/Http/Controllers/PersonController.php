@@ -22,12 +22,10 @@ class PersonController extends Controller
     }
 
    public function list()
-    {
-        // Parámetros de entrada
+     {
         $search   = request('search');
         $paginate = request('paginate', 10);
 
-        // Sub-consulta para el nombre completo
         $fullNameRaw = "TRIM(CONCAT(
             COALESCE(first_name, ''), ' ',
             COALESCE(middle_name, ''), ' ',
@@ -35,21 +33,20 @@ class PersonController extends Controller
             COALESCE(maternal_surname, '')
         ))";
 
-        // Consulta principal
-        $data = Person::query()
-            ->select('*')
+        $query = Person::query()
+            ->select('id', 'ci', 'birth_date', 'phone', 'gender', 'status', 'image', 
+                     'first_name', 'middle_name', 'paternal_surname', 'maternal_surname')
             ->selectRaw("$fullNameRaw as full_name")
-            ->when($search, function ($q) use ($search, $fullNameRaw) {
-                // Búsqueda numérica exacta (id o ci)
-                if (is_numeric($search)) {
-                    $q->where(function ($sub) use ($search) {
-                        $sub->where('id', $search)
-                            ->orWhere('ci', 'like', "%{$search}%");
-                    });
-                }
+            ->whereNull('deleted_at');
 
-                // Búsqueda textual parcial
-                $q->orWhere(function ($sub) use ($search, $fullNameRaw) {
+        if ($search) {
+            if (is_numeric($search)) {
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('id', $search)
+                        ->orWhere('ci', 'like', "%{$search}%");
+                });
+            } else {
+                $query->where(function ($sub) use ($search, $fullNameRaw) {
                     $sub->where('phone', 'like', "%{$search}%")
                         ->orWhere('first_name', 'like', "%{$search}%")
                         ->orWhere('middle_name', 'like', "%{$search}%")
@@ -57,10 +54,10 @@ class PersonController extends Controller
                         ->orWhere('maternal_surname', 'like', "%{$search}%")
                         ->orWhereRaw("{$fullNameRaw} like ?", ["%{$search}%"]);
                 });
-            })
-            ->whereNull('deleted_at')
-            ->orderByDesc('id')
-            ->paginate($paginate);
+            }
+        }
+
+        $data = $query->orderByDesc('id')->paginate($paginate);
 
         return view('administrations.people.list', compact('data'));
     }
