@@ -1,3 +1,14 @@
+<style>
+    #dataTable th {
+        background-color: #28a745 !important;
+        color: white !important;
+        border: 1px solid #1e7e34 !important;
+    }
+    #dataTable tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+
 <div class="col-md-12">
     <div class="table-responsive">
         <table id="dataTable" class="table table-bordered table-hover">
