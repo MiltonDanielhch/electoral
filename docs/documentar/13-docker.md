@@ -267,7 +267,7 @@ USER unit
 
 ### Construir la Imagen
 ```bash
-docker build -t electoral-app .
+docker build -t app .
 ```
 
 ### Construir con Versión
@@ -276,7 +276,7 @@ docker build \
   --build-arg VERSION=1.0.0 \
   --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
   --build-arg VCS_REF=$(git rev-parse --short HEAD) \
-  -t electoral:1.0.0 .
+  -t app:1.0.0 .
 ```
 
 ### Ejecutar con Docker Compose
@@ -298,7 +298,7 @@ docker-compose down -v
 ```bash
 docker run -p 8000:8000 \
   -v $(pwd)/.env:/var/www/example/.env \
-  electoral-app
+  app
 ```
 
 ### Ver Logs del Contenedor
@@ -326,13 +326,13 @@ docker exec -it <container-id> php -i | grep -E "opcache|memory_limit|upload_max
 
 ### Verificar Usuario
 ```bash
-docker run electoral-app whoami
+docker run app whoami
 # Debe mostrar: unit
 ```
 
 ### Verificar Etiquetas
 ```bash
-docker inspect electoral:1.0.0 | grep -A 10 Labels
+docker inspect app:1.0.0 | grep -A 10 Labels
 ```
 
 ---
@@ -343,7 +343,7 @@ El Dockerfile NO crea el archivo .env (por seguridad). Debe proporcionarse como 
 
 ```bash
 docker run -v $(pwd)/.env:/var/www/example/.env \
-           -p 8000:8000 electoral-app
+           -p 8000:8000 app
 ```
 
 O usar variables de entorno:
@@ -351,10 +351,10 @@ O usar variables de entorno:
 ```bash
 docker run -e APP_ENV=production \
            -e DB_HOST=mysql \
-           -e DB_DATABASE=electoral \
-           -e DB_USERNAME=electoral \
+           -e DB_DATABASE=app \
+           -e DB_USERNAME=app \
            -e DB_PASSWORD=secret \
-           -p 8000:8000 electoral-app
+           -p 8000:8000 app
 ```
 
 ---

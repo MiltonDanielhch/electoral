@@ -1,16 +1,16 @@
 # ============================================================================
-# Imagen para Sistema Electoral
+# Imagen para Panel Administrativo
 # ============================================================================
 # PHP 8.2 + NGINX Unit 1.33.0
 #
 # Uso:
-#   docker build -t electoral-app .
-#   docker run -p 8000:8000 electoral-app
+#   docker build -t app .
+#   docker run -p 8000:8000 app
 #
 # Variables de entorno:
 #   - DB_HOST: Host de la base de datos (default: mysql)
-#   - DB_DATABASE: Nombre de la base de datos (default: electoral)
-#   - DB_USERNAME: Usuario de la base de datos (default: electoral)
+#   - DB_DATABASE: Nombre de la base de datos (default: app)
+#   - DB_USERNAME: Usuario de la base de datos (default: app)
 #   - DB_PASSWORD: Contraseña de la base de datos
 #   - APP_ENV: Entorno (development|staging|production)
 # ============================================================================
@@ -28,9 +28,9 @@ ARG VCS_REF
 LABEL org.opencontainers.image.created=$BUILD_DATE \
       org.opencontainers.image.revision=$VCS_REF \
       org.opencontainers.image.version=$VERSION \
-      org.opencontainers.image.title="Sistema Electoral" \
-      org.opencontainers.image.description="Panel administrativo con Laravel + Voyager" \
-      org.opencontainers.image.vendor="Electoral"
+      org.opencontainers.image.title="Panel Administrativo" \
+      org.opencontainers.image.description="Panel administrativo genérico con Laravel + Voyager" \
+      org.opencontainers.image.vendor="Panel Admin"
 
 # ----------------------------------------------------------------------------
 # Instalar dependencias del sistema y extensiones de PHP

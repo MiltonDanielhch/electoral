@@ -1,8 +1,8 @@
-# Sistema Electoral - Documentación General
+# Panel Administrativo - Documentación General
 
 ## Información del Proyecto
 
-**Proyecto:** Sistema Electoral basado en Laravel + Voyager  
+**Proyecto:** Panel Administrativo genérico basado en Laravel + Voyager  
 **Versión Laravel:** 10.x  
 **Versión PHP:** 8.2+  
 **Framework Admin:** TCG Voyager 1.7+  
@@ -11,12 +11,12 @@
 
 ## Descripción General
 
-Este es un sistema de gestión electoral construido sobre Laravel con el panel de administración Voyager. El sistema permite gestionar personas, usuarios, roles y permisos con funcionalidades avanzadas de registro y eliminación de registros.
+Este es un panel de administración genérico construido sobre Laravel con el panel de administración Voyager. El sistema permite gestionar personas, usuarios, roles y permisos con funcionalidades avanzadas de registro y eliminación de registros.
 
 ## Estructura del Sistema
 
 ```
-electoral/
+app/
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/      # Controladores personalizados

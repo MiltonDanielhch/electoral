@@ -182,7 +182,7 @@ php artisan storage:link
 
 ### Configuración Básica
 ```bash
-APP_NAME="Sistema Electoral"
+APP_NAME="Panel Administrativo"
 APP_ENV=local
 APP_KEY=base64:...
 APP_DEBUG=true
@@ -197,7 +197,7 @@ LOG_LEVEL=debug
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=electoral
+DB_DATABASE=app
 DB_USERNAME=root
 DB_PASSWORD=
 ```

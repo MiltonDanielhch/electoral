@@ -19,9 +19,9 @@
   </a>
 </p>
 
-<h1 align="center">Sistema Electoral</h1>
+<h1 align="center">Panel Administrativo</h1>
 <p align="center">
-  Sistema de gestión electoral basado en Laravel + Voyager
+  Panel de administración genérico basado en Laravel + Voyager
 </p>
 
 ---
@@ -42,7 +42,7 @@
 
 ## 📖 Descripción
 
-El Sistema Electoral es una aplicación web completa para la gestión electoral construida sobre Laravel 10.x con el panel de administración TCG Voyager. El sistema permite gestionar personas, usuarios, roles y permisos con funcionalidades avanzadas de registro, auditoría y eliminación de registros.
+El Panel Administrativo es una aplicación web completa para la gestión de sistemas construida sobre Laravel 10.x con el panel de administración TCG Voyager. El sistema permite gestionar personas, usuarios, roles y permisos con funcionalidades avanzadas de registro, auditoría y eliminación de registros.
 
 ### Versión Actual
 - **Versión:** 1.2.0
@@ -144,8 +144,8 @@ Para un control total sobre el proceso de instalación:
 
 #### 1. Clonar el Repositorio
 ```bash
-git clone https://github.com/tu-usuario/electoral.git
-cd electoral
+git clone https://github.com/tu-usuario/app.git
+cd app
 ```
 
 #### 2. Instalar Dependencias
@@ -166,7 +166,7 @@ Editar `.env`:
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=electoral
+DB_DATABASE=app
 DB_USERNAME=tu_usuario
 DB_PASSWORD=tu_password
 ```
@@ -243,18 +243,18 @@ Crear en la raíz del proyecto:
 
 ### Construir Imagen
 ```bash
-docker build -t electoral-app .
+docker build -t app .
 ```
 
 ### Ejecutar Contenedor
 ```bash
 docker run -p 8000:8000 \
   -v $(pwd)/.env:/var/www/example/.env \
-  electoral-app
+  app
 ```
 o
 ```bash
-docker run -p 8001:8000 -v "${PWD}/.env:/var/www/example/.env" electoral-app
+docker run -p 8001:8000 -v "${PWD}/.env:/var/www/example/.env" app
 ```
 tines que poner en tu .env
 ```bash
@@ -266,14 +266,14 @@ DB_HOST=host.docker.internal
 docker-compose up -d
 ```
 ```bashs
-docker exec -it electoral-app php artisan example:install
+docker exec -it app php artisan example:install
 ```
 
 ### Variables de Entorno para Docker
 ```bash
 DB_CONNECTION=mysql
 DB_HOST=mysql
-DB_DATABASE=electoral
+DB_DATABASE=app
 DB_USERNAME=root
 DB_PASSWORD=secret
 ```

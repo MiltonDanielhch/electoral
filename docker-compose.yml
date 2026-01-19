@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: electoral-app
+    container_name: app-app
     restart: unless-stopped
     ports:
       - "8001:8000"
@@ -15,8 +15,8 @@ services:
       - APP_ENV=local
       - APP_DEBUG=true
       - DB_HOST=mysql
-      - DB_DATABASE=electoral
-      - DB_USERNAME=electoral
+      - DB_DATABASE=app
+      - DB_USERNAME=app
       - DB_PASSWORD=secret
       - CACHE_DRIVER=redis
       - QUEUE_CONNECTION=redis
@@ -27,38 +27,38 @@ services:
     entrypoint: ["/bin/sh", "-c"]
     command: ["composer install && exec /usr/local/bin/docker-entrypoint.sh unitd --no-daemon"]
     networks:
-      - electoral-net
+      - app-net
 
   mysql:
     image: mysql:8.0
-    container_name: electoral-mysql
+    container_name: app-mysql
     restart: unless-stopped
     environment:
       - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=electoral
-      - MYSQL_USER=electoral
+      - MYSQL_DATABASE=app
+      - MYSQL_USER=app
       - MYSQL_PASSWORD=secret
     volumes:
       - mysql-data:/var/lib/mysql
     ports:
       - "3308:3306"
     networks:
-      - electoral-net
+      - app-net
 
   redis:
     image: redis:alpine
-    container_name: electoral-redis
+    container_name: app-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
       - redis-data:/data
     networks:
-      - electoral-net
+      - app-net
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: electoral-phpmyadmin
+    container_name: app-phpmyadmin
     restart: unless-stopped
     ports:
       - "8083:80"
@@ -69,12 +69,12 @@ services:
     depends_on:
       - mysql
     networks:
-      - electoral-net
+      - app-net
 
 volumes:
   mysql-data:
   redis-data:
 
 networks:
-  electoral-net:
+  app-net:
     driver: bridge
