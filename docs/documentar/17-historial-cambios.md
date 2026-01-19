@@ -1,4 +1,4 @@
-# Historial de Cambios - Sistema Electoral
+# Historial de Cambios - Panel Administrativo
 
 ## Versión 1.2.0 (2026-01-18)
 

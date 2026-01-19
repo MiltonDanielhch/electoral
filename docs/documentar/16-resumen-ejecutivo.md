@@ -1,4 +1,4 @@
-# Resumen Ejecutivo - Sistema Electoral
+# Resumen Ejecutivo - Panel Administrativo
 
 ## 🎯 Estado Actual del Sistema
 
