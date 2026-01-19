@@ -138,9 +138,9 @@ ARG VCS_REF
 LABEL org.opencontainers.image.created=$BUILD_DATE \
       org.opencontainers.image.revision=$VCS_REF \
       org.opencontainers.image.version=$VERSION \
-      org.opencontainers.image.title="Sistema Electoral" \
-      org.opencontainers.image.description="Panel administrativo con Laravel + Voyager" \
-      org.opencontainers.image.vendor="Electoral"
+      org.opencontainers.image.title="Panel Administrativo" \
+      org.opencontainers.image.description="Panel administrativo genérico con Laravel + Voyager" \
+      org.opencontainers.image.vendor="Panel Admin"
 ```
 
 #### 2. Imagen Base
@@ -407,7 +407,7 @@ chmod -R 775 /var/www/example/storage
 ```bash
 # Asegúrate de pasar las variables de entorno o archivo .env
 docker run -v $(pwd)/.env:/var/www/example/.env \
-           -p 8000:8000 electoral-app
+           -p 8000:8000 app
 ```
 
 ### Error de Imagen No Carga
@@ -427,7 +427,7 @@ docker exec <container-id> php artisan storage:link
 docker logs <container-id>
 
 # Ejecutar en modo interactivo para ver errores
-docker run -it -p 8000:8000 electoral-app bash
+docker run -it -p 8000:8000 app bash
 ```
 
 ---
