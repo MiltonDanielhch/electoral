@@ -22,6 +22,8 @@
     "applications": {
         "laravel": {
             "type": "php",
+            "user": "unit",
+            "group": "unit",
             "root": "/var/www/example/public/",
             "script": "index.php"
         }

@@ -19,14 +19,18 @@ ARG VERSION=1.0.0
 ARG BUILD_DATE
 ARG VCS_REF
 
+FROM unit:1.33.0-php8.2
+
+ARG VERSION
+ARG BUILD_DATE
+ARG VCS_REF
+
 LABEL org.opencontainers.image.created=$BUILD_DATE \
       org.opencontainers.image.revision=$VCS_REF \
       org.opencontainers.image.version=$VERSION \
       org.opencontainers.image.title="Sistema Electoral" \
       org.opencontainers.image.description="Panel administrativo con Laravel + Voyager" \
       org.opencontainers.image.vendor="Electoral"
-
-FROM unit:1.33.0-php8.2
 
 # ----------------------------------------------------------------------------
 # Instalar dependencias del sistema y extensiones de PHP
@@ -123,12 +127,17 @@ COPY composer.json composer.lock ./
 # --no-interaction: No pregunta nada
 # --no-dev: No instala dependencias de desarrollo
 # ----------------------------------------------------------------------------
-RUN composer install --prefer-dist --optimize-autoloader --no-interaction --no-dev
+RUN composer install --prefer-dist --optimize-autoloader --no-interaction --no-dev --no-scripts
 
 # ----------------------------------------------------------------------------
 # Copiar el resto de archivos de la aplicación
 # ----------------------------------------------------------------------------
 COPY --chown=unit:unit . .
+
+# ----------------------------------------------------------------------------
+# Generar autoloader y ejecutar scripts (ahora que artisan existe)
+# ----------------------------------------------------------------------------
+RUN composer dump-autoload --optimize
 
 # ----------------------------------------------------------------------------
 # Permisos finales
@@ -160,13 +169,6 @@ COPY --chown=unit:unit unit.json /docker-entrypoint.d/unit.json
 # NGINX Unit escuchará en el puerto 8000
 # ----------------------------------------------------------------------------
 EXPOSE 8000
-
-# ----------------------------------------------------------------------------
-# Usuario de ejecución
-# ----------------------------------------------------------------------------
-# Ejecutar como usuario no-root por seguridad
-# ----------------------------------------------------------------------------
-USER unit
 
 # ----------------------------------------------------------------------------
 # Comando de inicio

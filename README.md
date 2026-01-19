@@ -252,10 +252,23 @@ docker run -p 8000:8000 \
   -v $(pwd)/.env:/var/www/example/.env \
   electoral-app
 ```
+o
+```bash
+docker run -p 8001:8000 -v "${PWD}/.env:/var/www/example/.env" electoral-app
+```
+tines que poner en tu .env
+```bash
+DB_HOST=host.docker.internal
+```
 
 ### Ejecutar con Docker Compose
 ```bash
 docker-compose up -d
+```
+```bash
+docker exec -it electoral-app composer install
+
+docker exec -it electoral-app php artisan example:install
 ```
 
 ### Variables de Entorno para Docker

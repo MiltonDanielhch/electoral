@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build:
@@ -8,23 +6,26 @@ services:
     container_name: electoral-app
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "8001:8000"
     volumes:
       - ./storage:/var/www/example/storage
       - ./bootstrap/cache:/var/www/example/bootstrap/cache
       - ./.env:/var/www/example/.env
     environment:
-      - APP_ENV=production
-      - APP_DEBUG=false
+      - APP_ENV=local
+      - APP_DEBUG=true
       - DB_HOST=mysql
       - DB_DATABASE=electoral
       - DB_USERNAME=electoral
       - DB_PASSWORD=secret
       - CACHE_DRIVER=redis
       - QUEUE_CONNECTION=redis
+      - REDIS_HOST=redis
     depends_on:
       - mysql
       - redis
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["composer install && exec /usr/local/bin/docker-entrypoint.sh unitd --no-daemon"]
     networks:
       - electoral-net
 
@@ -40,7 +41,7 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "3308:3306"
     networks:
       - electoral-net
 
@@ -60,7 +61,7 @@ services:
     container_name: electoral-phpmyadmin
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "8083:80"
     environment:
       - PMA_HOST=mysql
       - PMA_USER=root
