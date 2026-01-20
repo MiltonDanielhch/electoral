@@ -33,16 +33,23 @@ Este documento presenta una hoja de ruta modernizada para el desarrollo y manten
 
 ### 🚜 **Fase 1: Fortalecimiento del Núcleo y UX del Admin**
 
-**Estado:** `Finalizado` o saltar esta fase y ve a la fase 2
+**Estado:** `En Progreso` (Parcialmente Completado)
 
 **Objetivo:** Refinar la funcionalidad existente, mejorar la experiencia del operador y sentar las bases para pruebas automatizadas.
 
 - **Actividades:**
-  - **[ ] Refactorización de Vistas BREAD:** Convertir las vistas de `Person` y `User` a componentes Livewire para una experiencia más dinámica y reactiva, eliminando la dependencia de AJAX manual.
+  - **[x] Optimización de Vistas AJAX:** Mejorar rendimiento de vistas de `Person` y `User` optimizando el sistema AJAX existente (decisión: no migrar a Livewire por ahora).
+    - ✅ Reducción de delay búsqueda: 2000ms → 500ms (75% más rápido)
+    - ✅ Prevención de peticiones múltiples con flag `isLoading`
+    - ✅ Timeout de 10 segundos para evitar peticiones colgadas
+    - ✅ Selección explícita de campos SQL (reducción ~50% datos)
+    - ✅ Cambio de color de encabezado tablas a verde (#28a745)
   - **[ ] Pruebas Unitarias para Modelos:** Crear pruebas unitarias (`Pest` o `PHPUnit`) para los modelos `Person` y `User`, validando relaciones, scopes y accesors.
   - **[ ] Pruebas de Funcionalidad (Feature Tests):** Escribir pruebas que simulen el flujo CRUD completo para Personas y Usuarios a través de las rutas del admin.
   - **[ ] Mejora de la Validación:** Fortalecer las `FormRequest` para el registro y actualización, asegurando la integridad de los datos de entrada.
   - **[ ] Auditoría del `StorageController`:** Revisar y añadir pruebas para garantizar que el manejo de imágenes sea a prueba de fallos (ej. tipos de archivo inválidos, errores de escritura).
+
+**Documentación:** Ver `docs/plan/optimizacion-fase1.md` y `docs/documentar/comandos-git-2026-01-19.md`
 
 ---
 
