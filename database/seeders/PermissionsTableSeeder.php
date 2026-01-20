@@ -15,10 +15,10 @@ class PermissionsTableSeeder extends Seeder
      */
     public function run()
     {
-        
+
 
         \DB::table('permissions')->delete();
-        
+
         Permission::firstOrCreate([
             'key'        => 'browse_admin',
             'keyDescription'=>'vista de acceso al sistema',
@@ -54,7 +54,53 @@ class PermissionsTableSeeder extends Seeder
         Permission::generateFor('categories');
         Permission::generateFor('pages');
 
-        
+        $permissions = [
+            // Cargos
+            ['key' => 'browse_cargos', 'table_name' => 'cargos'],
+            ['key' => 'read_cargos', 'table_name' => 'cargos'],
+            ['key' => 'add_cargos', 'table_name' => 'cargos'],
+            ['key' => 'edit_cargos', 'table_name' => 'cargos'],
+            ['key' => 'delete_cargos', 'table_name' => 'cargos'],
+
+            // Organizaciones Políticas
+            ['key' => 'browse_organizaciones_politicas', 'table_name' => 'organizaciones_politicas'],
+            ['key' => 'read_organizaciones_politicas', 'table_name' => 'organizaciones_politicas'],
+            ['key' => 'add_organizaciones_politicas', 'table_name' => 'organizaciones_politicas'],
+            ['key' => 'edit_organizaciones_politicas', 'table_name' => 'organizaciones_politicas'],
+            ['key' => 'delete_organizaciones_politicas', 'table_name' => 'organizaciones_politicas'],
+
+            // Geografías
+            ['key' => 'browse_geografias', 'table_name' => 'geografias'],
+            ['key' => 'read_geografias', 'table_name' => 'geografias'],
+            ['key' => 'add_geografias', 'table_name' => 'geografias'],
+            ['key' => 'edit_geografias', 'table_name' => 'geografias'],
+            ['key' => 'delete_geografias', 'table_name' => 'geografias'],
+
+            // Recintos
+            ['key' => 'browse_recintos', 'table_name' => 'recintos'],
+            ['key' => 'read_recintos', 'table_name' => 'recintos'],
+            ['key' => 'add_recintos', 'table_name' => 'recintos'],
+            ['key' => 'edit_recintos', 'table_name' => 'recintos'],
+
+            // Mesas
+            ['key' => 'browse_mesas', 'table_name' => 'mesas'],
+            ['key' => 'read_mesas', 'table_name' => 'mesas'],
+            ['key' => 'add_mesas', 'table_name' => 'mesas'],
+            ['key' => 'edit_mesas', 'table_name' => 'mesas'],
+
+            // Candidatos
+            ['key' => 'browse_candidatos', 'table_name' => 'candidatos'],
+            ['key' => 'read_candidatos', 'table_name' => 'candidatos'],
+            ['key' => 'add_candidatos', 'table_name' => 'candidatos'],
+            ['key' => 'edit_candidatos', 'table_name' => 'candidatos'],
+        ];
+
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(
+                ['key' => $permission['key']],
+                $permission
+            );
+        }
 
         // Administracion
         $permissions = [
@@ -74,11 +120,11 @@ class PermissionsTableSeeder extends Seeder
             ]);
         }
 
-     
 
 
 
-        
-        
+
+
+
     }
 }

@@ -1,0 +1,60 @@
+<div class="col-md-12">
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th style="text-align: center; width: 80px;">ID</th>
+                    <th style="text-align: center;">CI</th>
+                    <th style="text-align: center;">Nombre Completo</th>
+                    <th style="text-align: center;">Partido</th>
+                    <th style="text-align: center;">Cargo</th>
+                    <th style="text-align: center;">Geografía</th>
+                    <th style="text-align: center;">Estado</th>
+                    <th style="text-align: center; width: 200px;" class="actions text-right">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($items as $candidato)
+                    <tr>
+                        <td>{{ $candidato->id_candidato }}</td>
+                        <td>{{ $candidato->ci }}</td>
+                        <td>{{ $candidato->nombre_completo }}</td>
+                        <td>{{ $candidato->partido ? $candidato->partido->sigla : '-' }}</td>
+                        <td>{{ $candidato->cargo ? $candidato->cargo->descripcion : '-' }}</td>
+                        <td>{{ $candidato->geografiaPostulacion ? $candidato->geografiaPostulacion->nombre : '-' }}</td>
+                        <td style="text-align: center;">
+                            <span class="label label-{{ $candidato->estado == 'Activo' ? 'success' : 'danger' }}">
+                                {{ $candidato->estado }}
+                            </span>
+                        </td>
+                        <td class="no-sort no-click bread-actions text-right">
+                            <a href="{{ route('admin.candidatos.edit', $candidato->id_candidato) }}" title="Editar" class="btn btn-sm btn-primary edit">
+                                <i class="voyager-edit"></i> <span class="hidden-xs hidden-sm">Editar</span>
+                            </a>
+                            <button title="Borrar" class="btn btn-sm btn-danger delete" data-id="{{ $candidato->id_candidato }}" data-toggle="modal" data-target="#delete_modal" onclick="deleteItem('{{ route('admin.candidatos.destroy', $candidato->id_candidato) }}', '{{ $candidato->nombre_completo }}')">
+                                <i class="voyager-trash"></i> <span class="hidden-xs hidden-sm">Borrar</span>
+                            </button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="8" class="text-center">No se encontraron candidatos.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="col-md-12">
+    <div class="col-md-4 text-muted">
+        @if($items->count() > 0)
+            <p class="text-muted">Mostrando del {{ $items->firstItem() }} al {{ $items->lastItem() }} de {{ $items->total() }} registros.</p>
+        @endif
+    </div>
+    <div class="col-md-8 text-right">
+        <nav class="text-right">
+            {{ $items->links() }}
+        </nav>
+    </div>
+</div>

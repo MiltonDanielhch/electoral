@@ -16,6 +16,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(VoyagerDatabaseSeeder::class);
         $this->call(UsersTableSeeder::class);
+        $this->call(CargoSeeder::class);
+        $this->call(GeografiaSeeder::class);
+        $this->call(ElectoralMenuSeeder::class);
 
         // $this->call(MenuItemsTableSeeder::class);
         // $this->call(DataTypesTableSeeder::class);
