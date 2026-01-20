@@ -10,6 +10,8 @@ class Mesa extends Model
 {
     use HasFactory, SoftDeletes;
 
+    public $timestamps = false;
+
     protected $table = 'mesas';
     protected $primaryKey = 'id_mesa';
 

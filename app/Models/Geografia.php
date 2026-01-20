@@ -9,6 +9,8 @@ class Geografia extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $table = 'geografias';
     protected $primaryKey = 'id_geografia';
 

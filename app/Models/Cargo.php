@@ -9,6 +9,8 @@ class Cargo extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $table = 'cargos';
     protected $primaryKey = 'id_cargo';
     protected $keyType = 'int';

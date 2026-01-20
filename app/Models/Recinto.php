@@ -10,6 +10,8 @@ class Recinto extends Model
 {
     use HasFactory, SoftDeletes;
 
+    public $timestamps = false;
+
     protected $table = 'recintos';
     protected $primaryKey = 'id_recinto';
 
