@@ -19,6 +19,13 @@ class DatabaseSeeder extends Seeder
         $this->call(CargoSeeder::class);
         $this->call(GeografiaSeeder::class);
         $this->call(OrganizacionPoliticaSeeder::class);
+        $this->call(RecintoSeeder::class);
+        $this->call(MesaSeeder::class);
+        $this->call(CandidatoSeeder::class);
+
+        // Opcional: Descomentar la siguiente línea para crear actas de ejemplo
+        // $this->call(ActaEscrutinioSeeder::class);
+
         $this->call(ElectoralMenuSeeder::class);
 
         // $this->call(MenuItemsTableSeeder::class);
