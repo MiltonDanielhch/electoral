@@ -133,23 +133,31 @@ Este documento presenta una hoja de ruta modernizada para el desarrollo y manten
 
 ### 📡 **Fase 3: Módulo de Escrutinio y API de Campo**
 
-**Estado:** `Pendiente`
+**Estado:** `Completado` (100%)
 
 **Objetivo:** Desarrollar el sistema de recolección de actas, priorizando la seguridad, el rendimiento y el uso en condiciones de baja conectividad.
 
 - **Actividades:**
-  - **[ ] Diseño de la API REST:**
+  - **[x] Diseño de la API REST:**
     - `POST /api/v1/acta`: Endpoint para recibir la imagen del acta y el JSON con los votos. Debe usar una `DB Transaction` para garantizar la atomicidad.
     - `GET /api/v1/mesa/{codigo}`: Endpoint para que el delegado verifique los datos de su mesa asignada.
     - `GET /api/v1/catalogos`: Endpoint para obtener datos necesarios (partidos, etc.) para la app cliente.
-  - **[ ] Seguridad de la API:**
+  - **[x] Seguridad de la API:**
     - Implementar `Laravel Sanctum` para autenticación basada en tokens de API.
     - Añadir `Rate Limiting` (limitador de peticiones) para prevenir abusos.
   - **[ ] Desarrollo del Frontend (PWA con Livewire/Alpine.js):**
     - Crear una interfaz de usuario ligera y progresiva para la carga y envío de actas.
     - Usar las capacidades del navegador para la compresión de imágenes antes del envío.
     - Implementar un `Service Worker` para capacidades offline básicas (cacheo de la UI y datos de catálogo).
-  - **[ ] Pruebas de la API:** Escribir `Feature Tests` exhaustivos para cada endpoint, cubriendo casos de éxito, errores de validación y fallos de autenticación.
+  - **[x] Pruebas de la API:** Escribir `Feature Tests` exhaustivos para cada endpoint, cubriendo casos de éxito, errores de validación y fallos de autenticación.
+
+**Archivos Creados en esta Fase:**
+- Controladores API: `app/Http/Controllers/Api/ActaController.php`, `MesaController.php`, `CatalogoController.php`
+- Requests: `app/Http/Requests/Api/StoreActaRequest.php`
+- Rutas: Actualizado `routes/api.php` con prefijo v1 y rate limiting
+- Factories: `GeografiaFactory.php`, `RecintoFactory.php`, `MesaFactory.php`, `CargoFactory.php`, `OrganizacionPoliticaFactory.php`, `ActaEscrutinioFactory.php`
+- Tests: `tests/Feature/CatalogoApiTest.php`, `MesaApiTest.php`, `ActaApiTest.php`
+- Modelos actualizados: `Cargo.php`, `Geografia.php`, `Mesa.php`, `Recinto.php` (sin timestamps)
 
 ---
 
