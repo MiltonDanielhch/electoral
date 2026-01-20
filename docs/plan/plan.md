@@ -66,11 +66,11 @@ Este documento presenta una hoja de ruta modernizada para el desarrollo y manten
         - `2026_01_18_008_create_votos_x_partido_table.php` (con trigger trg_votos_validacion)
         - `2026_01_18_009_create_auditoria_actas_table.php` (con trigger trg_auditoria_actas)
         - `2026_01_18_010_create_optimizacion_conteo_table.php` (resumen_votos, control_procesamiento, cache_resultados, evento sync_cache_backup, trigger trg_actualizar_resumen_validacion)
-  - **[x] Carga de Datos Iniciales (Seeders):**
-      - **[x]** Crear y ejecutar seeders para los catálogos principales.
-      - **[x]** **Geografía:** Cargar provincias y municipios del Beni (8 provincias, 15 municipios).
-      - **[ ]** **Organizaciones:** Pendiente - Cargar logos, siglas y colores de los partidos.
-      - **[x]** **Cargos:** Completado - Gobernador, Asambleísta Departamental, Alcalde Municipal, Concejal Municipal.
+   - **[x] Carga de Datos Iniciales (Seeders):**
+       - **[x]** Crear y ejecutar seeders para los catálogos principales.
+       - **[x]** **Geografía:** Cargar provincias y municipios del Beni (8 provincias, 15 municipios).
+       - **[x]** **Organizaciones:** Completado - 15 partidos políticos con siglas, colores y códigos TSE.
+       - **[x]** **Cargos:** Completado - Gobernador, Asambleísta Departamental, Alcalde Municipal, Concejal Municipal.
   - **[x] Adopción del Estándar CRUD:**
       - **Mandato:** Todo nuevo CRUD debe seguir estrictamente el patrón de diseño y las mejores prácticas documentadas en `docs/plan/prompts2.md`.
       - **✅ Completado:**
@@ -123,7 +123,7 @@ Este documento presenta una hoja de ruta modernizada para el desarrollo y manten
 
 **Archivos Creados en esta Fase:**
 - Migraciones: `database/migrations/2026_01_18_*.php` (10 archivos)
-- Seeders: `database/seeders/CargoSeeder.php`, `GeografiaSeeder.php`
+- Seeders: `database/seeders/CargoSeeder.php`, `GeografiaSeeder.php`, `OrganizacionPoliticaSeeder.php`
 - Trait: `app/Traits/ManagesCrud.php`
 - Modelos (9 archivos): `Cargo.php`, `OrganizacionPolitica.php`, `Geografia.php`, `Recinto.php`, `Mesa.php`, `Candidato.php`, `ActaEscrutinio.php`, `VotoXPartido.php`, `AuditoriaActa.php`, `ResumenVoto.php`
 - Requests (2 archivos): `StoreCargoRequest.php`, `UpdateCargoRequest.php`

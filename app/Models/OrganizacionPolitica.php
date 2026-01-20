@@ -9,6 +9,8 @@ class OrganizacionPolitica extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $table = 'organizaciones_politicas';
     protected $primaryKey = 'id_partido';
 
