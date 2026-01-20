@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Person;
 use App\Models\User;
+use App\Http\Requests\StorePersonRequest;
+use App\Http\Requests\UpdatePersonRequest;
 use Illuminate\Support\Facades\DB;
 
 class PersonController extends Controller
@@ -22,7 +24,7 @@ class PersonController extends Controller
     }
 
    public function list()
-     {
+      {
         $search   = request('search');
         $paginate = request('paginate', 10);
 
@@ -62,23 +64,9 @@ class PersonController extends Controller
         return view('administrations.people.list', compact('data'));
     }
 
-    public function store(Request $request)
+    public function store(StorePersonRequest $request)
     {
-        $this->custom_authorize('add_people');
-
-        $validated = $request->validate([
-            'ci' => 'required|string|regex:/^[0-9]{7,10}$/',
-            'first_name' => 'required|string|max:255',
-            'paternal_surname' => 'required|string|max:255',
-            'middle_name' => 'nullable|string|max:255',
-            'maternal_surname' => 'nullable|string|max:255',
-            'email' => 'nullable|email|unique:people|max:255',
-            'phone' => 'nullable|string|regex:/^[0-9+\s\-]{7,20}$/|max:20',
-            'gender' => 'nullable|string',
-            'birth_date' => 'nullable|date|before:today',
-            'address' => 'nullable|string|max:1000',
-            'image' => 'nullable|image|mimes:jpeg,jpg,png,bmp,webp|max:10240',
-        ]);
+        $validated = $request->validated();
 
         DB::beginTransaction();
         try {
@@ -117,23 +105,9 @@ class PersonController extends Controller
     }
 
 
-    public function update(Request $request, $id)
+    public function update(UpdatePersonRequest $request, $id)
     {
-        $this->custom_authorize('edit_people');
-
-        $validated = $request->validate([
-            'ci' => 'required|string|regex:/^[0-9]{7,10}$/|unique:people,ci,' . $id,
-            'first_name' => 'required|string|max:255',
-            'paternal_surname' => 'required|string|max:255',
-            'middle_name' => 'nullable|string|max:255',
-            'maternal_surname' => 'nullable|string|max:255',
-            'email' => 'nullable|email|unique:people,email,' . $id . ',id|max:255',
-            'phone' => 'nullable|string|regex:/^[0-9+\s\-]{7,20}$/|max:20',
-            'gender' => 'nullable|string',
-            'birth_date' => 'nullable|date|before:today',
-            'address' => 'nullable|string|max:1000',
-            'image' => 'nullable|image|mimes:jpeg,jpg,png,bmp,webp|max:10240',
-        ]);
+        $validated = $request->validated();
 
         DB::beginTransaction();
         try {

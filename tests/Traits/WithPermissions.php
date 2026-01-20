@@ -2,12 +2,8 @@
 
 namespace Tests;
 
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
-
-abstract class TestCase extends BaseTestCase
+trait WithPermissions
 {
-    use CreatesApplication;
-
     protected function createAdminUser(): \App\Models\User
     {
         $role = \TCG\Voyager\Models\Role::firstOrCreate(
@@ -19,22 +15,22 @@ abstract class TestCase extends BaseTestCase
 
         $browsePermission = \TCG\Voyager\Models\Permission::firstOrCreate(
             ['key' => 'browse_admin'],
-            ['table_name' => 'admin', 'keyDescription' => 'Browse Admin']
+            ['table_name' => 'admin', 'display_name' => 'Browse Admin']
         );
 
         $addPermission = \TCG\Voyager\Models\Permission::firstOrCreate(
             ['key' => 'add_admin'],
-            ['table_name' => 'admin', 'keyDescription' => 'Add Admin']
+            ['table_name' => 'admin', 'display_name' => 'Add Admin']
         );
 
         $editPermission = \TCG\Voyager\Models\Permission::firstOrCreate(
             ['key' => 'edit_admin'],
-            ['table_name' => 'admin', 'keyDescription' => 'Edit Admin']
+            ['table_name' => 'admin', 'display_name' => 'Edit Admin']
         );
 
         $deletePermission = \TCG\Voyager\Models\Permission::firstOrCreate(
             ['key' => 'delete_admin'],
-            ['table_name' => 'admin', 'keyDescription' => 'Delete Admin']
+            ['table_name' => 'admin', 'display_name' => 'Delete Admin']
         );
 
         $role->permissions()->sync([$browsePermission->id, $addPermission->id, $editPermission->id, $deletePermission->id]);
@@ -55,7 +51,7 @@ abstract class TestCase extends BaseTestCase
         foreach ($permissions as $perm) {
             $permission = \TCG\Voyager\Models\Permission::firstOrCreate(
                 ['key' => $perm],
-                ['table_name' => $perm, 'keyDescription' => ucfirst($perm)]
+                ['table_name' => $perm, 'display_name' => ucfirst($perm)]
             );
             $permissionIds[] = $permission->id;
         }
@@ -65,4 +61,3 @@ abstract class TestCase extends BaseTestCase
         return $user;
     }
 }
-

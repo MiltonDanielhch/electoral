@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Person;
 use App\Models\User;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,15 +17,6 @@ class UserController extends Controller
     {
         $this->middleware('auth');
     }
-
-    // public function index()
-    // {
-    //     $this->custom_authorize('browse_users');
-    //     return User::all();
-
-    // return view('vendor.voyager.users.browse');
-    // }
-
 
     public function list()
     {
@@ -55,21 +48,13 @@ class UserController extends Controller
         return view('vendor.voyager.users.list', compact('data'));
     }
 
-
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        $validated = $request->validate([
-            'person_id' => 'required|exists:people,id,deleted_at,NULL,status,1',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:8',
-            'role_id' => 'required|exists:roles,id',
-        ]);
-
         DB::beginTransaction();
         try {
             $person = Person::where('deleted_at', null)
                             ->where('status', 1)
-                            ->where('id', $validated['person_id'])
+                            ->where('id', $request->person_id)
                             ->first();
 
             if (!$person) {
@@ -77,12 +62,12 @@ class UserController extends Controller
             }
 
             User::create([
-                'person_id' => $validated['person_id'],
+                'person_id' => $request->person_id,
                 'name' => $person->first_name,
-                'role_id' => $validated['role_id'],
-                'email' => $validated['email'],
+                'role_id' => $request->role_id,
+                'email' => $request->email,
                 'avatar' => 'users/default.png',
-                'password' => bcrypt($validated['password']),
+                'password' => bcrypt($request->password),
             ]);
 
             DB::commit();
@@ -100,7 +85,7 @@ class UserController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateUserRequest $request, $id)
     {
         DB::beginTransaction();
         try {
@@ -109,13 +94,13 @@ class UserController extends Controller
                 'status'=> $request->status?1:0,
             ]);
 
-            if($request->role_id)
+            if($request->has('role_id'))
             {
                 $user->update([
                     'role_id' => $request->role_id,
                 ]);
             }
-            if($request->password)
+            if($request->has('password'))
             {
                 $user->update([
                     'password' => bcrypt($request->password)

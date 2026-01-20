@@ -40,6 +40,11 @@ class Person extends Model
     const STATUS_INACTIVE = 0;
     const STATUS_PENDING = 2;
 
+    public function user()
+    {
+        return $this->hasOne(User::class, 'person_id');
+    }
+
     public static function getStatusLabel($status)
     {
         return match ($status) {
