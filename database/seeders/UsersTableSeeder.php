@@ -36,7 +36,7 @@ class UsersTableSeeder extends Seeder
             1 =>
             array (
                 'id' => 2,
-                'role_id' => 2,
+                'role_id' => 3,
                 'name' => 'Administrador',
                 'email' => 'admin@admin.com',
                 'avatar' => 'users/default.png',

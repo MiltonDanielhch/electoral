@@ -88,6 +88,7 @@ class PermissionRoleTableSeeder extends Seeder
             'add_candidatos',
             'edit_candidatos',
             'delete_candidatos',
+            'browse_clear-cache',
         ];
 
         $permissions = Permission::whereIn('key', $permissionKeys)->get();
