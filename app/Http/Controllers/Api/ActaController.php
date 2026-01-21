@@ -19,7 +19,8 @@ class ActaController extends Controller
         try {
             DB::beginTransaction();
 
-            $mesa = Mesa::where('codigo_tse', $request->codigo_mesa)->first();
+            $mesa = Mesa::where('codigo_tse', $request->codigo_mesa)
+                ->first(['id_mesa', 'codigo_tse', 'estado']);
 
             $fotoFrontalPath = null;
             $fotoReversoPath = null;

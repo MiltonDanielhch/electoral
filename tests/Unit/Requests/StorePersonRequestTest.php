@@ -17,9 +17,9 @@ class StorePersonRequestTest extends TestCase
         $validator = Validator::make([], $rules);
 
         $this->assertTrue($validator->fails());
-        $this->assertArrayHasKey('ci', $validator->errors()->keys());
-        $this->assertArrayHasKey('first_name', $validator->errors()->keys());
-        $this->assertArrayHasKey('paternal_surname', $validator->errors()->keys());
+        $this->assertContains('ci', $validator->errors()->keys());
+        $this->assertContains('first_name', $validator->errors()->keys());
+        $this->assertContains('paternal_surname', $validator->errors()->keys());
     }
 
     public function test_validates_ci_format()
@@ -30,7 +30,7 @@ class StorePersonRequestTest extends TestCase
         ], $rules);
 
         $this->assertTrue($validator->fails());
-        $this->assertArrayHasKey('ci', $validator->errors()->keys());
+        $this->assertContains('ci', $validator->errors()->keys());
     }
 
     public function test_validates_ci_length()
@@ -43,7 +43,7 @@ class StorePersonRequestTest extends TestCase
         ], $rules);
 
         $this->assertTrue($validator->fails());
-        $this->assertArrayHasKey('ci', $validator->errors()->keys());
+        $this->assertContains('ci', $validator->errors()->keys());
     }
 
     public function test_validates_email_format()
@@ -54,7 +54,7 @@ class StorePersonRequestTest extends TestCase
         ], $rules);
 
         $this->assertTrue($validator->fails());
-        $this->assertArrayHasKey('email', $validator->errors()->keys());
+        $this->assertContains('email', $validator->errors()->keys());
     }
 
     public function test_passes_with_valid_data()

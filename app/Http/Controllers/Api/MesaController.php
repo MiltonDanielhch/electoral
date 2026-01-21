@@ -10,9 +10,13 @@ class MesaController extends Controller
 {
     public function show($codigo)
     {
-        $mesa = Mesa::with(['recinto.geografia', 'actasEscrutinio.cargo'])
-            ->where('codigo_tse', $codigo)
-            ->first();
+        $mesa = Mesa::with([
+            'recinto:id_recinto,nombre,direccion,id_geografia',
+            'recinto.geografia:id_geografia,nombre,tipo',
+            'actasEscrutinio:id_acta,id_mesa,id_cargo,codigo_acta,estado',
+            'actasEscrutinio.cargo:id_cargo,descripcion'
+        ])->where('codigo_tse', $codigo)
+            ->first(['id_mesa', 'id_recinto', 'codigo_tse', 'estado']);
 
         if (!$mesa) {
             return response()->json([

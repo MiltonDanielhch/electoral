@@ -1,0 +1,7 @@
+parameters:
+    paths:
+        - app/Http/Controllers
+        - app/Models
+    level: 1
+    ignoreErrors:
+        - '#Unsafe usage of new static#'

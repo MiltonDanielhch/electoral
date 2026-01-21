@@ -49,7 +49,9 @@ docs/
         ├── 01-estrategia-pruebas-fase1.md    # Estrategia de pruebas
         ├── 02-preparacion-fase4.md            # Optimización y seguridad
         ├── 03-preparacion-fase5.md            # Despliegue y DevOps
-        └── 04-api-documentacion-openapi.md    # Documentación API
+        ├── 04-api-documentacion-openapi.md    # Documentación API
+        ├── fase4-pruebas-carga-resultados.md  # Resultados pruebas carga
+        └── manual-usuario.md                   # Manual de usuario completo
 ```
 
 ---

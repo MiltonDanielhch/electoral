@@ -3,31 +3,21 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-
-use Illuminate\Pagination\Paginator;   
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\URL;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Events\QueryExecuted;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
     public function register()
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
     public function boot()
     {
-
         // Detectar si estamos detrás de un proxy (como Coolify)
         if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
             URL::forceScheme('https');
@@ -36,5 +26,16 @@ class AppServiceProvider extends ServiceProvider
 
         Paginator::useBootstrap();
 
+        if (config('app.debug')) {
+            DB::listen(function (QueryExecuted $query) {
+                if ($query->time > 100) {
+                    Log::warning('Slow query detected', [
+                        'sql' => $query->sql,
+                        'bindings' => $query->bindings,
+                        'time' => $query->time . 'ms',
+                    ]);
+                }
+            });
+        }
     }
 }
