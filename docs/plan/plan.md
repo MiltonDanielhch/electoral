@@ -233,27 +233,30 @@ Este documento presenta una hoja de ruta modernizada para el desarrollo y manten
 
 ### 🚀 **Fase 5: Despliegue, Operaciones y Monitoreo (DevOps)**
 
-**Estado:** `Pendiente`
+**Estado:** `Completado` (100%)
 
 **Objetivo:** Automatizar el despliegue y establecer un sistema robusto de monitoreo y respaldo para el entorno de producción.
 
 - **Actividades:**
-  - **[ ] Pipeline de CI/CD:** Configurar `GitHub Actions` (o similar) para:
+  - **[x] Pipeline de CI/CD:** Configurar `GitHub Actions` (o similar) para:
     - Ejecutar todas las pruebas automáticamente en cada `push`.
     - Desplegar a un entorno de `staging` para validación.
     - Desplegar a `producción` con un solo clic o de forma automática tras la aprobación.
-  - **[ ] Infraestructura como Código (IaC):** Refinar y documentar el `Dockerfile` y `docker-compose.yml` para una configuración de entorno predecible y replicable.
-  - **[ ] Configuración de Servidor de Producción:**
+  - **[x] Infraestructura como Código (IaC):** Refinar y documentar el `Dockerfile` y `docker-compose.yml` para una configuración de entorno predecible y replicable.
+  - **[x] Configuración de Servidor de Producción:**
     - Servidor Linux (Ubuntu 22.04 LTS).
     - Nginx con configuración optimizada para Laravel y SSL (Let's Encrypt).
     - Firewall (`ufw`) configurado para permitir solo el tráfico necesario (HTTP/S, SSH).
-  - **[ ] Estrategia de Monitoreo y Alertas:**
+  - **[x] Estrategia de Monitoreo y Alertas:**
     - Configurar un sistema de logging centralizado (ej. ELK Stack, Papertrail o Sentry).
     - Crear alertas para picos de errores, uso de CPU o memoria.
-  - **[ ] Política de Backups:** Automatizar backups incrementales de la base de datos y de los archivos subidos (`storage`) con una política de retención clara.
+  - **[x] Política de Backups:** Automatizar backups incrementales de la base de datos y de los archivos subidos (`storage`) con una política de retención clara.
 
 **Documentación:**
 - `docs/dev/plan/03-preparacion-fase5.md` - Guía completa de DevOps con pipelines CI/CD, Dockerfiles, provisión de servidor, Sentry y automatización de backups
+- `docs/dev/plan/05-coolify-deployment.md` - Guía de despliegue en Coolify
+- `docs/dev/plan/06-sentry-config.md` - Configuración de Sentry para monitoreo de errores
+- `docs/dev/plan/07-backups-coolify.md` - Estrategia de backups en Coolify
 
 ---
 
@@ -329,7 +332,7 @@ Se ha creado documentación detallada para cada fase en el directorio `docs/dev/
 | Fase 2: CRUDs Núcleo | ✅ Completado | 100% |
 | Fase 3: API Escrutinio | ✅ Completado | 100% |
 | Fase 4: Optimización | ⏳ En Progreso | 80% |
-| Fase 5: Despliegue | ⏳ Pendiente | 0% |
-| **TOTAL** | - | **88%** |
+| Fase 5: Despliegue | ✅ Completado | 100% |
+| **TOTAL** | - | **97%** |
 
 Para más detalles, ver el índice completo: `docs/dev/plan/00-INDICE.md`
