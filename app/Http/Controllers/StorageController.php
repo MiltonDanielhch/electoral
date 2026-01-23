@@ -107,15 +107,14 @@ class StorageController extends Controller
                 '-cropped' => ['width' => 300, 'height' => 300, 'crop' => true, 'quality' => 80]
             ];
 
-            $filename = $baseName.'.'.$extension;
-            $original =  $directory.$filename;
+            $result = [];
 
             foreach ($versions as $suffix => $config) {
                 $filename = $baseName . $suffix . '.' . $extension;
                 $path = "{$directory}/{$filename}";
-                
+
                 $image = clone $originalImage;
-                
+
                 if (isset($config['crop']) && $config['crop']) {
                     $image->resize(null, $config['height'], function ($constraint) {
                         $constraint->aspectRatio();
@@ -128,7 +127,7 @@ class StorageController extends Controller
                 }
 
                 Storage::put($path, $image->encode($extension, $config['quality']));
-                // $original[$suffix ? substr($suffix, 1) : 'original'] = $path;
+                $result[$suffix] = $path;
             }
 
             // if (env('FILESYSTEM_DRIVER') == 's3') {
@@ -136,10 +135,10 @@ class StorageController extends Controller
             //         return env('AWS_ENDPOINT') . '/' . env('AWS_BUCKET') . '/' . env('AWS_ROOT') . '/' . $path;
             //     }, $original);
                 
-            //     return $original;
+            // return $original;
             // }
 
-            return $original;
+            return $result;
 
         } catch (\Throwable $th) {
             Log::error('Error al guardar la imagen: ' . $th->getMessage(), [

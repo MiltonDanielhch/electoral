@@ -27,7 +27,7 @@
                                     </ul>
                                 </div>
                             </div>
-                        </div>                        
+                        </div>
                     </div>
                 </div>
             </div>
@@ -37,9 +37,9 @@
 
 @section('content')
     @php
-        $meses = array('', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');       
+        $meses = array('', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
     @endphp
-    
+
     <div class="page-content container-fluid">
         @include('voyager::alerts')
         @include('voyager::dimmers')
@@ -155,7 +155,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="row">
             <!-- Tabla de últimos pedidos -->
             <div class="col-md-12">
@@ -286,20 +286,20 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        $(document).ready(function(){   
+        $(document).ready(function(){
             // Configuración de rangos de fecha
             $('.dropdown-menu a').click(function(e) {
                 e.preventDefault();
                 let range = $(this).data('range');
                 $('#refresh-dashboard').html('<i class="voyager-refresh"></i> Actualizando...');
-                
+
                 // Simular carga de datos
                 setTimeout(function() {
                     $('#refresh-dashboard').html('<i class="voyager-refresh"></i> Actualizar');
                     toastr.success('Datos actualizados para el período: ' + range);
                 }, 1500);
             });
-            
+
             // Datos de ejemplo
             const ventasMensualesData = {
                 labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
@@ -399,7 +399,7 @@
                     }
                 }
             };
-            
+
             const pieChartOptions = {
                 responsive: true,
                 maintainAspectRatio: false,

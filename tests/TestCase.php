@@ -37,9 +37,32 @@ abstract class TestCase extends BaseTestCase
             ['table_name' => 'admin', 'keyDescription' => 'Delete Admin']
         );
 
-        $role->permissions()->sync([$browsePermission->id, $addPermission->id, $editPermission->id, $deletePermission->id]);
+        $browseUsersPermission = \TCG\Voyager\Models\Permission::firstOrCreate(
+            ['key' => 'browse_users'],
+            ['table_name' => 'users', 'keyDescription' => 'Browse Users']
+        );
 
-        return $user;
+        $addUsersPermission = \TCG\Voyager\Models\Permission::firstOrCreate(
+            ['key' => 'add_users'],
+            ['table_name' => 'users', 'keyDescription' => 'Add Users']
+        );
+
+        $editUsersPermission = \TCG\Voyager\Models\Permission::firstOrCreate(
+            ['key' => 'edit_users'],
+            ['table_name' => 'users', 'keyDescription' => 'Edit Users']
+        );
+
+        $deleteUsersPermission = \TCG\Voyager\Models\Permission::firstOrCreate(
+            ['key' => 'delete_users'],
+            ['table_name' => 'users', 'keyDescription' => 'Delete Users']
+        );
+
+        $role->permissions()->sync([
+            $browsePermission->id, $addPermission->id, $editPermission->id, $deletePermission->id,
+            $browseUsersPermission->id, $addUsersPermission->id, $editUsersPermission->id, $deleteUsersPermission->id
+        ]);
+
+        return $user->load('role.permissions');
     }
 
     protected function createPermittedUser(array $permissions): \App\Models\User
@@ -62,7 +85,7 @@ abstract class TestCase extends BaseTestCase
 
         $role->permissions()->sync($permissionIds);
 
-        return $user;
+        return $user->load('role.permissions');
     }
 }
 

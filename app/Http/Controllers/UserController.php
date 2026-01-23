@@ -20,7 +20,8 @@ class UserController extends Controller
 
     public function list()
     {
-        $rol_id = Auth::user()->role->id;
+        $user = Auth::user();
+        $rol_id = $user->role ? $user->role->id : null;
 
         $search = request('search');
         $paginate = request('paginate', 10);
@@ -61,9 +62,11 @@ class UserController extends Controller
                 throw new \Exception('La persona seleccionada no existe o no está activa.');
             }
 
+            $fullName = trim($person->first_name . ' ' . $person->paternal_surname);
+
             User::create([
                 'person_id' => $request->person_id,
-                'name' => $person->first_name,
+                'name' => $fullName,
                 'role_id' => $request->role_id,
                 'email' => $request->email,
                 'avatar' => 'users/default.png',

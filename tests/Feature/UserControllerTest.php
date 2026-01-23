@@ -317,7 +317,10 @@ class UserControllerTest extends TestCase
 
     public function test_store_uses_person_name_as_user_name()
     {
-        $person = Person::factory()->active()->create(['first_name' => 'Pedro']);
+        $person = Person::factory()->active()->create([
+            'first_name' => 'Pedro',
+            'paternal_surname' => 'Garcia'
+        ]);
 
         $userData = [
             'person_id' => $person->id,
@@ -331,17 +334,19 @@ class UserControllerTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'person_id' => $person->id,
-            'name' => 'Pedro',
+            'email' => 'pedro@example.com',
+            'name' => 'Pedro Garcia',
         ]);
     }
 
     public function test_store_sets_default_avatar()
     {
         $person = Person::factory()->active()->create();
+        $email = 'user@example.com';
 
         $userData = [
             'person_id' => $person->id,
-            'email' => 'user@example.com',
+            'email' => $email,
             'password' => 'password123',
             'role_id' => 2,
         ];
@@ -351,6 +356,7 @@ class UserControllerTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'person_id' => $person->id,
+            'email' => $email,
             'avatar' => 'users/default.png',
         ]);
     }
