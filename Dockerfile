@@ -118,6 +118,8 @@ RUN mkdir -p /var/www/example/storage \
 # 3. Resto de archivos
 # ----------------------------------------------------------------------------
 COPY composer.json composer.lock ./
+# COPY composer.json composer.lock ./
+COPY composer.json ./
 
 # ----------------------------------------------------------------------------
 # Instalar dependencias de Composer
