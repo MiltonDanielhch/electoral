@@ -8,8 +8,72 @@ services:
     ports:
       - "8006:8000"
     volumes:
-      - ./storage:/var/www/example/storage
-      - ./bootstrap/cache:/var/www/example/bootstrap/cache
+      # Solo volúmenes nombrados para persistencia, NO bind mounts de código
+      - storage-data:/var/www/electoral/storage
+      - cache-data:/var/www/electoral/bootstrap/cache
+    environment:
+      - APP_ENV=${APP_ENV:-production}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - DB_HOST=mysql
+      - DB_DATABASE=${DB_DATABASE:-electoral}
+      - DB_USERNAME=${DB_USERNAME:-electoral}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - CACHE_DRIVER=redis
+      - QUEUE_CONNECTION=redis
+      - REDIS_HOST=redis
+      - SESSION_DRIVER=redis
+      - SESSION_LIFETIME=120
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - electoral-net
+    # NO sobrescribir entrypoint/command - dejar que el Dockerfile maneje Unit
+
+  mysql:
+    image: mysql:8.0
+    container_name: electoral-mysql
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-rootsecret}
+      - MYSQL_DATABASE=${DB_DATABASE:-electoral}
+      - MYSQL_USER=${DB_USERNAME:-electoral}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-secret}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3308:3306"
+    networks:
+      - electoral-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootsecret}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: electoral-redis
+    restart: unless-stopped
+    networks:
+      - electoral-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Opcional: Queue Worker para Laravel
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: electoral-queue
+    restart: unless-stopped
+    command: ["php", "artisan", "queue:work", "--sleep=3", "--tries=3", "--max-time=3600"]
     environment:
       - APP_ENV=${APP_ENV:-production}
       - APP_DEBUG=${APP_DEBUG:-false}
@@ -23,44 +87,34 @@ services:
     depends_on:
       - mysql
       - redis
-    entrypoint: ["/bin/sh", "-c"]
-    command:
-      - |
-        # Purga de archivos que causan el error Collision
-        rm -rf bootstrap/cache/*.php
-
-        # Sintonía de permisos en caliente
-        chown -R unit:unit /var/www/example/storage /var/www/example/bootstrap/cache
-
-        # Limpieza de Laravel
-        php artisan config:clear
-        php artisan route:clear
-
-        # Ejecutar el binario original de Unit
-        exec unitd --no-daemon --control unix:/var/run/control.unit.sock
-    networks:
-      - electoral-net
-
-  mysql:
-    image: mysql:8.0
-    container_name: electoral-mysql
-    restart: unless-stopped
-    environment:
-      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-secret}
-      - MYSQL_DATABASE=${DB_DATABASE:-electoral}
-      - MYSQL_USER=${DB_USERNAME:-electoral}
-      - MYSQL_PASSWORD=${DB_PASSWORD:-secret}
     volumes:
-      - mysql-data:/var/lib/mysql
-    ports:
-      - "3308:3306"
+      - storage-data:/var/www/electoral/storage
     networks:
       - electoral-net
 
-  redis:
-    image: redis:alpine
-    container_name: electoral-redis
+  # Opcional: Scheduler para Laravel
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: electoral-scheduler
     restart: unless-stopped
+    command: ["/bin/sh", "-c", "while true; do php artisan schedule:run --no-interaction; sleep 60; done"]
+    environment:
+      - APP_ENV=${APP_ENV:-production}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - DB_HOST=mysql
+      - DB_DATABASE=${DB_DATABASE:-electoral}
+      - DB_USERNAME=${DB_USERNAME:-electoral}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - CACHE_DRIVER=redis
+      - QUEUE_CONNECTION=redis
+      - REDIS_HOST=redis
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - storage-data:/var/www/electoral/storage
     networks:
       - electoral-net
 
@@ -70,3 +124,5 @@ networks:
 
 volumes:
   mysql-data:
+  storage-data:
+  cache-data:

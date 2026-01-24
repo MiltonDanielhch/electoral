@@ -4,28 +4,44 @@
             "pass": "routes"
         }
     },
-
     "routes": [
         {
             "match": {
-                "uri": "!/index.php"
+                "uri": [
+                    "*.css",
+                    "*.js",
+                    "*.png",
+                    "*.jpg",
+                    "*.jpeg",
+                    "*.gif",
+                    "*.svg",
+                    "*.ico",
+                    "*.woff",
+                    "*.woff2",
+                    "*.ttf",
+                    "*.eot"
+                ]
             },
             "action": {
-                "share": "/var/www/example/public$uri",
-                "fallback": {
-                    "pass": "applications/laravel"
-                }
+                "share": "/var/www/electoral/public$uri"
+            }
+        },
+        {
+            "action": {
+                "pass": "applications/laravel"
             }
         }
     ],
-
     "applications": {
         "laravel": {
             "type": "php",
-            "user": "unit",
-            "group": "unit",
-            "root": "/var/www/example/public/",
-            "script": "index.php"
+            "root": "/var/www/electoral/public/",
+            "script": "index.php",
+            "processes": {
+                "max": 20,
+                "spare": 5,
+                "idle_timeout": 30
+            }
         }
     }
 }

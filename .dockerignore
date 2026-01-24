@@ -22,3 +22,4 @@ README.md
 *.md
 .editorconfig
 .phpunit.xml
+public/storage
