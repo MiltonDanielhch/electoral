@@ -25,12 +25,16 @@ services:
       - redis
     entrypoint: ["/bin/sh", "-c"]
     command:
-      - |
-        mkdir -p storage/framework/views storage/framework/cache storage/framework/sessions storage/logs bootstrap/cache
-        chown -R unit:unit storage bootstrap/cache
-        chmod -R 775 storage bootstrap/cache
-        php artisan optimize:clear
-        exec unitd --no-daemon --control unix:/var/run/control.unit.sock
+          - |
+            mkdir -p storage/framework/views storage/framework/cache storage/framework/sessions storage/logs bootstrap/cache
+            chown -R unit:unit storage bootstrap/cache
+            chmod -R 775 storage bootstrap/cache
+            # Limpieza profunda de servicios de desarrollo
+            php artisan config:clear
+            php artisan route:clear
+            php artisan package:discover --ansi
+            php artisan optimize:clear
+            exec unitd --no-daemon --control unix:/var/run/control.unit.sock
     networks:
       - electoral-net
 
