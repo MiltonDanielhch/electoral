@@ -5,8 +5,6 @@ services:
       dockerfile: Dockerfile
     container_name: electoral-app
     restart: unless-stopped
-    # Nota: Coolify suele manejar el mapeo de puertos mediante su Proxy (Traefik),
-    # pero mantenemos esto por si usas el mapeo manual.
     ports:
       - "8001:8000"
     volumes:
@@ -26,7 +24,13 @@ services:
       - mysql
       - redis
     entrypoint: ["/bin/sh", "-c"]
-    command: ["composer install && exec /usr/local/bin/docker-entrypoint.sh unitd --no-daemon"]
+    command:
+      - |
+        mkdir -p storage/framework/views storage/framework/cache storage/framework/sessions storage/logs bootstrap/cache
+        chown -R unit:unit storage bootstrap/cache
+        chmod -R 775 storage bootstrap/cache
+        php artisan optimize:clear
+        exec unitd --no-daemon --control unix:/var/run/control.unit.sock
     networks:
       - electoral-net
 
