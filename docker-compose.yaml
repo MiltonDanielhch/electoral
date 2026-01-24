@@ -5,19 +5,20 @@ services:
       dockerfile: Dockerfile
     container_name: electoral-app
     restart: unless-stopped
+    # Nota: Coolify suele manejar el mapeo de puertos mediante su Proxy (Traefik),
+    # pero mantenemos esto por si usas el mapeo manual.
     ports:
       - "8001:8000"
     volumes:
       - ./storage:/var/www/example/storage
       - ./bootstrap/cache:/var/www/example/bootstrap/cache
-      - ./.env:/var/www/example/.env
     environment:
-      - APP_ENV=local
-      - APP_DEBUG=true
+      - APP_ENV=${APP_ENV:-production}
+      - APP_DEBUG=${APP_DEBUG:-false}
       - DB_HOST=mysql
-      - DB_DATABASE=electoral
-      - DB_USERNAME=electoral
-      - DB_PASSWORD=secret
+      - DB_DATABASE=${DB_DATABASE:-electoral}
+      - DB_USERNAME=${DB_USERNAME:-electoral}
+      - DB_PASSWORD=${DB_PASSWORD:-secret}
       - CACHE_DRIVER=redis
       - QUEUE_CONNECTION=redis
       - REDIS_HOST=redis
@@ -34,10 +35,10 @@ services:
     container_name: electoral-mysql
     restart: unless-stopped
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=electoral
-      - MYSQL_USER=electoral
-      - MYSQL_PASSWORD=secret
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-secret}
+      - MYSQL_DATABASE=${DB_DATABASE:-electoral}
+      - MYSQL_USER=${DB_USERNAME:-electoral}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-secret}
     volumes:
       - mysql-data:/var/lib/mysql
     ports:
@@ -65,7 +66,7 @@ services:
     environment:
       - PMA_HOST=mysql
       - PMA_USER=root
-      - PMA_PASSWORD=root
+      - PMA_PASSWORD=${DB_PASSWORD:-secret}
     depends_on:
       - mysql
     networks:
