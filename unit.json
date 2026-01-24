@@ -7,40 +7,25 @@
     "routes": [
         {
             "match": {
-                "uri": [
-                    "*.css",
-                    "*.js",
-                    "*.png",
-                    "*.jpg",
-                    "*.jpeg",
-                    "*.gif",
-                    "*.svg",
-                    "*.ico",
-                    "*.woff",
-                    "*.woff2",
-                    "*.ttf",
-                    "*.eot"
-                ]
+                "uri": "!/index.php"
             },
             "action": {
-                "share": "/var/www/electoral/public$uri"
-            }
-        },
-        {
-            "action": {
-                "pass": "applications/laravel"
+                "share": "/var/www/electoral/public$uri",
+                "fallback": {
+                    "pass": "applications/laravel"
+                }
             }
         }
     ],
     "applications": {
         "laravel": {
             "type": "php",
-            "root": "/var/www/electoral/public/",
+            "root": "/var/www/electoral/public",
             "script": "index.php",
-            "processes": {
-                "max": 20,
-                "spare": 5,
-                "idle_timeout": 30
+            "options": {
+                "admin": {
+                    "memory_limit": "512M"
+                }
             }
         }
     }

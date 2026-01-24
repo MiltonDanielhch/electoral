@@ -6,7 +6,7 @@ services:
     container_name: electoral-app
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "8082:8000"
     environment:
       # Solo variables que NO gestiona Coolify automáticamente
       - APP_NAME=${APP_NAME:-Laravel}
@@ -14,28 +14,28 @@ services:
       - APP_DEBUG=${APP_DEBUG:-false}
       - APP_URL=${SERVICE_URL_APP:-http://localhost}
       - APP_DEMO=${APP_DEMO:-false}
-      
+
       # Base de datos
       - DB_CONNECTION=mysql
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_DATABASE=${DB_DATABASE:-electoral}
-      - DB_USERNAME=${DB_USERNAME:-electoral}
-      - DB_PASSWORD=${DB_PASSWORD:-secret}
-      
+      - DB_USERNAME=root
+      - DB_PASSWORD=${DB_ROOT_PASSWORD:-rootsecret}
+
       # Redis - solo REDIS_HOST, el resto gestiona Coolify o usa defaults
       - REDIS_HOST=redis
       - REDIS_PASSWORD=${REDIS_PASSWORD:-null}
-      
+
       # FILESYSTEM_DISK no suele gestionar Coolify
       - FILESYSTEM_DISK=local
-      
+
       # BROADCAST_DRIVER no suele gestionar Coolify
       - BROADCAST_DRIVER=log
-      
+
       # SESSION_LIFETIME no suele gestionar Coolify
       - SESSION_LIFETIME=120
-      
+
     depends_on:
       mysql:
         condition: service_healthy
@@ -57,18 +57,18 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-rootsecret}
       - MYSQL_DATABASE=${DB_DATABASE:-electoral}
-      - MYSQL_USER=${DB_USERNAME:-electoral}
-      - MYSQL_PASSWORD=${DB_PASSWORD:-secret}
+      # - MYSQL_USER=${DB_USERNAME:-electoral}
+      # - MYSQL_PASSWORD=${DB_PASSWORD:-secret}
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
       - electoral-net
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootsecret}"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 60s
 
   redis:
     image: redis:7-alpine
@@ -90,6 +90,7 @@ services:
     restart: unless-stopped
     command: ["php", "artisan", "queue:work", "--sleep=3", "--tries=3", "--max-time=3600"]
     environment:
+      - CONTAINER_ROLE=queue
       - APP_NAME=${APP_NAME:-Laravel}
       - APP_KEY=${APP_KEY}
       - APP_DEBUG=${APP_DEBUG:-false}
@@ -97,8 +98,8 @@ services:
       - DB_CONNECTION=mysql
       - DB_HOST=mysql
       - DB_DATABASE=${DB_DATABASE:-electoral}
-      - DB_USERNAME=${DB_USERNAME:-electoral}
-      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - DB_USERNAME=root
+      - DB_PASSWORD=${DB_ROOT_PASSWORD:-rootsecret}
       - REDIS_HOST=redis
       - REDIS_PASSWORD=${REDIS_PASSWORD:-null}
     depends_on:
@@ -122,8 +123,8 @@ services:
       - DB_CONNECTION=mysql
       - DB_HOST=mysql
       - DB_DATABASE=${DB_DATABASE:-electoral}
-      - DB_USERNAME=${DB_USERNAME:-electoral}
-      - DB_PASSWORD=${DB_PASSWORD:-secret}
+      - DB_USERNAME=root
+      - DB_PASSWORD=${DB_ROOT_PASSWORD:-rootsecret}
       - REDIS_HOST=redis
       - REDIS_PASSWORD=${REDIS_PASSWORD:-null}
     depends_on:

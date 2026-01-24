@@ -7,7 +7,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         pcntl opcache pdo pdo_mysql intl zip gd exif ftp bcmath mbstring \
-        tokenizer xml ctype fileinfo json openssl pcre session \
     && pecl install redis \
     && docker-php-ext-enable redis \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
@@ -42,22 +41,20 @@ RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 
 # Copiar código fuente
 COPY . .
+# COPY --from=frontend /app/public/build /var/www/electoral/public/build
 
-# Generar autoloader y optimizar
-RUN composer dump-autoload --optimize \
-    && php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache \
-    && php artisan event:cache
+# Generar autoloader
+RUN composer dump-autoload --optimize
 
-# Permisos y storage link
+# Permisos
 RUN mkdir -p storage/app/public storage/framework/cache storage/framework/sessions storage/framework/testing storage/framework/views storage/logs \
     && chown -R unit:unit /var/www/electoral \
-    && chmod -R 775 storage bootstrap/cache \
-    && php artisan storage:link
+    && chmod -R 775 storage bootstrap/cache
 
-# Configuración de Unit
+# Configuración de Unit y scripts de inicio
 COPY unit.json /docker-entrypoint.d/config.json
+COPY laravel-setup.sh /docker-entrypoint.d/laravel-setup.sh
+RUN chmod +x /docker-entrypoint.d/laravel-setup.sh
 
 EXPOSE 8000
 
