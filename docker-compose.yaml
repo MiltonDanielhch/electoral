@@ -25,16 +25,26 @@ services:
       - redis
     entrypoint: ["/bin/sh", "-c"]
     command:
-          - |
-            mkdir -p storage/framework/views storage/framework/cache storage/framework/sessions storage/logs bootstrap/cache
-            chown -R unit:unit storage bootstrap/cache
-            chmod -R 775 storage bootstrap/cache
-            # Limpieza profunda de servicios de desarrollo
-            php artisan config:clear
-            php artisan route:clear
-            php artisan package:discover --ansi
-            php artisan optimize:clear
-            exec unitd --no-daemon --control unix:/var/run/control.unit.sock
+      - |
+        # 1. Limpieza de emergencia de la caché fantasma
+        echo "Limpiando archivos de caché antiguos..."
+        rm -rf bootstrap/cache/*.php
+
+        # 2. Asegurar estructura de carpetas y permisos
+        mkdir -p storage/framework/views storage/framework/cache storage/framework/sessions storage/logs bootstrap/cache
+
+        # Ajustamos permisos de todo el proyecto para Unit
+        chown -R unit:unit /var/www/example
+        chmod -R 775 storage bootstrap/cache
+
+        # 3. Purga y Optimización de Laravel
+        php artisan config:clear
+        php artisan route:clear
+        php artisan view:clear
+        php artisan package:discover --ansi
+
+        echo "Iniciando Nginx Unit..."
+        exec unitd --no-daemon --control unix:/var/run/control.unit.sock
     networks:
       - electoral-net
 
