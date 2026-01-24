@@ -6,23 +6,36 @@ services:
     container_name: electoral-app
     restart: unless-stopped
     ports:
-      - "8006:8000"
-    volumes:
-      # Solo volúmenes nombrados para persistencia, NO bind mounts de código
-      - storage-data:/var/www/electoral/storage
-      - cache-data:/var/www/electoral/bootstrap/cache
+      - "8000:8000"
     environment:
-      - APP_ENV=${APP_ENV:-production}
+      # Solo variables que NO gestiona Coolify automáticamente
+      - APP_NAME=${APP_NAME:-Laravel}
+      - APP_KEY=${APP_KEY}
       - APP_DEBUG=${APP_DEBUG:-false}
+      - APP_URL=${SERVICE_URL_APP:-http://localhost}
+      - APP_DEMO=${APP_DEMO:-false}
+      
+      # Base de datos
+      - DB_CONNECTION=mysql
       - DB_HOST=mysql
+      - DB_PORT=3306
       - DB_DATABASE=${DB_DATABASE:-electoral}
       - DB_USERNAME=${DB_USERNAME:-electoral}
       - DB_PASSWORD=${DB_PASSWORD:-secret}
-      - CACHE_DRIVER=redis
-      - QUEUE_CONNECTION=redis
+      
+      # Redis - solo REDIS_HOST, el resto gestiona Coolify o usa defaults
       - REDIS_HOST=redis
-      - SESSION_DRIVER=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-null}
+      
+      # FILESYSTEM_DISK no suele gestionar Coolify
+      - FILESYSTEM_DISK=local
+      
+      # BROADCAST_DRIVER no suele gestionar Coolify
+      - BROADCAST_DRIVER=log
+      
+      # SESSION_LIFETIME no suele gestionar Coolify
       - SESSION_LIFETIME=120
+      
     depends_on:
       mysql:
         condition: service_healthy
@@ -30,7 +43,12 @@ services:
         condition: service_started
     networks:
       - electoral-net
-    # NO sobrescribir entrypoint/command - dejar que el Dockerfile maneje Unit
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/up"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   mysql:
     image: mysql:8.0
@@ -43,8 +61,6 @@ services:
       - MYSQL_PASSWORD=${DB_PASSWORD:-secret}
     volumes:
       - mysql-data:/var/lib/mysql
-    ports:
-      - "3308:3306"
     networks:
       - electoral-net
     healthcheck:
@@ -66,7 +82,6 @@ services:
       timeout: 3s
       retries: 5
 
-  # Opcional: Queue Worker para Laravel
   queue:
     build:
       context: .
@@ -75,24 +90,23 @@ services:
     restart: unless-stopped
     command: ["php", "artisan", "queue:work", "--sleep=3", "--tries=3", "--max-time=3600"]
     environment:
-      - APP_ENV=${APP_ENV:-production}
+      - APP_NAME=${APP_NAME:-Laravel}
+      - APP_KEY=${APP_KEY}
       - APP_DEBUG=${APP_DEBUG:-false}
+      - APP_URL=${SERVICE_URL_APP:-http://localhost}
+      - DB_CONNECTION=mysql
       - DB_HOST=mysql
       - DB_DATABASE=${DB_DATABASE:-electoral}
       - DB_USERNAME=${DB_USERNAME:-electoral}
       - DB_PASSWORD=${DB_PASSWORD:-secret}
-      - CACHE_DRIVER=redis
-      - QUEUE_CONNECTION=redis
       - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-null}
     depends_on:
       - mysql
       - redis
-    volumes:
-      - storage-data:/var/www/electoral/storage
     networks:
       - electoral-net
 
-  # Opcional: Scheduler para Laravel
   scheduler:
     build:
       context: .
@@ -101,20 +115,20 @@ services:
     restart: unless-stopped
     command: ["/bin/sh", "-c", "while true; do php artisan schedule:run --no-interaction; sleep 60; done"]
     environment:
-      - APP_ENV=${APP_ENV:-production}
+      - APP_NAME=${APP_NAME:-Laravel}
+      - APP_KEY=${APP_KEY}
       - APP_DEBUG=${APP_DEBUG:-false}
+      - APP_URL=${SERVICE_URL_APP:-http://localhost}
+      - DB_CONNECTION=mysql
       - DB_HOST=mysql
       - DB_DATABASE=${DB_DATABASE:-electoral}
       - DB_USERNAME=${DB_USERNAME:-electoral}
       - DB_PASSWORD=${DB_PASSWORD:-secret}
-      - CACHE_DRIVER=redis
-      - QUEUE_CONNECTION=redis
       - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-null}
     depends_on:
       - mysql
       - redis
-    volumes:
-      - storage-data:/var/www/electoral/storage
     networks:
       - electoral-net
 
@@ -124,5 +138,3 @@ networks:
 
 volumes:
   mysql-data:
-  storage-data:
-  cache-data:
