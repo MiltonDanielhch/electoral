@@ -6,7 +6,7 @@ services:
     container_name: electoral-app
     restart: unless-stopped
     ports:
-      - "8001:8000"
+      - "8006:8000"
     volumes:
       - ./storage:/var/www/example/storage
       - ./bootstrap/cache:/var/www/example/bootstrap/cache
