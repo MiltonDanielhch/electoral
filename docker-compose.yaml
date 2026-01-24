@@ -26,24 +26,17 @@ services:
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
-        # 1. Limpieza de emergencia de la caché fantasma
-        echo "Limpiando archivos de caché antiguos..."
+        # Purga de archivos que causan el error Collision
         rm -rf bootstrap/cache/*.php
 
-        # 2. Asegurar estructura de carpetas y permisos
-        mkdir -p storage/framework/views storage/framework/cache storage/framework/sessions storage/logs bootstrap/cache
+        # Sintonía de permisos en caliente
+        chown -R unit:unit /var/www/example/storage /var/www/example/bootstrap/cache
 
-        # Ajustamos permisos de todo el proyecto para Unit
-        chown -R unit:unit /var/www/example
-        chmod -R 775 storage bootstrap/cache
-
-        # 3. Purga y Optimización de Laravel
+        # Limpieza de Laravel
         php artisan config:clear
         php artisan route:clear
-        php artisan view:clear
-        php artisan package:discover --ansi
 
-        echo "Iniciando Nginx Unit..."
+        # Ejecutar el binario original de Unit
         exec unitd --no-daemon --control unix:/var/run/control.unit.sock
     networks:
       - electoral-net
@@ -68,32 +61,12 @@ services:
     image: redis:alpine
     container_name: electoral-redis
     restart: unless-stopped
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
     networks:
       - electoral-net
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: electoral-phpmyadmin
-    restart: unless-stopped
-    ports:
-      - "8083:80"
-    environment:
-      - PMA_HOST=mysql
-      - PMA_USER=root
-      - PMA_PASSWORD=${DB_PASSWORD:-secret}
-    depends_on:
-      - mysql
-    networks:
-      - electoral-net
-
-volumes:
-  mysql-data:
-  redis-data:
 
 networks:
   electoral-net:
     driver: bridge
+
+volumes:
+  mysql-data:
