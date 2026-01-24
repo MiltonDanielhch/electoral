@@ -1,7 +1,7 @@
 # ============================================================================
 # PHP 8.2 + NGINX Unit 1.33.0 -
 # ============================================================================
-FROM nginx/unit:1.33.0-php8.2
+FROM unit:1.33.0-php8.2
 
 # Instalar dependencias del sistema y extensiones de PHP
 RUN apt-get update && apt-get install -y \
