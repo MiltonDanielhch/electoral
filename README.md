@@ -261,176 +261,101 @@ tines que poner en tu .env
 DB_HOST=host.docker.internal
 ```
 
-### Ejecutar con Docker Compose
-```bash
-docker-compose up -d
-```
-```bashs
-docker exec -it electoral-app php artisan example:install
-```
+### Opción 1: Desarrollo Local con Docker (Recomendado)
 
-### Variables de Entorno para Docker
-```bash
-DB_CONNECTION=mysql
-DB_HOST=mysql
-DB_DATABASE=electoral
-DB_USERNAME=root
-DB_PASSWORD=secret
-```
+Sigue estos pasos para levantar el entorno completo en tu máquina local.
+
+#### Requisitos
+- Docker
+- Docker Compose
+
+#### Pasos de Instalación
+1.  **Clonar el Repositorio**
+    ```bash
+    git clone https://github.com/MiltonDanielhch/electoral.git
+    cd electoral
+    ```
+
+2.  **Configurar Entorno Local**
+    Copia el archivo de ejemplo `.env.example` a `.env`. No necesitas modificarlo para el arranque inicial, ya que `docker-compose.yaml` provee los valores por defecto.
+    ```bash
+    cp .env.example .env
+    ```
+
+3.  **Levantar los Contenedores**
+    Este comando construirá las imágenes y levantará todos los servicios (aplicación, base de datos, Redis, colas y planificador).
+    ```bash
+    docker-compose up -d --build
+    ```
+
+4.  **Ejecutar Migraciones y Seeders**
+    Una vez los contenedores estén corriendo, ejecuta las migraciones de la base de datos y los datos iniciales.
+    ```bash
+    docker exec -it electoral-app php artisan migrate:fresh --seed
+    ```
+
+5.  **Crear Usuario Administrador**
+    Crea tu usuario para acceder al panel de Voyager.
+    ```bash
+    docker exec -it electoral-app php artisan voyager:admin tu-email@ejemplo.com --create
+    ```
+
+6.  **Acceder a la Aplicación**
+    ¡Listo! Puedes acceder a la aplicación en **http://localhost:8082**.
+
+### Opción 2: Despliegue en Producción con Coolify
+
+El proyecto está preparado para un despliegue "push-to-deploy" usando Coolify.
+
+#### Requisitos
+- Un repositorio en GitHub con el código del proyecto.
+- Una instancia de Coolify configurada.
+
+#### Pasos de Despliegue
+1.  **Subir Cambios a GitHub**
+    Asegúrate de que todos tus cambios estén en la rama que vas a desplegar (ej. `main`).
+    ```bash
+    git push origin main
+    ```
+
+2.  **Crear Recurso en Coolify**
+    - En tu panel de Coolify, selecciona "Create New Resource".
+    - Elige "From Git Repository" y selecciona tu repositorio y rama.
+    - Coolify detectará automáticamente el `docker-compose.yaml` y configurará los servicios (`app`, `queue`, `scheduler`).
+
+3.  **Configurar Variables de Entorno**
+    - Ve a la pestaña "Environment Variables" de tu aplicación en Coolify.
+    - Agrega las variables necesarias para producción. Coolify gestionará las de la base de datos y Redis si los creas como servicios dependientes.
+
+    **Variables Clave para Producción:**
+    ```env
+    APP_ENV=production
+    APP_DEBUG=false
+    APP_URL=https://tu-dominio-desplegado.com
+    APP_KEY=base64:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx= # Genera una nueva con php artisan key:generate
+
+    # Drivers de Rendimiento
+    CACHE_DRIVER=redis
+    SESSION_DRIVER=redis
+    QUEUE_CONNECTION=redis
+    ```
+
+4.  **Desplegar**
+    - Haz clic en el botón "Deploy". Coolify construirá la imagen y desplegará los contenedores.
+
+5.  **Ejecutar Comandos Post-Despliegue**
+    - Una vez el despliegue sea exitoso, ve a la pestaña "Execute Command" de tu servicio `app`.
+    - Ejecuta los comandos para preparar la base de datos de producción:
+      ```bash
+      php artisan migrate --seed --force
+      php artisan storage:link
+      php artisan voyager:admin tu-admin@produccion.com --create
+      php artisan optimize
+      ```
+
+---
 
 Para más detalles, ver la [documentación completa de Docker](docs/documentar/13-docker.md).
-
----
-
-## 📚 Documentación
-
-La documentación completa del sistema está disponible en `docs/documentar/`:
-
-### 📋 Resumen Rápido
-- **[Resumen Ejecutivo](docs/documentar/16-resumen-ejecutivo.md)** - Vista rápida del estado actual del sistema
-
-### 📖 Documentación Completa
-1. **[README](docs/documentar/00-README.md)** - Documentación general del sistema
-2. **[Modelos](docs/documentar/01-modelos.md)** - Modelos de datos (Person, User)
-3. **[Controladores](docs/documentar/02-controladores.md)** - Controladores y lógica de negocio
-4. **[Rutas](docs/documentar/03-rutas.md)** - Definición de rutas del sistema
-5. **[Middleware](docs/documentar/04-middleware.md)** - Middleware personalizados (Loggin, System)
-6. **[Vistas](docs/documentar/05-vistas.md)** - Vistas personalizadas del sistema
-7. **[Migraciones](docs/documentar/06-migraciones.md)** - Estructura de base de datos
-8. **[Configuración](docs/documentar/07-configuracion.md)** - Configuraciones del sistema
-9. **[Traits](docs/documentar/08-traits.md)** - Traits reutilizables (RegistersUserEvents)
-10. **[BREAD](docs/documentar/09-bread.md)** - Sistema BREAD de Voyager
-11. **[Logs](docs/documentar/10-logs.md)** - Sistema de logging
-
-### 📊 Diagramas y Análisis
-12. **[Índice](docs/documentar/11-indice.md)** - Índice completo de documentación
-13. **[Diagramas](docs/documentar/12-diagramas.md)** - Diagramas de arquitectura
-14. **[Docker](docs/documentar/13-docker.md)** - Configuración de Docker optimizada
-
-### 🎯 Estado del Sistema
-15. **[Análisis de Bugs y Mejoras](docs/documentar/14-analisis-bugs-mejoras.md)** - Análisis completo del sistema
-16. **[Plan de Ejecución](docs/documentar/15-plan-ejecucion.md)** - Plan de ejecución y resumen final
-17. **[Historial de Cambios](docs/documentar/17-historial-cambios.md)** - Registro de modificaciones
-
----
-
-## 📊 Estado del Sistema
-
-### ✅ Versión 1.1.0 (2026-01-18)
-
-#### Bugs y Vulnerabilidades
-- ✅ **Bugs Críticos:** 0 resueltos (eran 6)
-- ✅ **Vulnerabilidades SQL:** 0 corregidas (eran 3)
-- ✅ **Errores de Sintaxis:** 0
-
-#### Seguridad
-- ✅ Sin SQL Injection
-- ✅ Validación de contraseñas (mínimo 8 caracteres)
-- ✅ Validaciones robustas en todos los controladores
-- ✅ Auditoría automática de acciones
-- ✅ Logs HTTP completos
-
-#### Funcionalidad
-- ✅ Validaciones completas con regex para CI y teléfono
-- ✅ Manejo de errores con try-catch
-- ✅ Transacciones de base de datos
-- ✅ Soft deletes con observaciones obligatorias
-
-#### Rendimiento
-- ✅ Caché de consultas frecuentes (5 minutos)
-- ✅ Imágenes optimizadas en múltiples formatos AVIF
-- ✅ Consultas optimizadas con Eloquent
-
-#### Auditoría
-- ✅ Método hasRole() en modelo User
-- ✅ Método hasPermission() en modelo User
-- ✅ Trait RegistersUserEvents para auditoría automática
-- ✅ Logs de peticiones HTTP en canal separado
-
-### 📈 Métricas de Calidad
-
-| Métrica | Antes | Después | Mejora |
-|---------|-------|---------|--------|
-| Bugs Críticos | 6 | 0 | ✅ 100% |
-| Vulnerabilidades SQL | 3 | 0 | ✅ 100% |
-| Validaciones de Datos | 0 | 8 | ✅ Nueva |
-| Caché de Consultas | 0 | 1 | ✅ Nueva |
-| Métodos de Auditoría | 0 | 2 | ✅ Nueva |
-
----
-
-## 🔧 Comandos Útiles
-
-### Verificar Sintaxis PHP
-```bash
-find app -name "*.php" -exec php -l {} \;
-```
-
-### Limpiar Caché
-```bash
-php artisan optimize:clear
-php artisan cache:clear
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
-```
-
-### Ver Logs
-```bash
-# Logs de peticiones HTTP
-tail -f storage/logs/requests-$(date +%Y-%m-%d).log
-
-# Logs generales
-tail -f storage/logs/laravel.log
-```
-
-### Verificar Migraciones
-```bash
-php artisan migrate:status
-```
-
-### Ejecutar Tests
-```bash
-php artisan test
-```
-
----
-
-## 🤝 Contribuyendo
-
-Las contribuciones son bienvenidas. Por favor, sigue estos pasos:
-
-1. Fork el repositorio
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
----
-
-## 📝 Notas Importantes
-
-1. **Soft Deletes:** El sistema usa soft deletes para mantener integridad de datos.
-2. **Auditoría:** Se registra automáticamente el usuario y rol que crea/elimina registros.
-3. **Imágenes:** Las imágenes se almacenan en formato AVIF optimizado.
-4. **Licencias:** El sistema tiene integración con un sistema de licencias externo (opcional).
-5. **Logs de HTTP:** Se almacenan en un canal separado (`requests`) para auditoría.
-6. **Docker:** El Dockerfile está completamente optimizado con NGINX Unit.
-
----
-
-## 🐛 Reportando Issues
-
-Si encuentras un bug o tienes una sugerencia, por favor:
-
-1. Revisa la [documentación](docs/documentar/)
-2. Busca issues existentes
-3. Crea un nuevo issue con:
-   - Descripción detallada del problema
-   - Pasos para reproducir
-   - Versión de PHP y Laravel
-   - Mensaje de error completo
-   - Capturas de pantalla si es aplicable
 
 ---
 

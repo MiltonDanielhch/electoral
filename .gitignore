@@ -17,3 +17,5 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+/docs/dev/plan
+/docs/plan/prompts2.md
