@@ -14,13 +14,22 @@ class UpdateCandidatoRequest extends FormRequest
 
     public function rules()
     {
-        $candidatoId = $this->route('candidato')->id_candidato;
+        // FIX: Bug del ID Huérfano - Validación defensiva si el objeto candidato es nulo
+        $candidatoId = $this->route('candidato') ? $this->route('candidato')->id_candidato : $this->id;
 
         return [
             'nombre_completo' => 'required|string|max:200',
             'ci' => ['required', 'string', 'max:20', Rule::unique('candidatos')->ignore($candidatoId, 'id_candidato')],
             'imagen' => 'nullable|image|max:2048',
-            'id_partido' => 'required|exists:organizaciones_politicas,id_partido',
+            // MEJORA: Validación de unicidad electoral compuesta (previene error SQL 23000)
+            'combinacion_unica' => [
+                Rule::unique('candidatos', 'id_partido')
+                    ->where(fn ($q) =>
+                        $q->where('id_cargo', $this->id_cargo)
+                          ->where('id_geografia_postulacion', $this->id_geografia_postulacion)
+                    )
+                    ->ignore($candidatoId, 'id_candidato')
+            ],
             'id_cargo' => 'required|exists:cargos,id_cargo',
             'id_geografia_postulacion' => 'required|exists:geografias,id_geografia',
             'estado' => ['required', 'string', Rule::in(['Activo', 'Inactivo'])],
@@ -43,6 +52,7 @@ class UpdateCandidatoRequest extends FormRequest
             'id_geografia_postulacion.exists' => 'La geografía de postulación seleccionada no existe.',
             'estado.required' => 'El estado es obligatorio.',
             'estado.in' => 'El estado seleccionado no es válido.',
+            'combinacion_unica.unique' => 'Ya existe un candidato para este partido, cargo y geografía de postulación.',
         ];
     }
 }

@@ -24,8 +24,11 @@ class CargoController extends Controller
 
     protected function applySearch(Builder $query, string $search): Builder
     {
-        return $query->where('descripcion', 'like', "%$search%")
-            ->orWhere('nivel', 'like', "%$search%");
+        $searchTerm = '%' . $search . '%';
+        return $query->where(function ($q) use ($searchTerm) {
+            $q->where('descripcion', 'like', $searchTerm)
+              ->orWhere('nivel', 'like', $searchTerm);
+        });
     }
 
     public function create()
@@ -76,7 +79,11 @@ class CargoController extends Controller
             $cargo->delete();
             return redirect()->route('admin.cargos.index')
                 ->with(['message' => 'Cargo eliminado exitosamente.', 'alert-type' => 'success']);
-        } catch (\Exception $e) {
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() == 23000) {
+                return redirect()->route('admin.cargos.index')
+                    ->with(['message' => 'No se puede eliminar: el cargo tiene registros relacionados.', 'alert-type' => 'error']);
+            }
             Log::error("Error al eliminar cargo {$cargo->id_cargo}: " . $e->getMessage());
             return redirect()->route('admin.cargos.index')
                 ->with(['message' => 'Error al eliminar el cargo.', 'alert-type' => 'error']);

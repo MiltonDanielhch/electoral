@@ -27,32 +27,24 @@
                 @forelse ($data as $item)
                 <tr>
                     <td>{{ $item->id }}</td>
-                    <td>{{ $item->ci }}{{ $item->ci_complemento ? '-' . $item->ci_complemento : '' }}</td>
+                    <td>{{ $item->ci_formatted }}</td>
                     <td>
                         <table>
                             @php
-                                $image = asset('images/default.jpg');
-                                if($item->image){
-                                    $image = $item->image
-                                        ? asset('storage/' . $item->image)
-                                        : asset('images/default.jpg');
-                                }
-                                $now = \Carbon\Carbon::now();
-                                $birthday = new \Carbon\Carbon($item->birth_date);
-                                $age = $birthday->diffInYears($now);
+                                $image = $item->image 
+                                    ? asset('storage/' . $item->image)
+                                    : asset('images/default.jpg');
                             @endphp
                             <tr>
-                                <td><img src="{{ $image }}" alt="{{ $item->first_name }} " style="width: 60px; height: 60px; border-radius: 30px; margin-right: 10px"></td>
-                                <td>
-                                    {{-- {{ strtoupper($item->first_name) }} {{ $item->middle_name??strtoupper($item->middle_name) }} {{ strtoupper($item->paternal_surname) }}  {{ strtoupper($item->maternal_surname) }} --}}
-                                    {{ strtoupper($item->full_name) }}
-                                </td>
+                                <td><img src="{{ $image }}" alt="{{ $item->full_name }}" loading="lazy" style="width: 60px; height: 60px; border-radius: 30px; margin-right: 10px; object-fit: cover;"></td>
+                                <td>{{ strtoupper($item->full_name) }}</td>
                             </tr>
                         </table>
                     </td>
                     <td style="text-align: center">
                         @if ($item->birth_date)
-                            {{ date('d/m/Y', strtotime($item->birth_date)) }} <br> <small>{{ $age }} años</small>
+                            {{ $item->birth_date->format('d/m/Y') }} <br> 
+                            <small>{{ $item->age }} años</small>
                         @else
                             Sin Datos
                         @endif
@@ -84,7 +76,7 @@
                             </a>
                         @endif
                         @if (auth()->user()->hasPermission('delete_people'))
-                            <a href="#" onclick="deleteItem('{{ route('admin.people.destroy', $item->id) }}')" title="Eliminar" data-toggle="modal" data-target="#modal-delete" class="btn btn-sm btn-danger delete">
+                            <a href="#" data-url="{{ route('admin.people.destroy', $item->id) }}" title="Eliminar" data-toggle="modal" data-target="#modal-delete" class="btn btn-sm btn-danger delete-item">
                                 <i class="voyager-trash"></i> <span class="hidden-xs hidden-sm">Eliminar</span>
                             </a>
                         @endif
@@ -92,12 +84,14 @@
                 </tr>
                 @empty
                     <tr>
-                        <td colspan="7">
-                            <h5 class="text-center" style="margin-top: 50px">
-                                <img src="{{ asset('images/empty.png') }}" width="120px" alt="" style="opacity: 0.8">
-                                <br><br>
-                                No hay resultados
-                            </h5>
+                        <td colspan="7" class="text-center" style="padding: 40px;">
+                            <div class="text-muted">
+                                <i class="voyager-search" style="font-size: 50px; margin-bottom: 10px; display: block;"></i>
+                                <p>No se encontraron personas con esos criterios.</p>
+                                <button class="btn btn-sm btn-info" onclick="$('#input-search').val('').trigger('input')">
+                                    <i class="voyager-refresh"></i> Limpiar filtros
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 @endforelse
@@ -120,17 +114,21 @@
 </div>
 
 <script>
+    // Delegación de eventos para paginación AJAX - funciona con contenido dinámico
+    $(document).off('click', '.page-link').on('click', '.page-link', function(e){
+        e.preventDefault();
+        let link = $(this).attr('href');
+        if(link){
+            let url = new URL(link);
+            let page = url.searchParams.get('page') || 1;
+            list(page);
+        }
+    });
 
-   var page = "{{ request('page') }}";
-    $(document).ready(function(){
-        $('.page-link').click(function(e){
-            e.preventDefault();
-            let link = $(this).attr('href');
-            if(link){
-                let url = new URL(link);
-                let page = url.searchParams.get('page') || 1;
-                list(page);
-            }
-        });
+    // Delegación de eventos para botón eliminar
+    $(document).off('click', '.delete-item').on('click', '.delete-item', function(e){
+        e.preventDefault();
+        let url = $(this).data('url');
+        deleteItem(url);
     });
 </script>

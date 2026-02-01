@@ -25,12 +25,7 @@
                     <tr>
                         <th>Nivel</th>
                         <td>
-                            <span class="label label-info">
-                                @if($cargo->nivel == 'D') Departamental
-                                @elseif($cargo->nivel == 'P') Provincial
-                                @else Municipal
-                                @endif
-                            </span>
+                            <span class="label label-info">{{ $cargo->nivel_texto }}</span>
                         </td>
                     </tr>
                     <tr>
@@ -52,19 +47,7 @@
                 </tbody>
             </table>
 
-            <h5 style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 20px;">Metadatos</h5>
-            <table class="table table-bordered">
-                <tbody>
-                    <tr>
-                        <th style="width: 250px;">Creado</th>
-                        <td>{{ $cargo->created_at ? $cargo->created_at->format('d/m/Y H:i') : '-' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Última Actualización</th>
-                        <td>{{ $cargo->updated_at ? $cargo->updated_at->format('d/m/Y H:i') : '-' }}</td>
-                    </tr>
-                </tbody>
-            </table>
+
         </div>
 
         <div class="panel-footer text-right">

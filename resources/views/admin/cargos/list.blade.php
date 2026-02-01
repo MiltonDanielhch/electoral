@@ -17,12 +17,7 @@
                     <td>{{ $cargo->id_cargo }}</td>
                     <td>{{ $cargo->descripcion }}</td>
                     <td style="text-align: center;">
-                        <span class="label label-info">
-                            @if($cargo->nivel == 'D') Departamental
-                            @elseif($cargo->nivel == 'P') Provincial
-                            @else Municipal
-                            @endif
-                        </span>
+                        <span class="label label-info">{{ $cargo->nivel_texto }}</span>
                     </td>
                     <td style="text-align: center;">
                         <span class="label label-{{ $cargo->tipo_acta == 'Normal' ? 'primary' : 'warning' }}">
@@ -35,20 +30,41 @@
                         </span>
                     </td>
                     <td class="no-sort no-click bread-actions text-right">
-                        <a href="{{ route('admin.cargos.show', $cargo->id_cargo) }}" title="Ver" class="btn btn-sm btn-warning view">
+                        <a href="{{ route('admin.cargos.show', $cargo->id_cargo) }}" 
+                           title="Ver" 
+                           aria-label="Ver cargo {{ $cargo->descripcion }}"
+                           class="btn btn-sm btn-warning view">
                             <i class="voyager-eye"></i> <span class="hidden-xs hidden-sm">Ver</span>
                         </a>
-                        <a href="{{ route('admin.cargos.edit', $cargo->id_cargo) }}" title="Editar" class="btn btn-sm btn-primary edit">
+                        <a href="{{ route('admin.cargos.edit', $cargo->id_cargo) }}" 
+                           title="Editar" 
+                           aria-label="Editar cargo {{ $cargo->descripcion }}"
+                           class="btn btn-sm btn-primary edit">
                             <i class="voyager-edit"></i> <span class="hidden-xs hidden-sm">Editar</span>
                         </a>
-                        <button title="Borrar" class="btn btn-sm btn-danger delete" data-id="{{ $cargo->id_cargo }}" data-toggle="modal" data-target="#delete_modal" onclick="deleteItem('{{ route('admin.cargos.destroy', $cargo->id_cargo) }}', '{{ $cargo->descripcion }}')">
+                        <button type="button"
+                                title="Borrar" 
+                                aria-label="Borrar cargo {{ $cargo->descripcion }}"
+                                class="btn btn-sm btn-danger delete" 
+                                data-toggle="modal" 
+                                data-target="#delete_modal" 
+                                data-delete-url="{{ route('admin.cargos.destroy', $cargo->id_cargo) }}"
+                                data-item-name="{{ $cargo->descripcion }}">
                             <i class="voyager-trash"></i> <span class="hidden-xs hidden-sm">Borrar</span>
                         </button>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="text-center">No se encontraron cargos.</td>
+                    <td colspan="6" class="text-center" style="padding: 30px;">
+                        <div class="text-muted">
+                            <i class="voyager-search" style="font-size: 40px;"></i>
+                            <p>No se encontraron cargos con los criterios de búsqueda.</p>
+                            <button class="btn btn-sm btn-info" onclick="$('#search').val('').trigger('input');">
+                                Limpiar búsqueda
+                            </button>
+                        </div>
+                    </td>
                 </tr>
             @endforelse
         </tbody>

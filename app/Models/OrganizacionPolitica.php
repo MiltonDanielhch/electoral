@@ -24,7 +24,8 @@ class OrganizacionPolitica extends Model
     ];
 
     protected $casts = [
-        'estado' => 'string',
+        'id_partido' => 'integer',
+        'estado'     => 'string',
     ];
 
     public function candidatos()

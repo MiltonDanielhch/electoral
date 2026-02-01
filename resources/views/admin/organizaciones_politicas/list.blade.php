@@ -44,7 +44,15 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center">No se encontraron organizaciones políticas.</td>
+                        <td colspan="7" class="text-center" style="padding: 40px;">
+                            <div class="text-muted">
+                                <i class="voyager-search" style="font-size: 50px; margin-bottom: 10px;"></i>
+                                <p>No se encontraron organizaciones políticas con esos criterios.</p>
+                                <button class="btn btn-sm btn-info" onclick="$('#search').val('').trigger('input')">
+                                    <i class="voyager-refresh"></i> Limpiar filtros
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                 @endforelse
             </tbody>

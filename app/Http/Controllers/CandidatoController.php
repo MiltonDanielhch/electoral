@@ -10,6 +10,7 @@ use App\Http\Requests\StoreCandidatoRequest;
 use App\Http\Requests\UpdateCandidatoRequest;
 use App\Traits\ManagesCrud;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -30,7 +31,16 @@ class CandidatoController extends Controller
     protected function applySearch(Builder $query, string $search): Builder
     {
         return $query->where('nombre_completo', 'like', "%$search%")
-            ->orWhere('ci', 'like', "%$search%");
+            ->orWhere('ci', 'like', "%$search%")
+            // MEJORA: Filtro Smart - Permitir buscar por sigla de partido
+            ->orWhereHas('partido', function($q) use ($search) {
+                $q->where('sigla', 'like', "%$search%")
+                  ->orWhere('nombre', 'like', "%$search%");
+            })
+            // MEJORA: También buscar por descripción de cargo
+            ->orWhereHas('cargo', function($q) use ($search) {
+                $q->where('descripcion', 'like', "%$search%");
+            });
     }
 
     public function create()
@@ -90,14 +100,17 @@ class CandidatoController extends Controller
         $data = $request->validated();
 
         try {
-            if ($request->hasFile('imagen')) {
-                if ($candidato->imagen) {
-                    Storage::disk('public')->delete($candidato->imagen);
+            // FIX: Race Condition - Envolver en transacción DB para asegurar integridad
+            DB::transaction(function() use ($request, $candidato, &$data) {
+                if ($request->hasFile('imagen')) {
+                    if ($candidato->imagen) {
+                        Storage::disk('public')->delete($candidato->imagen);
+                    }
+                    $data['imagen'] = $request->file('imagen')->store('candidatos', 'public');
                 }
-                $data['imagen'] = $request->file('imagen')->store('candidatos', 'public');
-            }
 
-            $candidato->update($data);
+                $candidato->update($data);
+            });
 
             return redirect()->route('admin.candidatos.index')
                 ->with(['message' => 'Candidato actualizado exitosamente.', 'alert-type' => 'success']);

@@ -24,6 +24,7 @@ class Cargo extends Model
 
     protected $casts = [
         'acta_unica' => 'boolean',
+        'id_cargo' => 'integer',
     ];
 
     public function candidatos()
@@ -39,5 +40,15 @@ class Cargo extends Model
     public function resumenVotos()
     {
         return $this->hasMany(ResumenVoto::class, 'id_cargo', 'id_cargo');
+    }
+
+    public function getNivelTextoAttribute(): string
+    {
+        return match($this->nivel) {
+            'D' => 'Departamental',
+            'P' => 'Provincial',
+            'M' => 'Municipal',
+            default => 'Desconocido',
+        };
     }
 }

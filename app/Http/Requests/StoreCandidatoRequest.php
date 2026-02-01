@@ -22,6 +22,14 @@ class StoreCandidatoRequest extends FormRequest
             'id_cargo' => 'required|exists:cargos,id_cargo',
             'id_geografia_postulacion' => 'required|exists:geografias,id_geografia',
             'estado' => ['required', 'string', Rule::in(['Activo', 'Inactivo'])],
+            // MEJORA: Validación de unicidad electoral compuesta (previene error SQL 23000)
+            'combinacion_unica' => [
+                Rule::unique('candidatos', 'id_partido')
+                    ->where(fn ($q) =>
+                        $q->where('id_cargo', $this->id_cargo)
+                          ->where('id_geografia_postulacion', $this->id_geografia_postulacion)
+                    )
+            ],
         ];
     }
 
@@ -41,6 +49,7 @@ class StoreCandidatoRequest extends FormRequest
             'id_geografia_postulacion.exists' => 'La geografía de postulación seleccionada no existe.',
             'estado.required' => 'El estado es obligatorio.',
             'estado.in' => 'El estado seleccionado no es válido.',
+            'combinacion_unica.unique' => 'Ya existe un candidato para este partido, cargo y geografía de postulación.',
         ];
     }
 }

@@ -19,8 +19,28 @@ class StoreRecintoRequest extends FormRequest
             'id_geografia' => 'required|exists:geografias,id_geografia',
             'nombre' => 'required|string|max:150',
             'direccion' => 'nullable|string|max:255',
-            'latitud' => 'nullable|numeric|between:-90,90',
-            'longitud' => 'nullable|numeric|between:-180,180',
+            'latitud' => [
+                'nullable',
+                'numeric',
+                'between:-90,90',
+                // Sintonía: Geofencing - Validar coordenadas dentro del Departamento del Beni
+                function ($attribute, $value, $fail) {
+                    if ($value !== null && ($value < -16.5 || $value > -10.0)) {
+                        $fail('La latitud debe estar dentro del Departamento del Beni (entre -16.50 y -10.00).');
+                    }
+                },
+            ],
+            'longitud' => [
+                'nullable',
+                'numeric',
+                'between:-180,180',
+                // Sintonía: Geofencing - Validar coordenadas dentro del Departamento del Beni
+                function ($attribute, $value, $fail) {
+                    if ($value !== null && ($value < -68.0 || $value > -60.0)) {
+                        $fail('La longitud debe estar dentro del Departamento del Beni (entre -68.00 y -60.00).');
+                    }
+                },
+            ],
         ];
     }
 

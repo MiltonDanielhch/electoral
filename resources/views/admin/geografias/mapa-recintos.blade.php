@@ -17,7 +17,7 @@
                 <div class="col-md-12">
                     <div class="alert alert-info">
                         <i class="voyager-info"></i>
-                        Mostrando <strong id="total-recintos">{{ $geografia->recintos->count() }}</strong> recintos
+                        Mostrando <strong id="total-recintos">{{ $geografia->contador_recintos }}</strong> recintos
                         en {{ $geografia->nombre }} ({{ $geografia->tipo }})
                     </div>
                 </div>
@@ -83,6 +83,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
 
         const data = await response.json();
+        
+        // Debug: Ver datos recibidos
+        console.log('Datos recibidos:', data);
+        console.log('Total recintos:', data.total);
+        console.log('Cantidad en array:', data.recintos.length);
 
         data.recintos.forEach(recinto => {
             const marker = L.marker([recinto.lat, recinto.lon], { icon: recintoIcon }).addTo(map);

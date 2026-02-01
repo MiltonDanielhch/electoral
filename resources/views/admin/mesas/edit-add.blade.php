@@ -35,19 +35,27 @@
                     @endif
 
                     <div class="row">
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-4">
                             <label for="codigo_tse">Código TSE <span class="text-danger">* (11 dígitos)</span></label>
                             <input type="text" name="codigo_tse" id="codigo_tse" class="form-control"
-                                   placeholder="Ej: 00001010001" maxlength="11"
+                                   placeholder="Ej: 00001010001" maxlength="11" pattern="[0-9]{11}"
                                    value="{{ old('codigo_tse', $mesa->codigo_tse) }}" required>
-                            <small class="text-muted">Debe contener exactamente 11 números para cumplir la sintonía del sistema.</small>
+                            <small class="text-muted">Debe contener exactamente 11 números.</small>
                         </div>
 
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-4">
                             <label for="numero_mesa">Número de Mesa <span class="text-danger">*</span></label>
                             <input type="number" name="numero_mesa" id="numero_mesa" class="form-control"
                                    min="1" placeholder="Ej: 1"
                                    value="{{ old('numero_mesa', $mesa->numero_mesa) }}" required>
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            <label for="cantidad_electores">Cantidad de Electores <span class="text-danger">*</span></label>
+                            <input type="number" name="cantidad_electores" id="cantidad_electores" class="form-control"
+                                   min="0" placeholder="Ej: 250"
+                                   value="{{ old('cantidad_electores', $mesa->cantidad_electores ?? 250) }}" required>
+                            <small class="text-muted">Total de electores en el padrón de esta mesa.</small>
                         </div>
                     </div>
 

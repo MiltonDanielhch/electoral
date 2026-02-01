@@ -49,11 +49,12 @@
                     <div class="form-group">
                         <label for="imagen">Imagen</label>
                         <input type="file" name="imagen" id="imagen" class="form-control" accept="image/*">
-                        @if($candidato->imagen)
-                            <div style="margin-top: 10px;">
-                                <img src="{{ \Illuminate\Support\Facades\Storage::url($candidato->imagen) }}" alt="Imagen Candidato" style="max-width: 200px;">
-                            </div>
-                        @endif
+                        <!-- MEJORA: Previsualización de imagen dinámica -->
+                        <div style="margin-top: 10px;">
+                            <img id="preview_img" src="{{ $candidato->imagen ? \Illuminate\Support\Facades\Storage::url($candidato->imagen) : '' }}" 
+                                 alt="Vista previa" 
+                                 style="max-width: 200px; @if(!$candidato->imagen) display: none; @endif">
+                        </div>
                     </div>
 
                     <div class="row">
@@ -106,3 +107,17 @@
         </form>
     </div>
 @stop
+
+@section('javascript')
+    <script>
+        // MEJORA UX: Previsualización de imagen dinámica
+        document.getElementById('imagen').onchange = evt => {
+            const [file] = evt.target.files;
+            if (file) {
+                const preview = document.getElementById('preview_img');
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = 'block';
+            }
+        }
+    </script>
+@endsection

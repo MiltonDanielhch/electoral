@@ -9,6 +9,14 @@ class MesaSeeder extends Seeder
 {
     public function run(): void
     {
+        // Limpiar la tabla antes de sembrar para asegurar sintonía de datos fresca
+        // Evita duplicados lógicos o mesas huérfanas si cambian recintos
+        // Deshabilitamos claves foráneas temporalmente para permitir truncate
+        DB::statement('SET FOREIGN_KEY_CHECKS = 0');
+        DB::table('mesas')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS = 1');
+        $this->command->info('Tabla de mesas truncada. Generando datos frescos...');
+
         // Traemos todos los recintos para asegurar que ninguno se quede sin mesas
         $recintos = DB::table('recintos')->get();
 
@@ -21,16 +29,15 @@ class MesaSeeder extends Seeder
                 // Total: 11 dígitos para que el TRIGGER no lo rechace
                 $codigoMesa = str_pad($recinto->codigo_tse, 6, "0", STR_PAD_LEFT) . str_pad($i, 5, "0", STR_PAD_LEFT);
 
-                DB::table('mesas')->updateOrInsert(
-                    ['codigo_tse' => $codigoMesa],
-                    [
-                        'id_recinto' => $recinto->id_recinto,
-                        'numero_mesa' => $i,
-                        'estado'     => 'Habilitada',
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]
-                );
+                DB::table('mesas')->insert([
+                    'codigo_tse' => $codigoMesa,
+                    'id_recinto' => $recinto->id_recinto,
+                    'numero_mesa' => $i,
+                    'cantidad_electores' => 250, // Promedio estándar por mesa
+                    'estado'     => 'Habilitada',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
             }
         }
 

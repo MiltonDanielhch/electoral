@@ -23,111 +23,162 @@
                 <div class="panel panel-bordered">
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-md-4">
+                            {{-- Columna de Imagen --}}
+                            <div class="col-md-4 text-center">
                                 <div class="panel-heading" style="border-bottom:0;">
-                                    <h3 class="panel-title">Imagen</h3>
+                                    <h3 class="panel-title">Fotografía</h3>
                                 </div>
                                 <div class="panel-body" style="padding-top:0;">
                                     @if($person->image)
-                                        <img src="{{ asset('storage/' . $person->image) }}" style="width:100%; max-width:200px; border-radius: 5px;">
+                                        <img src="{{ asset('storage/' . $person->image) }}" 
+                                             alt="{{ $person->full_name }}"
+                                             style="width:100%; max-width:200px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                     @else
-                                        <p class="text-muted">Sin imagen</p>
+                                        <div style="width:200px; height:200px; margin:0 auto; background:#f5f5f5; border-radius:10px; display:flex; align-items:center; justify-content:center;">
+                                            <i class="voyager-person" style="font-size:80px; color:#ccc;"></i>
+                                        </div>
+                                        <p class="text-muted" style="margin-top:10px;">Sin imagen registrada</p>
                                     @endif
                                 </div>
+                                
+                                {{-- Información de Registro --}}
+                                <div class="panel-heading" style="border-bottom:0; margin-top:20px;">
+                                    <h3 class="panel-title">Información de Registro</h3>
+                                </div>
+                                <div class="panel-body" style="padding-top:0;">
+                                    <p class="text-muted">
+                                        <small>
+                                            <strong>ID:</strong> {{ $person->id }}<br>
+                                            <strong>Registrado:</strong> {{ $person->created_at ? $person->created_at->format('d/m/Y H:i') : 'N/A' }}<br>
+                                            @if($person->registerUser_id && $person->registerUser)
+                                                <strong>Por:</strong> {{ $person->registerUser->name ?? 'Usuario #' . $person->registerUser_id }}
+                                            @endif
+                                        </small>
+                                    </p>
+                                </div>
                             </div>
+                            
+                            {{-- Columna de Datos --}}
                             <div class="col-md-8">
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="panel-heading" style="border-bottom:0;">
-                                            <h3 class="panel-title">Tipo de Persona</h3>
-                                        </div>
-                                        <div class="panel-body" style="padding-top:0;">
-                                            <p>{{ $person->person_type ?? 'N/A' }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="panel-heading" style="border-bottom:0;">
-                                            <h3 class="panel-title">Nombre Completo</h3>
-                                        </div>
-                                        <div class="panel-body" style="padding-top:0;">
-                                            <p>{{ $person->full_name }}</p>
+                                    {{-- Nombre Completo --}}
+                                    <div class="col-md-12">
+                                        <div class="panel-heading" style="border-bottom:0; background:#f8f9fa; border-radius:5px; margin-bottom:10px;">
+                                            <h3 class="panel-title" style="font-size:18px;">
+                                                <i class="voyager-person"></i> {{ strtoupper($person->full_name) }}
+                                            </h3>
                                         </div>
                                     </div>
+                                    
+                                    {{-- Documento de Identidad --}}
                                     <div class="col-md-6">
                                         <div class="panel-heading" style="border-bottom:0;">
-                                            <h3 class="panel-title">Tipo de Documento</h3>
+                                            <h3 class="panel-title">Documento de Identidad</h3>
                                         </div>
                                         <div class="panel-body" style="padding-top:0;">
-                                            <p>{{ $person->tipo_doc ?? 'N/A' }}</p>
+                                            <p style="font-size:16px; font-weight:bold;">
+                                                {{ $person->tipo_doc ?? 'N/A' }}: {{ $person->ci_formatted }}
+                                            </p>
                                         </div>
                                     </div>
+                                    
+                                    {{-- Padrón Electoral --}}
                                     <div class="col-md-6">
                                         <div class="panel-heading" style="border-bottom:0;">
-                                            <h3 class="panel-title">CI / Pasaporte</h3>
+                                            <h3 class="panel-title">Padrón Electoral</h3>
                                         </div>
                                         <div class="panel-body" style="padding-top:0;">
-                                            <p>{{ $person->ci }}{{ $person->ci_complemento ? '-' . $person->ci_complemento : '' }}</p>
+                                            <p>{{ $person->padron ?? 'No registrado' }}</p>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="panel-heading" style="border-bottom:0;">
-                                            <h3 class="panel-title">NIT</h3>
-                                        </div>
-                                        <div class="panel-body" style="padding-top:0;">
-                                            <p>{{ $person->nit ?? 'N/A' }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="panel-heading" style="border-bottom:0;">
-                                            <h3 class="panel-title">Padrón</h3>
-                                        </div>
-                                        <div class="panel-body" style="padding-top:0;">
-                                            <p>{{ $person->padron ?? 'N/A' }}</p>
-                                        </div>
-                                    </div>
+                                    
+                                    {{-- Fecha de Nacimiento --}}
                                     <div class="col-md-6">
                                         <div class="panel-heading" style="border-bottom:0;">
                                             <h3 class="panel-title">Fecha de Nacimiento</h3>
                                         </div>
                                         <div class="panel-body" style="padding-top:0;">
-                                            <p>{{ $person->birth_date ? date('d/m/Y', strtotime($person->birth_date)) : 'N/A' }}</p>
+                                            <p>
+                                                @if($person->birth_date)
+                                                    {{ $person->birth_date->format('d/m/Y') }}
+                                                    <span class="text-muted">({{ $person->age }} años)</span>
+                                                @else
+                                                    N/A
+                                                @endif
+                                            </p>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="panel-heading" style="border-bottom:0;">
-                                            <h3 class="panel-title">Teléfono / Celular</h3>
-                                        </div>
-                                        <div class="panel-body" style="padding-top:0;">
-                                            <p>{{ $person->phone ?? 'N/A' }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="panel-heading" style="border-bottom:0;">
-                                            <h3 class="panel-title">Email</h3>
-                                        </div>
-                                        <div class="panel-body" style="padding-top:0;">
-                                            <p>{{ $person->email ?? 'N/A' }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="panel-heading" style="border-bottom:0;">
-                                            <h3 class="panel-title">Dirección</h3>
-                                        </div>
-                                        <div class="panel-body" style="padding-top:0;">
-                                            <p>{{ $person->address ?? 'N/A' }}</p>
-                                        </div>
-                                    </div>
+                                    
+                                    {{-- Género --}}
                                     <div class="col-md-6">
                                         <div class="panel-heading" style="border-bottom:0;">
                                             <h3 class="panel-title">Género</h3>
                                         </div>
                                         <div class="panel-body" style="padding-top:0;">
-                                            <p>{{ $person->gender ?? 'N/A' }}</p>
+                                            <p>
+                                                @if($person->gender)
+                                                    <span class="label label-{{ $person->gender == 'Masculino' ? 'info' : 'danger' }}">
+                                                        {{ $person->gender }}
+                                                    </span>
+                                                @else
+                                                    N/A
+                                                @endif
+                                            </p>
                                         </div>
                                     </div>
+                                    
+                                    {{-- Teléfono --}}
                                     <div class="col-md-6">
                                         <div class="panel-heading" style="border-bottom:0;">
-                                            <h3 class="panel-title">Estado</h3>
+                                            <h3 class="panel-title">Teléfono / Celular</h3>
+                                        </div>
+                                        <div class="panel-body" style="padding-top:0;">
+                                            <p>
+                                                @if($person->phone)
+                                                    <i class="voyager-phone"></i> {{ $person->phone }}
+                                                @else
+                                                    <span class="text-muted">No registrado</span>
+                                                @endif
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    {{-- Email --}}
+                                    <div class="col-md-6">
+                                        <div class="panel-heading" style="border-bottom:0;">
+                                            <h3 class="panel-title">Correo Electrónico</h3>
+                                        </div>
+                                        <div class="panel-body" style="padding-top:0;">
+                                            <p>
+                                                @if($person->email)
+                                                    <i class="voyager-mail"></i> {{ $person->email }}
+                                                @else
+                                                    <span class="text-muted">No registrado</span>
+                                                @endif
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    {{-- Dirección --}}
+                                    <div class="col-md-12">
+                                        <div class="panel-heading" style="border-bottom:0;">
+                                            <h3 class="panel-title">Dirección</h3>
+                                        </div>
+                                        <div class="panel-body" style="padding-top:0;">
+                                            <p>
+                                                @if($person->address)
+                                                    <i class="voyager-location"></i> {{ $person->address }}
+                                                @else
+                                                    <span class="text-muted">No registrada</span>
+                                                @endif
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    {{-- Estado --}}
+                                    <div class="col-md-6">
+                                        <div class="panel-heading" style="border-bottom:0;">
+                                            <h3 class="panel-title">Estado del Registro</h3>
                                         </div>
                                         <div class="panel-body" style="padding-top:0;">
                                             @php
@@ -139,7 +190,10 @@
                                                     default => 'default'
                                                 };
                                             @endphp
-                                            <span class="label label-{{ $labelColor }}">{{ $statusLabel }}</span>
+                                            <span class="label label-{{ $labelColor }}" style="font-size:14px; padding:8px 12px;">
+                                                <i class="voyager-{{ $person->status == 1 ? 'check' : ($person->status == 0 ? 'x' : 'clock') }}"></i>
+                                                {{ $statusLabel }}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>

@@ -28,6 +28,69 @@
 @stop
 
 @section('content')
+    {{-- Dashboard de Estadísticas --}}
+    <div class="page-content container-fluid" style="padding-bottom: 0;">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-bordered panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            <i class="voyager-pie-chart"></i> Sintonía de Transmisión - Estadísticas en Tiempo Real
+                        </h3>
+                    </div>
+                    <div class="panel-body" id="stats-container">
+                        <div class="row text-center">
+                            <div class="col-md-2 col-sm-4 col-xs-6">
+                                <div class="well well-sm">
+                                    <h3 style="margin: 0; color: #333;" id="stat-total">-</h3>
+                                    <small class="text-muted">Total Mesas</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-4 col-xs-6">
+                                <div class="well well-sm" style="background-color: #d4edda; border-color: #c3e6cb;">
+                                    <h3 style="margin: 0; color: #155724;" id="stat-escrutadas">-</h3>
+                                    <small style="color: #155724;">Escrutadas</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-4 col-xs-6">
+                                <div class="well well-sm" style="background-color: #fff3cd; border-color: #ffeeba;">
+                                    <h3 style="margin: 0; color: #856404;" id="stat-habilitadas">-</h3>
+                                    <small style="color: #856404;">Habilitadas</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-4 col-xs-6">
+                                <div class="well well-sm" style="background-color: #f8d7da; border-color: #f5c6cb;">
+                                    <h3 style="margin: 0; color: #721c24;" id="stat-observadas">-</h3>
+                                    <small style="color: #721c24;">Observadas</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-4 col-xs-6">
+                                <div class="well well-sm" style="background-color: #f5f5f5; border-color: #ddd;">
+                                    <h3 style="margin: 0; color: #333;" id="stat-faltantes">-</h3>
+                                    <small class="text-muted">Faltantes</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-4 col-xs-6">
+                                <div class="well well-sm" style="background-color: #cce5ff; border-color: #b3d7ff;">
+                                    <h3 style="margin: 0; color: #004085;" id="stat-porcentaje">-%</h3>
+                                    <small style="color: #004085;">Progreso</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress" style="margin-bottom: 0; margin-top: 10px;">
+                            <div id="progress-bar" class="progress-bar progress-bar-striped active" role="progressbar" 
+                                 style="width: 0%; background-color: #28a745;" 
+                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                <span id="progress-text">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Lista de Mesas --}}
     <div class="page-content browse container-fluid">
         <div class="row">
             <div class="col-md-12">
@@ -71,6 +134,15 @@
     .voyager-spin {
         animation: spin 1.5s linear infinite;
     }
+    .well-sm {
+        padding: 10px;
+        border-radius: 3px;
+        margin-bottom: 10px;
+    }
+    .well-sm h3 {
+        font-size: 24px;
+        font-weight: bold;
+    }
 </style>
 @endsection
 
@@ -99,7 +171,42 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('delete-modal-wrapper').style.display = '';
+    
+    // Cargar estadísticas
+    loadEstadisticas();
 });
+
+function loadEstadisticas() {
+    fetch('/api/v1/mesas/estadisticas', {
+        headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const stats = data.data;
+            document.getElementById('stat-total').textContent = stats.total_mesas.toLocaleString();
+            document.getElementById('stat-escrutadas').textContent = stats.escrutadas.toLocaleString();
+            document.getElementById('stat-habilitadas').textContent = stats.habilitadas.toLocaleString();
+            document.getElementById('stat-observadas').textContent = stats.observadas.toLocaleString();
+            document.getElementById('stat-faltantes').textContent = stats.faltantes.toLocaleString();
+            document.getElementById('stat-porcentaje').textContent = stats.porcentaje_escrutadas + '%';
+            
+            // Actualizar barra de progreso
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            progressBar.style.width = stats.porcentaje_escrutadas + '%';
+            progressBar.setAttribute('aria-valuenow', stats.porcentaje_escrutadas);
+            progressText.textContent = stats.porcentaje_escrutadas + '% Completado';
+        }
+    })
+    .catch(error => console.error('Error cargando estadísticas:', error));
+}
+
+// Recargar estadísticas cada 30 segundos
+setInterval(loadEstadisticas, 30000);
 </script>
 
 @push('javascript')

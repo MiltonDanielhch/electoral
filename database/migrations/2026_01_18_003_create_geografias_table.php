@@ -23,8 +23,8 @@ return new class extends Migration
             $table->index(['tipo', 'parent_id'], 'idx_geo_tipo_parent');
             $table->index('nivel_jerarquico');
             $table->index('codigo_tse');
+            $table->timestamps();
         });
-
         DB::unprepared("
         CREATE TRIGGER trg_geo_nivel_jerarquico
         BEFORE INSERT ON geografias

@@ -63,8 +63,8 @@
                             <label for="acta_unica">Acta Única <span class="text-danger">*</span></label>
                             <select name="acta_unica" id="acta_unica" class="form-control" required>
                                 <option value="">-- Seleccione --</option>
-                                <option value="1" @if(old('acta_unica', $cargo->acta_unica) === true) selected @endif>Sí</option>
-                                <option value="0" @if(old('acta_unica', $cargo->acta_unica) === false) selected @endif>No</option>
+                            <option value="1" @if(old('acta_unica', $cargo->acta_unica) == true) selected @endif>Sí</option>
+                            <option value="0" @if(old('acta_unica', $cargo->acta_unica) == false) selected @endif>No</option>
                             </select>
                         </div>
                     </div>

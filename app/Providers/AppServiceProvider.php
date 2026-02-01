@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Candidato;
+use App\Observers\CandidatoObserver;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\URL;
@@ -25,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Paginator::useBootstrap();
+
+        // Registrar Observer para limpieza de imágenes de candidatos
+        Candidato::observe(CandidatoObserver::class);
 
         if (config('app.debug')) {
             DB::listen(function (QueryExecuted $query) {

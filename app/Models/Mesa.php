@@ -20,12 +20,14 @@ class Mesa extends Model
         'codigo_tse',
         'id_recinto',
         'numero_mesa', // Añadido para sintonía con el seeder
+        'cantidad_electores',
         'estado',
     ];
 
     protected $casts = [
         'estado' => 'string',
         'numero_mesa' => 'integer',
+        'cantidad_electores' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

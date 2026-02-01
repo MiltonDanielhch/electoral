@@ -61,6 +61,9 @@
 
 @section('css')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+<link rel="stylesheet" href="{{ asset('css/custom-admin.css') }}"/>
 <style>
     .loading-icon {
         animation: spin 1.5s linear infinite;
@@ -110,54 +113,125 @@ document.addEventListener('DOMContentLoaded', function() {
     @include('admin.partials.list-browse-script', ['listUrl' => route('admin.recintos.ajax.list')])
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <script src="{{ asset('js/mapa-config.js') }}"></script>
     <script>
-    function initMiniMaps() {
-        const miniMaps = document.querySelectorAll('.mini-map-data');
+    // Sintonía: Mapas inicializados (evitar doble inicialización)
+    const mapasInicializados = new Set();
+    
+    /**
+     * Inicializa un mini mapa individual
+     */
+    function initMiniMap(input) {
+        const lat = parseFloat(input.getAttribute('data-lat'));
+        const lon = parseFloat(input.getAttribute('data-lon'));
+        const id = input.getAttribute('data-id');
+        const containerId = 'mini-map-' + id;
+        
+        // Evitar inicializar el mismo mapa dos veces
+        if (mapasInicializados.has(containerId)) {
+            return;
+        }
+        
+        const mapContainer = document.getElementById(containerId);
 
-        miniMaps.forEach(function(input) {
-            const lat = parseFloat(input.getAttribute('data-lat'));
-            const lon = parseFloat(input.getAttribute('data-lon'));
-            const id = input.getAttribute('data-id');
-            const mapContainer = document.getElementById('mini-map-' + id);
-
-            if (!isNaN(lat) && !isNaN(lon) && mapContainer) {
-                try {
-                    const map = L.map('mini-map-' + id, {
-                        center: [lat, lon],
-                        zoom: 15,
-                        zoomControl: false,
-                        attributionControl: false,
-                        scrollWheelZoom: false,
-                        dragging: false,
-                        doubleClickZoom: false,
-                        tap: false
-                    });
-
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: ''
-                    }).addTo(map);
-
-                    L.marker([lat, lon], {
-                        icon: L.divIcon({
-                            className: 'custom-div-icon',
-                            html: '<div style="background-color: #26e07f; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 4px rgba(0,0,0,0.3);"></div>',
-                            iconSize: [12, 12],
-                            iconAnchor: [6, 6]
-                        })
-                    }).addTo(map);
-                } catch (e) {
-                    console.error('Error inicializando mini mapa ' + id + ':', e);
-                }
+        if (!isNaN(lat) && !isNaN(lon) && mapContainer) {
+            try {
+                // Usar SintoniaMap para inicialización modular
+                const sintoniaMap = new SintoniaMap(containerId, {
+                    center: [lat, lon],
+                    zoom: 15,
+                    zoomControl: false,
+                    attributionControl: false,
+                    scrollWheelZoom: false,
+                    dragging: false,
+                    doubleClickZoom: false,
+                    tap: false
+                });
+                
+                sintoniaMap.init();
+                
+                // Agregar marcador con icono personalizado
+                sintoniaMap.agregarMarcador(lat, lon, {
+                    icono: SintoniaMap.crearIcono('punto', '#26e07f')
+                });
+                
+                // Marcar como inicializado
+                mapasInicializados.add(containerId);
+                
+            } catch (e) {
+                console.error('Error inicializando mini mapa ' + id + ':', e);
             }
-        });
+        }
     }
 
+    /**
+     * Sintonía: Lazy Loading de mapas con Intersection Observer
+     * Los mapas solo se cargan cuando son visibles en el viewport
+     */
+    function initLazyLoadingMapas() {
+        // Configuración del observer
+        const observerOptions = {
+            root: null, // viewport
+            rootMargin: '50px', // carga 50px antes de ser visible
+            threshold: 0.1 // al menos 10% visible
+        };
+
+        const mapObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const input = entry.target.querySelector('.mini-map-data');
+                    if (input) {
+                        initMiniMap(input);
+                    }
+                    // Dejar de observar una vez inicializado
+                    mapObserver.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Observar todos los contenedores de mini mapas
+        document.querySelectorAll('.mini-map-container').forEach(container => {
+            mapObserver.observe(container);
+        });
+
+        return mapObserver;
+    }
+
+    /**
+     * Inicialización tradicional (fallback si IntersectionObserver no está disponible)
+     */
+    function initMiniMaps() {
+        const miniMaps = document.querySelectorAll('.mini-map-data');
+        miniMaps.forEach(initMiniMap);
+    }
+
+    // Inicialización cuando el DOM está listo
     document.addEventListener('DOMContentLoaded', function() {
-        initMiniMaps();
+        // Usar Intersection Observer si está disponible (mejor rendimiento)
+        if ('IntersectionObserver' in window) {
+            window.miniMapObserver = initLazyLoadingMapas();
+        } else {
+            // Fallback para navegadores antiguos
+            initMiniMaps();
+        }
     });
 
+    // Reinicializar cuando se carga nueva lista
     document.addEventListener('list-loaded', function() {
-        setTimeout(initMiniMaps, 100);
+        // Limpiar set de mapas inicializados para la nueva lista
+        mapasInicializados.clear();
+        
+        setTimeout(function() {
+            if ('IntersectionObserver' in window && window.miniMapObserver) {
+                // Reconfigurar observer para nuevos elementos
+                document.querySelectorAll('.mini-map-container').forEach(container => {
+                    window.miniMapObserver.observe(container);
+                });
+            } else {
+                initMiniMaps();
+            }
+        }, 100);
     });
     </script>
 @endpush

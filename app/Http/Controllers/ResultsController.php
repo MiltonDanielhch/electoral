@@ -17,9 +17,10 @@ class ResultsController extends Controller
 
     public function index()
     {
-        $cacheKey = 'election_results_' . now()->format('Y-m-d-H');
+        // Sintonía: TTL reducido a 60 segundos para conteo "en vivo"
+        $cacheKey = 'election_live_results';
 
-        $results = Cache::remember($cacheKey, 300, function () {
+        $results = Cache::remember($cacheKey, 60, function () {
             return ResumenVoto::query()
                 ->with(['geografia:id_geografia,nombre', 'cargo:id_cargo,descripcion'])
                 ->select(['id_cargo', 'id_geografia', 'id_partido', 'total_votos', 'total_mesas_escrutadas', 'porcentaje_votos'])
@@ -40,7 +41,8 @@ class ResultsController extends Controller
     {
         $cacheKey = "results:cargo:{$cargoId}";
 
-        $results = Cache::remember($cacheKey, 300, function () use ($cargoId) {
+        // Sintonía: TTL reducido a 60 segundos para resultados en tiempo real
+        $results = Cache::remember($cacheKey, 60, function () use ($cargoId) {
             return ResumenVoto::query()
                 ->with(['geografia:id_geografia,nombre', 'organizacionPolitica:id_partido,nombre,sigla,color_hex'])
                 ->where('id_cargo', $cargoId)
@@ -64,7 +66,8 @@ class ResultsController extends Controller
     {
         $cacheKey = "results:geografia:{$geografiaId}";
 
-        $results = Cache::remember($cacheKey, 300, function () use ($geografiaId) {
+        // Sintonía: TTL reducido a 60 segundos para resultados en tiempo real
+        $results = Cache::remember($cacheKey, 60, function () use ($geografiaId) {
             return ResumenVoto::query()
                 ->with(['cargo:id_cargo,descripcion,nivel', 'organizacionPolitica:id_partido,nombre,sigla,color_hex'])
                 ->where('id_geografia', $geografiaId)
@@ -87,7 +90,8 @@ class ResultsController extends Controller
 
     public function clearCache()
     {
-        Cache::forget('election_results_' . now()->format('Y-m-d-H'));
+        // Sintonía: Limpiar la nueva clave de caché en vivo
+        Cache::forget('election_live_results');
 
         return response()->json([
             'success' => true,

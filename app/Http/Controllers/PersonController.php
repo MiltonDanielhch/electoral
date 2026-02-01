@@ -9,6 +9,7 @@ use App\Http\Requests\StorePersonRequest;
 use App\Http\Requests\UpdatePersonRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class PersonController extends Controller
 {
@@ -49,13 +50,54 @@ class PersonController extends Controller
     {
         $this->custom_authorize('add_people');
 
+        // Validación de CI Boliviano
+        if ($request->tipo_doc === 'CI' && $request->ci) {
+            if (!Person::validateBolivianCI($request->ci, $request->ci_complemento)) {
+                return back()->withInput()->with([
+                    'message' => 'El número de Carnet de Identidad no es válido. Verifique el número y el dígito verificador.',
+                    'alert-type' => 'error'
+                ]);
+            }
+        }
+
+        // Verificar duplicados antes de guardar
+        $duplicates = Person::potentialDuplicates(
+            $request->ci,
+            $request->first_name,
+            $request->paternal_surname,
+            $request->maternal_surname
+        )->get();
+
+        if ($duplicates->count() > 0) {
+            $duplicateNames = $duplicates->map(fn($p) => $p->full_name . ' (CI: ' . $p->ci_formatted . ')')->implode(', ');
+            return back()->withInput()->with([
+                'message' => 'Atención: Posibles registros duplicados encontrados: ' . $duplicateNames . '. Verifique antes de continuar.',
+                'alert-type' => 'warning'
+            ]);
+        }
+
         DB::beginTransaction();
         try {
             $data = $request->validated();
-            $data['image'] = $request->hasFile('image') ? $this->storeImage($request->file('image')) : null;
+            
+            // Validar y almacenar imagen
+            if ($request->hasFile('image')) {
+                $validationResult = $this->validateImage($request->file('image'));
+                if ($validationResult !== true) {
+                    return back()->withInput()->with([
+                        'message' => $validationResult,
+                        'alert-type' => 'error'
+                    ]);
+                }
+                $data['image'] = $this->storeImage($request->file('image'));
+            }
 
             // Asignar status por defecto si no viene
             $data['status'] = 1;
+            
+            // Registrar usuario que crea
+            $data['registerUser_id'] = auth()->id();
+            $data['registerRole'] = auth()->user()->role->name ?? 'Usuario';
 
             Person::create($data);
 
@@ -66,8 +108,9 @@ class PersonController extends Controller
             ]);
         } catch (\Throwable $th) {
             DB::rollBack();
+            Log::error('Error creando persona: ' . $th->getMessage());
             return redirect()->route('admin.people.index')->with([
-                'message' => 'Ocurrió un error al guardar el registro.',
+                'message' => 'Ocurrió un error al guardar el registro: ' . $th->getMessage(),
                 'alert-type' => 'error'
             ]);
         }
@@ -86,11 +129,48 @@ class PersonController extends Controller
         $person = Person::findOrFail($id);
         $this->custom_authorize('edit_people');
 
+        // Validación de CI Boliviano (si cambió el CI)
+        if ($request->tipo_doc === 'CI' && $request->ci && $request->ci !== $person->ci) {
+            if (!Person::validateBolivianCI($request->ci, $request->ci_complemento)) {
+                return back()->withInput()->with([
+                    'message' => 'El número de Carnet de Identidad no es válido. Verifique el número y el dígito verificador.',
+                    'alert-type' => 'error'
+                ]);
+            }
+        }
+
+        // Verificar duplicados antes de guardar (excluyendo el registro actual)
+        if ($request->ci !== $person->ci || $request->first_name !== $person->first_name) {
+            $duplicates = Person::potentialDuplicates(
+                $request->ci,
+                $request->first_name,
+                $request->paternal_surname,
+                $request->maternal_surname,
+                $person->id
+            )->get();
+
+            if ($duplicates->count() > 0) {
+                $duplicateNames = $duplicates->map(fn($p) => $p->full_name . ' (CI: ' . $p->ci_formatted . ')')->implode(', ');
+                return back()->withInput()->with([
+                    'message' => 'Atención: Posibles registros duplicados encontrados: ' . $duplicateNames . '. Verifique antes de continuar.',
+                    'alert-type' => 'warning'
+                ]);
+            }
+        }
+
         DB::beginTransaction();
         try {
             $data = $request->validated();
 
+            // Validar y almacenar imagen
             if ($request->hasFile('image')) {
+                $validationResult = $this->validateImage($request->file('image'));
+                if ($validationResult !== true) {
+                    return back()->withInput()->with([
+                        'message' => $validationResult,
+                        'alert-type' => 'error'
+                    ]);
+                }
                 $data['image'] = $this->storeImage($request->file('image'), $person->image);
             } elseif ($request->boolean('remove_image')) {
                 if ($person->image) {
@@ -111,8 +191,11 @@ class PersonController extends Controller
             ]);
         } catch (\Throwable $th) {
             DB::rollback();
-            // DEBUG: Muestra el error exacto que impide guardar. Si no ves nada, el problema es de validación.
-            dd($th);
+            Log::error('Error actualizando persona: ' . $th->getMessage());
+            return redirect()->route('admin.people.index')->with([
+                'message' => 'Ocurrió un error al actualizar el registro: ' . $th->getMessage(),
+                'alert-type' => 'error'
+            ]);
         }
     }
 
@@ -140,6 +223,41 @@ class PersonController extends Controller
     }
 
     /* ----------  MÉTODOS PRIVADOS  ---------- */
+
+    /**
+     * Valida una imagen antes de almacenarla
+     * 
+     * @param \Illuminate\Http\UploadedFile $file
+     * @return true|string True si es válida, mensaje de error si no
+     */
+    private function validateImage($file)
+    {
+        // Validar tamaño máximo (2MB)
+        $maxSize = 2 * 1024 * 1024; // 2MB en bytes
+        if ($file->getSize() > $maxSize) {
+            return 'La imagen no debe superar los 2MB.';
+        }
+
+        // Validar tipos MIME permitidos
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        if (!in_array($file->getMimeType(), $allowedTypes)) {
+            return 'Formato de imagen no válido. Use JPG o PNG.';
+        }
+
+        // Validar dimensiones mínimas
+        $dimensions = getimagesize($file->getPathname());
+        if ($dimensions) {
+            list($width, $height) = $dimensions;
+            if ($width < 100 || $height < 100) {
+                return 'La imagen debe tener al menos 100x100 píxeles.';
+            }
+            if ($width > 2000 || $height > 2000) {
+                return 'La imagen no debe superar 2000x2000 píxeles.';
+            }
+        }
+
+        return true;
+    }
 
     private function storeImage($file, $old = null)
     {

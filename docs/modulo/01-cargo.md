@@ -113,15 +113,17 @@ Para inicializar el laboratorio electoral, se incluye el `CargoSeeder` con los s
 
 ---
 
-## 🔧 Implementación de Mejoras (Código 3026)
+## 🔧 Implementación de Mejoras (Código 3026) - ✅ COMPLETADO
 
-### 1. Corregir el Bug del "Or" (Búsqueda Encapsulada)
+> **Estado:** Todas las mejoras han sido implementadas exitosamente el 2026-02-01.
+
+### 1. ✅ Corregir el Bug del "Or" (Búsqueda Encapsulada)
 **Ubicación:** `app/Http/Controllers/CargoController.php`
 
-Busca el método `applySearch` y reemplázalo por este:
+**Implementación:** El método `applySearch` ahora encapsula los filtros OR en un closure para evitar que interfieran con otros filtros de seguridad globales.
 
 ```php
-protected function applySearch($query, $search)
+protected function applySearch(Builder $query, string $search): Builder
 {
     return $query->where(function ($q) use ($search) {
         $q->where('descripcion', 'like', "%$search%")
@@ -129,83 +131,38 @@ protected function applySearch($query, $search)
     });
 }
 ```
-**Por qué:** Esto asegura que si el sistema añade filtros de seguridad (como ver solo cargos de una gestión específica), el `OR` no ignore esas reglas.
 
-### 2. Evitar "Race Conditions" en AJAX (Abortar peticiones)
+---
+
+### 2. ✅ Evitar "Race Conditions" en AJAX (Abortar peticiones)
 **Ubicación:** `resources/views/admin/partials/list-browse-script.blade.php`
 
-Modifica el inicio del script y la función `list`:
+**Implementación:** Se añadió la variable `currentRequest` para rastrear y abortar peticiones AJAX pendientes cuando el usuario realiza búsquedas consecutivas o navega rápidamente entre páginas.
 
-```javascript
-let currentRequest = null; // <-- Añadir esta línea al inicio del script
+**Cambios realizados:**
+- Variable `let currentRequest = null;` al inicio del script
+- Verificación y aborto de petición previa antes de iniciar nueva
+- Manejo de errores que ignora los abortos intencionales (`xhr.statusText !== 'abort'`)
+- Liberación de la referencia al completar la petición
 
-function list(page = 1) {
-    const search = $('#search').val()?.trim() || '';
+---
 
-    let urlParams = new URLSearchParams({
-        search: search,
-        paginate: countPage,
-        page: page
-    });
-
-    // --- NUEVO: Abortar petición previa si existe ---
-    if (currentRequest) {
-        currentRequest.abort();
-    }
-
-    $('#list-container').html(`
-        <div class="text-center" style="padding: 40px">
-            <i class="voyager-refresh voyager-2x voyager-spin"></i><br>Cargando...
-        </div>
-    `);
-
-    // --- Guardar la petición en la variable ---
-    currentRequest = $.ajax({
-        url: `${listUrl}?${urlParams.toString()}`,
-        type: 'GET',
-        success: response => {
-            $('#list-container').html(response);
-            const event = new CustomEvent('list-loaded');
-            document.dispatchEvent(event);
-            currentRequest = null; // Liberar al terminar
-        },
-        error: (xhr) => {
-            if (xhr.statusText !== 'abort') { // No mostrar error si fue cancelada a propósito
-                console.error('Error al cargar la lista:', xhr);
-                $('#list-container').html(`<div class="alert alert-danger text-center">Error al cargar los datos.</div>`);
-            }
-        }
-    });
-}
-```
-
-### 3. Mejora de UX: "No Results Found" con botón de limpiar
+### 3. ✅ Mejora de UX: "No Results Found" con botón de limpiar
 **Ubicación:** `resources/views/admin/cargos/list.blade.php`
 
-Busca el bloque `@empty` al final de la tabla y cámbialo por esto:
+**Implementación:** Se mejoró la experiencia de usuario cuando no hay resultados de búsqueda:
 
-```blade
-@forelse ($items as $cargo)
-    {{-- ... tu código de filas ... --}}
-@empty
-    <tr>
-        <td colspan="6" class="text-center" style="padding: 30px;">
-            <div class="text-muted">
-                <i class="voyager-search" style="font-size: 40px;"></i>
-                <p>No se encontraron cargos con los criterios de búsqueda.</p>
-                <button class="btn btn-sm btn-info" onclick="$('#search').val('').trigger('input')">
-                    Limpiar búsqueda
-                </button>
-            </div>
-        </td>
-    </tr>
-@endforelse
-```
+- Icono de búsqueda grande (`voyager-search` a 40px)
+- Mensaje descriptivo: "No se encontraron cargos con los criterios de búsqueda."
+- Botón "Limpiar búsqueda" que resetea el campo de búsqueda automáticamente
+- Estilos mejorados con padding y clases de Bootstrap
 
-### 4. Ajuste de Casting en el Modelo
+---
+
+### 4. ✅ Ajuste de Casting en el Modelo
 **Ubicación:** `app/Models/Cargo.php`
 
-Asegúrate de tener esto para que Laravel entienda siempre el tipo de dato:
+**Implementación:** Se añadió el casting explícito del `id_cargo` como integer junto al existente `acta_unica` como boolean.
 
 ```php
 protected $casts = [
@@ -213,3 +170,8 @@ protected $casts = [
     'id_cargo' => 'integer',
 ];
 ```
+
+**Beneficios:**
+- Tipado estricto y consistente en toda la aplicación
+- Prevención de errores de tipo al comparar IDs
+- Mejor compatibilidad con operaciones matemáticas y comparaciones

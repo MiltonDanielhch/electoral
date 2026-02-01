@@ -14,6 +14,7 @@ return new class extends Migration
             $table->char('codigo_tse', 11)->unique();
             $table->foreignId('id_recinto')->constrained('recintos', 'id_recinto');
             $table->integer('numero_mesa');
+            $table->integer('cantidad_electores')->unsigned()->default(0);
             $table->enum('estado', ['Habilitada', 'Escrutada', 'Anulada', 'Observada'])->default('Habilitada');
             $table->softDeletes();
             $table->timestamps();

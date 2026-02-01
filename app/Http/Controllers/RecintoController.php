@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateRecintoRequest;
 use App\Traits\ManagesCrud;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class RecintoController extends Controller
 {
@@ -49,7 +50,10 @@ class RecintoController extends Controller
         $data = $request->validated();
 
         try {
-            Recinto::create($data);
+            $recinto = Recinto::create($data);
+
+            // Sintonía: Invalidar cachés relacionados al crear recinto
+            $this->invalidarCacheRecinto($data['id_geografia'] ?? null);
 
             return redirect()->route('admin.recintos.index')
                 ->with(['message' => 'Recinto creado exitosamente.', 'alert-type' => 'success']);
@@ -73,9 +77,20 @@ class RecintoController extends Controller
     {
         $this->authorize('update', $recinto);
         $data = $request->validated();
+        
+        // Guardar geografía anterior para invalidar caché si cambió
+        $geoAnterior = $recinto->id_geografia;
 
         try {
             $recinto->update($data);
+
+            // Sintonía: Invalidar cachés relacionados al actualizar recinto
+            $this->invalidarCacheRecinto($data['id_geografia'] ?? null);
+            
+            // Si cambió de geografía, invalidar también la anterior
+            if (isset($data['id_geografia']) && $geoAnterior != $data['id_geografia']) {
+                $this->invalidarCacheRecinto($geoAnterior);
+            }
 
             return redirect()->route('admin.recintos.index')
                 ->with(['message' => 'Recinto actualizado exitosamente.', 'alert-type' => 'success']);
@@ -102,7 +117,12 @@ class RecintoController extends Controller
         }
 
         try {
+            $geoId = $recinto->id_geografia;
             $recinto->delete();
+            
+            // Sintonía: Invalidar cachés relacionados al eliminar recinto
+            $this->invalidarCacheRecinto($geoId);
+            
             return redirect()->route('admin.recintos.index')
                 ->with(['message' => 'Recinto eliminado exitosamente.', 'alert-type' => 'success']);
         } catch (\Exception $e) {
@@ -110,5 +130,24 @@ class RecintoController extends Controller
             return back()->withInput()
                 ->with(['message' => 'Error al eliminar el recinto.', 'alert-type' => 'error']);
         }
+    }
+
+    /**
+     * Sintonía: Invalidar cachés relacionados con recintos
+     * Se llama después de crear, actualizar o eliminar
+     */
+    private function invalidarCacheRecinto(?int $idGeografia = null): void
+    {
+        // Limpiar cachés específicos de mapas
+        if ($idGeografia) {
+            Cache::forget("recintos_por_geo:{$idGeografia}");
+            Cache::forget("recintos_geojson:{$idGeografia}");
+            Cache::forget("geo_recintos_count_{$idGeografia}");
+            Cache::forget("geo_children_{$idGeografia}");
+        }
+        
+        // Limpiar cachés globales
+        Cache::forget('election_live_results');
+        Cache::forget('cargos:all');
     }
 }

@@ -5,7 +5,8 @@
                 <tr>
                     <th style="text-align: center; width: 60px;">ID</th>
                     <th style="text-align: center;">Código TSE</th>
-                    <th style="text-align: center;">Nº Mesa</th> {{-- Sintonía: Nueva columna --}}
+                    <th style="text-align: center;">Nº Mesa</th>
+                    <th style="text-align: center;">Electores</th>
                     <th style="text-align: center;">Estado</th>
                     <th style="text-align: center;">Recinto</th>
                     <th style="text-align: center; width: 220px;" class="actions text-right">Acciones</th>
@@ -17,6 +18,11 @@
                         <td class="text-center">{{ $mesa->id_mesa }}</td>
                         <td class="text-center"><code>{{ $mesa->codigo_tse }}</code></td>
                         <td class="text-center"><strong>{{ $mesa->numero_mesa }}</strong></td>
+                        <td class="text-center">
+                            <span class="badge" style="background-color: #5bc0de;">
+                                {{ number_format($mesa->cantidad_electores) }}
+                            </span>
+                        </td>
                         <td style="text-align: center;">
                             @php
                                 $labelClass = match($mesa->estado) {
@@ -48,14 +54,16 @@
                                 <i class="voyager-edit"></i> <span class="hidden-xs">Editar</span>
                             </a>
                             <button title="Borrar" class="btn btn-sm btn-danger delete"
-                                    onclick="deleteItem('{{ route('admin.mesas.destroy', $mesa->id_mesa) }}', 'Mesa {{ $mesa->numero_mesa }} - {{ $mesa->codigo_tse }}')">
+                                    data-url="{{ route('admin.mesas.destroy', $mesa->id_mesa) }}"
+                                    data-name="Mesa {{ $mesa->numero_mesa }} - {{ $mesa->codigo_tse }}"
+                                    onclick="deleteItem(this.dataset.url, this.dataset.name)">
                                 <i class="voyager-trash"></i> <span class="hidden-xs">Borrar</span>
                             </button>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center">No se encontraron mesas en la sintonía actual.</td>
+                        <td colspan="7" class="text-center">No se encontraron mesas en la sintonía actual.</td>
                     </tr>
                 @endforelse
             </tbody>

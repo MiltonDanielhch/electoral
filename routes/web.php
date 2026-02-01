@@ -100,7 +100,10 @@ Route::get('/mapa-resultados', function () {
 
     // ──────────────── RECINTOS ────────────────
     Route::prefix('recintos')->group(function () {
-        Route::get('/ajax/list', [RecintoController::class, 'list'])->name('admin.recintos.ajax.list');
+        // Sintonía: Throttle para evitar abusos en AJAX (60 peticiones/min)
+        Route::get('/ajax/list', [RecintoController::class, 'list'])
+            ->name('admin.recintos.ajax.list')
+            ->middleware('throttle:60,1');
         Route::get('/', [RecintoController::class, 'index'])->name('admin.recintos.index');
         Route::post('/', [RecintoController::class, 'store'])->name('admin.recintos.store');
         Route::get('/{recinto}/edit', [RecintoController::class, 'edit'])->name('admin.recintos.edit');
@@ -126,10 +129,10 @@ Route::get('/mapa-resultados', function () {
     Route::prefix('candidatos')->group(function () {
         Route::get('/ajax/list', [CandidatoController::class, 'list'])->name('admin.candidatos.ajax.list');
         Route::get('/', [CandidatoController::class, 'index'])->name('admin.candidatos.index');
+        Route::get('/create', [CandidatoController::class, 'create'])->name('admin.candidatos.create');
         Route::post('/', [CandidatoController::class, 'store'])->name('admin.candidatos.store');
         Route::get('/{candidato}/edit', [CandidatoController::class, 'edit'])->name('admin.candidatos.edit');
         Route::put('/{candidato}', [CandidatoController::class, 'update'])->name('admin.candidatos.update');
-        Route::get('/create', [CandidatoController::class, 'create'])->name('admin.candidatos.create');
         Route::get('/{candidato}', [CandidatoController::class, 'show'])->name('admin.candidatos.show');
         Route::delete('/{candidato}', [CandidatoController::class, 'destroy'])->name('admin.candidatos.destroy');
     });

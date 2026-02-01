@@ -58,4 +58,32 @@ class Recinto extends Model
     {
         return $this->hasMany(Mesa::class, 'id_recinto', 'id_recinto');
     }
+
+    /**
+     * Scope para filtrar recintos con coordenadas válidas dentro del Beni
+     * Sintonía: Geofencing - Validación de Territorio
+     */
+    public function scopeConCoordenadasValidas($query)
+    {
+        return $query
+            ->whereNotNull('latitud')
+            ->whereNotNull('longitud')
+            ->where('latitud', '!=', 0)
+            ->where('longitud', '!=', 0)
+            // Sintonía: Rango válido para el Departamento del Beni
+            ->whereBetween('latitud', [-16.5, -10.0])
+            ->whereBetween('longitud', [-68.0, -60.0]);
+    }
+
+    /**
+     * Scope para recintos que tienen coordenadas (no nulas ni 0,0)
+     */
+    public function scopeGeolocalizados($query)
+    {
+        return $query
+            ->whereNotNull('latitud')
+            ->whereNotNull('longitud')
+            ->where('latitud', '!=', 0)
+            ->where('longitud', '!=', 0);
+    }
 }

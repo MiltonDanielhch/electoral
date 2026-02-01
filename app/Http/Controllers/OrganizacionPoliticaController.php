@@ -26,9 +26,11 @@ class OrganizacionPoliticaController extends Controller
 
     protected function applySearch(Builder $query, string $search): Builder
     {
-        return $query->where('nombre', 'like', "%$search%")
-            ->orWhere('sigla', 'like', "%$search%")
-            ->orWhere('codigo_tse', 'like', "%$search%");
+        return $query->where(function ($q) use ($search) {
+            $q->where('nombre', 'like', "%$search%")
+              ->orWhere('sigla', 'like', "%$search%")
+              ->orWhere('codigo_tse', 'like', "%$search%");
+        });
     }
 
     public function create()
@@ -64,7 +66,8 @@ class OrganizacionPoliticaController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('logo_url')) {
-            if ($organizacion->logo_url) {
+            // Eliminar físico si existe la ruta y el archivo en disco
+            if ($organizacion->logo_url && Storage::disk('public')->exists($organizacion->logo_url)) {
                 Storage::disk('public')->delete($organizacion->logo_url);
             }
             $data['logo_url'] = $request->file('logo_url')->store('organizaciones/logos', 'public');
