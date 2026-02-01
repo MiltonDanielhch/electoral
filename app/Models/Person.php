@@ -15,17 +15,23 @@ class Person extends Model
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
+        'person_type',
+        'tipo_doc',
         'ci',
+        'ci_complemento',
+        'nit',
         'first_name',
         'middle_name',
         'paternal_surname',
         'maternal_surname',
+        'legal_name',
         'birth_date',
         'email',
         'phone',
         'address',
         'gender',
         'image',
+        'padron',
         'status',
 
         'registerUser_id',
@@ -34,6 +40,11 @@ class Person extends Model
         'deleteUser_id',
         'deleteRole',
         'deleteObservation',
+    ];
+
+    protected $casts = [
+        'birth_date' => 'date',
+        'status' => 'integer',
     ];
 
     const STATUS_ACTIVE = 1;
@@ -59,6 +70,10 @@ class Person extends Model
      | -----------------------------------------------------------------*/
    public function getFullNameAttribute()
     {
+        if ($this->person_type === 'Jurídica') {
+            return $this->legal_name;
+        }
+
         return trim(collect([
             $this->first_name,
             $this->middle_name,
@@ -72,5 +87,35 @@ class Person extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 1);
+    }
+
+    public function scopeSearch($query, $term)
+    {
+        if (!$term) {
+            return $query;
+        }
+
+        $fullNameRaw = "CASE
+            WHEN person_type = 'Jurídica' THEN legal_name
+            ELSE TRIM(CONCAT(
+                COALESCE(first_name, ''), ' ',
+                COALESCE(middle_name, ''), ' ',
+                COALESCE(paternal_surname, ''), ' ',
+                COALESCE(maternal_surname, '')
+            ))
+        END";
+
+        return $query->where(function ($sub) use ($term, $fullNameRaw) {
+            if (is_numeric($term)) {
+                $sub->where('id', $term)
+                    ->orWhere('ci', 'like', "%{$term}%")
+                    ->orWhere('nit', 'like', "%{$term}%")
+                    ->orWhere('padron', 'like', "%{$term}%");
+            } else {
+                $sub->where('email', 'like', "%{$term}%")
+                    ->orWhere('legal_name', 'like', "%{$term}%")
+                    ->orWhereRaw("{$fullNameRaw} like ?", ["%{$term}%"]);
+            }
+        });
     }
 }

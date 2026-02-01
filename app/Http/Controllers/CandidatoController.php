@@ -11,6 +11,7 @@ use App\Http\Requests\UpdateCandidatoRequest;
 use App\Traits\ManagesCrud;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class CandidatoController extends Controller
 {
@@ -56,6 +57,10 @@ class CandidatoController extends Controller
         $data = $request->validated();
 
         try {
+            if ($request->hasFile('imagen')) {
+                $data['imagen'] = $request->file('imagen')->store('candidatos', 'public');
+            }
+
             Candidato::create($data);
 
             return redirect()->route('admin.candidatos.index')
@@ -85,6 +90,13 @@ class CandidatoController extends Controller
         $data = $request->validated();
 
         try {
+            if ($request->hasFile('imagen')) {
+                if ($candidato->imagen) {
+                    Storage::disk('public')->delete($candidato->imagen);
+                }
+                $data['imagen'] = $request->file('imagen')->store('candidatos', 'public');
+            }
+
             $candidato->update($data);
 
             return redirect()->route('admin.candidatos.index')

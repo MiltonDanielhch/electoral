@@ -31,7 +31,7 @@ class GeografiaController extends Controller
     public function create()
     {
         $this->authorize('create', Geografia::class);
-        $tipos = ['Departamento', 'Provincia', 'Municipio', 'Cantón', 'Localidad'];
+        $tipos = ['Departamento', 'Provincia', 'Municipio', 'Localidad'];
         $parents = Geografia::orderBy('nombre')->pluck('nombre', 'id_geografia');
         return view('admin.geografias.edit-add', ['geografia' => new Geografia(), 'tipos' => $tipos, 'parents' => $parents]);
     }
@@ -48,7 +48,7 @@ class GeografiaController extends Controller
     public function edit(Geografia $geografia)
     {
         $this->authorize('update', $geografia);
-        $tipos = ['Departamento', 'Provincia', 'Municipio', 'Cantón', 'Localidad'];
+        $tipos = ['Departamento', 'Provincia', 'Municipio', 'Localidad'];
         $parents = Geografia::orderBy('nombre')->pluck('nombre', 'id_geografia');
         return view('admin.geografias.edit-add', compact('geografia', 'tipos', 'parents'));
     }
@@ -67,6 +67,13 @@ class GeografiaController extends Controller
         $this->authorize('view', $geografia);
         $geografia->load(['parent', 'children', 'recintos']);
         return view('admin.geografias.read', compact('geografia'));
+    }
+
+    public function mapaRecintos(Geografia $geografia)
+    {
+        $this->authorize('view', $geografia);
+        $geografia->load(['parent', 'children', 'recintos', 'limite']);
+        return view('admin.geografias.mapa-recintos', compact('geografia'));
     }
 
     public function destroy(Geografia $geografia)

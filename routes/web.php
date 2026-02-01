@@ -25,19 +25,28 @@ use TCG\Voyager\Facades\Voyager;
 Route::redirect('login', 'admin/login')->name('login');
 Route::redirect('/', 'admin');
 
-// Grupo principal con middleware personalizado
-Route::prefix('admin')->middleware(['loggin', 'system'])->group(function () {
+
+// Rutas públicas
+Route::get('/mapa-resultados', function () {
+    return view('dashboard.mapa-resultados');
+    })->name('mapa.resultados');
 
     // Rutas de Voyager (no tocar)
     Voyager::routes();
 
-    // ──────────────── PERSONAS ────────────────
-    Route::prefix('people')->group(function () {
-        Route::get('/', [PersonController::class, 'index'])->name('voyager.people.index');
-        Route::get('/ajax/list', [PersonController::class, 'list'])->name('voyager.people.ajax.list');
-        Route::post('/', [PersonController::class, 'store'])->name('voyager.people.store');
-        Route::put('/{id}', [PersonController::class, 'update'])->name('voyager.people.update');
-    });
+    // Grupo principal con middleware personalizado
+    Route::prefix('admin')->middleware(['loggin', 'system'])->group(function () {
+
+        // ──────────────── PERSONAS ────────────────
+    Route::get('people', [PersonController::class, 'index'])->name('admin.people.index');
+    Route::get('people/create', [PersonController::class, 'create'])->name('admin.people.create');
+    Route::post('people', [PersonController::class, 'store'])->name('admin.people.store');
+    Route::get('people/{person}', [PersonController::class, 'show'])->name('admin.people.show');
+    Route::get('people/{person}/edit', [PersonController::class, 'edit'])->name('admin.people.edit');
+    Route::put('people/{person}', [PersonController::class, 'update'])->name('admin.people.update');
+    Route::delete('people/{person}', [PersonController::class, 'destroy'])->name('admin.people.destroy');
+    Route::get('people/ajax/list', [PersonController::class, 'list'])->name('admin.people.ajax.list');
+
 
     // ──────────────── USUARIOS ────────────────
     Route::prefix('users')->group(function () {
@@ -85,6 +94,7 @@ Route::prefix('admin')->middleware(['loggin', 'system'])->group(function () {
         Route::put('/{geografia}', [GeografiaController::class, 'update'])->name('admin.geografias.update');
         Route::get('/create', [GeografiaController::class, 'create'])->name('admin.geografias.create');
         Route::get('/{geografia}', [GeografiaController::class, 'show'])->name('admin.geografias.show');
+        Route::get('/{geografia}/mapa', [GeografiaController::class, 'mapaRecintos'])->name('admin.geografias.mapa');
         Route::delete('/{geografia}', [GeografiaController::class, 'destroy'])->name('admin.geografias.destroy');
     });
 
@@ -139,3 +149,4 @@ Route::prefix('admin')->middleware(['loggin', 'system'])->group(function () {
         ]);
     })->name('clear.cache');
 });
+

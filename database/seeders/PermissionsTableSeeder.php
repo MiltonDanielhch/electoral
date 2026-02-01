@@ -81,18 +81,28 @@ class PermissionsTableSeeder extends Seeder
             ['key' => 'read_recintos', 'table_name' => 'recintos'],
             ['key' => 'add_recintos', 'table_name' => 'recintos'],
             ['key' => 'edit_recintos', 'table_name' => 'recintos'],
+            ['key' => 'delete_recintos', 'table_name' => 'recintos'],
 
             // Mesas
             ['key' => 'browse_mesas', 'table_name' => 'mesas'],
             ['key' => 'read_mesas', 'table_name' => 'mesas'],
             ['key' => 'add_mesas', 'table_name' => 'mesas'],
             ['key' => 'edit_mesas', 'table_name' => 'mesas'],
+            ['key' => 'delete_mesas', 'table_name' => 'mesas'],
 
             // Candidatos
             ['key' => 'browse_candidatos', 'table_name' => 'candidatos'],
             ['key' => 'read_candidatos', 'table_name' => 'candidatos'],
             ['key' => 'add_candidatos', 'table_name' => 'candidatos'],
             ['key' => 'edit_candidatos', 'table_name' => 'candidatos'],
+            ['key' => 'delete_candidatos', 'table_name' => 'candidatos'],
+
+            // Personas
+            ['key' => 'browse_people', 'table_name' => 'people'],
+            ['key' => 'read_people', 'table_name' => 'people'],
+            ['key' => 'add_people', 'table_name' => 'people'],
+            ['key' => 'edit_people', 'table_name' => 'people'],
+            ['key' => 'delete_people', 'table_name' => 'people'],
         ];
 
         foreach ($permissions as $permission) {
@@ -102,23 +112,23 @@ class PermissionsTableSeeder extends Seeder
             );
         }
 
-        // Administracion
-        $permissions = [
-            'browse_people' => 'Ver lista de personas',
-            'read_people' => 'Ver detalles de una persona',
-            'edit_people' => 'Editar información de personas',
-            'add_people' => 'Agregar nuevas personas',
-            'delete_people' => 'Eliminar personas',
-        ];
+        // // Administracion
+        // $permissions = [
+        //     'browse_people' => 'Ver lista de personas',
+        //     'read_people' => 'Ver detalles de una persona',
+        //     'edit_people' => 'Editar información de personas',
+        //     'add_people' => 'Agregar nuevas personas',
+        //     'delete_people' => 'Eliminar personas',
+        // ];
 
-        foreach ($permissions as $key => $description) {
-            Permission::firstOrCreate([
-                'key'        => $key,
-                'keyDescription'=> $description,
-                'table_name' => 'people',
-                'tableDescription'=>'Personas'
-            ]);
-        }
+        // foreach ($permissions as $key => $description) {
+        //     Permission::firstOrCreate([
+        //         'key'        => $key,
+        //         'keyDescription'=> $description,
+        //         'table_name' => 'people',
+        //         'tableDescription'=>'Personas'
+        //     ]);
+        // }
 
 
 

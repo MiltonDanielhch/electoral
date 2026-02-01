@@ -42,13 +42,9 @@ return new class extends Migration
 
             $table->enum('gender', ['Masculino', 'Femenino'])->nullable();
             $table->string('image')->nullable();
-
+            $table->string('padron')->nullable()->index(); // Indexado para búsquedas rápidas
 
             $table->tinyInteger('status')->default(1)->comment('1=activo,0=inactivo,2=pending');
-
-            // Estado persona (IDTGB: Activo/Inactivo/Fallecido)
-            $table->enum('estado_persona', ['Activo', 'Inactivo', 'Fallecido'])
-                ->default('Activo');
 
             $table->timestamps();
             $table->foreignId('registerUser_id')->nullable()->constrained('users');

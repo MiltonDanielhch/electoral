@@ -27,6 +27,7 @@ class MesaController extends Controller
     protected function applySearch(Builder $query, string $search): Builder
     {
         return $query->where('codigo_tse', 'like', "%$search%")
+            ->orWhere('numero_mesa', 'like', "%$search%")
             ->orWhereHas('recinto', function($q) use ($search) {
                 $q->where('nombre', 'like', "%$search%");
             });
@@ -36,7 +37,7 @@ class MesaController extends Controller
     {
         $this->authorize('create', Mesa::class);
         $recintos = Recinto::orderBy('nombre')->get();
-        $estados = ['Activa', 'Inactiva'];
+        $estados = ['Habilitada', 'Escrutada', 'Anulada', 'Observada'];
         return view('admin.mesas.edit-add', [
             'mesa' => new Mesa(),
             'recintos' => $recintos,
@@ -65,7 +66,7 @@ class MesaController extends Controller
     {
         $this->authorize('update', $mesa);
         $recintos = Recinto::orderBy('nombre')->get();
-        $estados = ['Activa', 'Inactiva'];
+        $estados = ['Habilitada', 'Escrutada', 'Anulada', 'Observada'];
         return view('admin.mesas.edit-add', compact('mesa', 'recintos', 'estados'));
     }
 

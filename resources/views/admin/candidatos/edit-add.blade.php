@@ -17,7 +17,7 @@
 @section('content')
     <div class="page-content container-fluid">
         @include('voyager::alerts')
-        <form method="POST" action="{{ $candidato->exists ? route('admin.candidatos.update', $candidato->id_candidato) : route('admin.candidatos.store') }}">
+        <form method="POST" action="{{ $candidato->exists ? route('admin.candidatos.update', $candidato->id_candidato) : route('admin.candidatos.store') }}" enctype="multipart/form-data">
             @csrf
             @if($candidato->exists)
                 @method('PUT')
@@ -44,6 +44,16 @@
                             <label for="ci">CI <span class="text-danger">*</span></label>
                             <input type="text" name="ci" id="ci" class="form-control" value="{{ old('ci', $candidato->ci) }}" required>
                         </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="imagen">Imagen</label>
+                        <input type="file" name="imagen" id="imagen" class="form-control" accept="image/*">
+                        @if($candidato->imagen)
+                            <div style="margin-top: 10px;">
+                                <img src="{{ \Illuminate\Support\Facades\Storage::url($candidato->imagen) }}" alt="Imagen Candidato" style="max-width: 200px;">
+                            </div>
+                        @endif
                     </div>
 
                     <div class="row">

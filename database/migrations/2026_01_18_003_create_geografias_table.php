@@ -13,9 +13,12 @@ return new class extends Migration
             $table->id('id_geografia');
             $table->char('codigo_tse', 9)->unique();
             $table->string('nombre', 100);
-            $table->enum('tipo', ['Departamento', 'Provincia', 'Municipio', 'Cantón', 'Localidad']);
+            $table->enum('tipo', ['Departamento', 'Provincia', 'Municipio', 'Localidad']);
             $table->foreignId('parent_id')->nullable()->constrained('geografias', 'id_geografia')->onDelete('set null');
             $table->tinyInteger('nivel_jerarquico')->default(0);
+
+            $table->decimal('latitud', 10, 8)->nullable();
+            $table->decimal('longitud', 11, 8)->nullable();
 
             $table->index(['tipo', 'parent_id'], 'idx_geo_tipo_parent');
             $table->index('nivel_jerarquico');

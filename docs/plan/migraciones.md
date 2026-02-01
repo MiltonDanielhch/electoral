@@ -103,7 +103,7 @@ return new class extends Migration
             $table->id('id_geografia');
             $table->char('codigo_tse', 9)->unique();
             $table->string('nombre', 100);
-            $table->enum('tipo', ['Departamento', 'Provincia', 'Municipio', 'Cantón', 'Localidad']);
+            $table->enum('tipo', ['Departamento', 'Provincia', 'Municipio', 'Localidad']);
             $table->foreignId('parent_id')->nullable()->constrained('geografias', 'id_geografia')->onDelete('set null');
             $table->tinyInteger('nivel_jerarquico')->default(0);
 

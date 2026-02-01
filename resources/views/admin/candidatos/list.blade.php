@@ -4,6 +4,7 @@
             <thead>
                 <tr>
                     <th style="text-align: center; width: 80px;">ID</th>
+                    <th style="text-align: center;">Imagen</th>
                     <th style="text-align: center;">CI</th>
                     <th style="text-align: center;">Nombre Completo</th>
                     <th style="text-align: center;">Partido</th>
@@ -17,6 +18,13 @@
                 @forelse ($items as $candidato)
                     <tr>
                         <td>{{ $candidato->id_candidato }}</td>
+                        <td style="text-align: center;">
+                            @if($candidato->imagen)
+                                <img src="{{ \Illuminate\Support\Facades\Storage::url($candidato->imagen) }}" alt="Imagen" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
+                            @else
+                                -
+                            @endif
+                        </td>
                         <td>{{ $candidato->ci }}</td>
                         <td>{{ $candidato->nombre_completo }}</td>
                         <td>{{ $candidato->partido ? $candidato->partido->sigla : '-' }}</td>
@@ -28,6 +36,9 @@
                             </span>
                         </td>
                         <td class="no-sort no-click bread-actions text-right">
+                            <a href="{{ route('admin.candidatos.show', $candidato->id_candidato) }}" title="Ver" class="btn btn-sm btn-warning view">
+                                <i class="voyager-eye"></i> <span class="hidden-xs hidden-sm">Ver</span>
+                            </a>
                             <a href="{{ route('admin.candidatos.edit', $candidato->id_candidato) }}" title="Editar" class="btn btn-sm btn-primary edit">
                                 <i class="voyager-edit"></i> <span class="hidden-xs hidden-sm">Editar</span>
                             </a>
@@ -38,7 +49,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="text-center">No se encontraron candidatos.</td>
+                        <td colspan="9" class="text-center">No se encontraron candidatos.</td>
                     </tr>
                 @endforelse
             </tbody>

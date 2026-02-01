@@ -10,7 +10,7 @@ Define la jerarquía territorial del departamento.
 - **id_geografia** (PK, BigInt): Identificador único.
 - **codigo_tse** (Char 9, Unique): Código oficial del Órgano Electoral.
 - **nombre** (String 100): Nombre del territorio (ej. "Vaca Díez", "Riberalta").
-- **tipo** (Enum): `['Departamento', 'Provincia', 'Municipio', 'Cantón', 'Localidad']`.
+- **tipo** (Enum): `['Departamento', 'Provincia', 'Municipio', 'Localidad']`.
 - **parent_id** (FK): Referencia a la misma tabla (el padre jerárquico).
 - **nivel_jerarquico** (TinyInt): Calculado por trigger (1=Dpto, 2=Prov, 3=Mun...).
 

@@ -20,7 +20,9 @@ class PermissionRoleTableSeeder extends Seeder
 
         // --- ROL ADMIN ---
         $this->command->info('Asignando permisos a Admin...');
-        $role = Role::where('name', 'admin')->first();
+
+        // $role = Role::where('name', 'admin')->first();
+        $role = Role::where('name', 'admin')->orWhere('id', 1)->first();
 
         if (!$role) {
             $role = Role::create(['name' => 'admin', 'display_name' => 'Administrador']);
@@ -40,6 +42,18 @@ class PermissionRoleTableSeeder extends Seeder
                                                 table_name = "roles" or
                                                 table_name = "users" or
                                                 table_name = "settings" or
+                                                table_name = "cargos" or
+                                                `key` = "browse_people" or
+                                                `key` = "read_people" or
+                                                `key` = "add_people" or
+                                                `key` = "edit_people" or
+                                                `key` = "delete_people" or
+                                                table_name = "organizaciones_politicas" or
+                                                table_name = "geografias" or
+                                                table_name = "recintos" or
+                                                table_name = "mesas" or
+                                                table_name = "candidatos" or
+
 
                                                 `key` = "browse_clear-cache"')->get();
             $role->permissions()->sync($permissions->pluck('id')->all());
@@ -88,6 +102,14 @@ class PermissionRoleTableSeeder extends Seeder
             'add_candidatos',
             'edit_candidatos',
             'delete_candidatos',
+
+            // Personas
+            'browse_people',
+            'read_people',
+            'add_people',
+            'edit_people',
+            'delete_people',
+
             'browse_clear-cache',
         ];
 

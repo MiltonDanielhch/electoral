@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -10,61 +9,47 @@ class MesaSeeder extends Seeder
 {
     public function run(): void
     {
-        $recintos = DB::table('recintos')->pluck('id_recinto', 'nombre')->toArray();
+        // Traemos todos los recintos para asegurar que ninguno se quede sin mesas
+        $recintos = DB::table('recintos')->get();
 
-        $mesasPorRecinto = [
-            'Unidad Educativa 6 de Junio' => [
-                '00100100001', '00100100002', '00100100003', '00100100004', '00100100005',
-                '00100100006', '00100100007', '00100100008', '00100100009', '00100100010',
-            ],
-            'Unidad Educativa Bolivia' => [
-                '00100200001', '00100200002', '00100200003', '00100200004', '00100200005',
-            ],
-            'Colegio Nacional San Ignacio' => [
-                '00100300001', '00100300002', '00100300003', '00100300004',
-            ],
-            'Unidad Educativa Petrolera' => [
-                '00100400001', '00100400002', '00100400003',
-            ],
-            'Centro Cultural René Moreno' => [
-                '00100500001', '00100500002', '00100500003', '00100500004',
-            ],
-            'Unidad Educativa San Ignacio' => [
-                '00100600001', '00100600002', '00100600003',
-            ],
-            'Colegio Técnico Humanístico' => [
-                '00100700001', '00100700002',
-            ],
-            'Unidad Educativa General Ballivián' => [
-                '00100800001', '00100800002', '00100800003', '00100800004', '00100800005',
-            ],
-            'Colegio Sagrado Corazón' => [
-                '00100900001', '00100900002', '00100900003',
-            ],
-            'Unidad Educativa San Javier' => [
-                '00101000001', '00101000002', '00101000003',
-            ],
-            'Centro Educativo Franciscano' => [
-                '00101100001', '00101100002',
-            ],
-        ];
+        foreach ($recintos as $recinto) {
+            $cantidadMesas = $this->obtenerCantidadMesas($recinto->nombre);
 
-        $estados = ['Habilitada', 'Escrutada', 'Anulada', 'Observada'];
+            for ($i = 1; $i <= $cantidadMesas; $i++) {
+                // SINTONÍA DE CÓDIGO:
+                // Código Recinto (supongamos 3 dígitos) + relleno + número mesa
+                // Total: 11 dígitos para que el TRIGGER no lo rechace
+                $codigoMesa = str_pad($recinto->codigo_tse, 6, "0", STR_PAD_LEFT) . str_pad($i, 5, "0", STR_PAD_LEFT);
 
-        foreach ($mesasPorRecinto as $recintoNombre => $mesas) {
-            $recintoId = $recintos[$recintoNombre] ?? null;
-
-            if (!$recintoId) {
-                continue;
-            }
-
-            foreach ($mesas as $codigoMesa) {
-                DB::table('mesas')->insert([
-                    'codigo_tse' => $codigoMesa,
-                    'id_recinto' => $recintoId,
-                    'estado' => $estados[array_rand($estados)],
-                ]);
+                DB::table('mesas')->updateOrInsert(
+                    ['codigo_tse' => $codigoMesa],
+                    [
+                        'id_recinto' => $recinto->id_recinto,
+                        'numero_mesa' => $i,
+                        'estado'     => 'Habilitada',
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]
+                );
             }
         }
+
+        $this->command->info('Mesas habilitadas en todos los recintos del Beni.');
+    }
+
+    /**
+     * Define la cantidad de mesas según el nombre del recinto (Sintonía Manual)
+     */
+    private function obtenerCantidadMesas($nombre)
+    {
+        return match ($nombre) {
+            'Unidad Educativa 6 de Junio'         => 10,
+            'Unidad Educativa Bolivia'            => 6,
+            'Colegio Nacional San Ignacio'        => 5,
+            'Unidad Educativa Petrolera'          => 4,
+            'Centro Cultural René Moreno'         => 4,
+            'Unidad Educativa General Ballivián'  => 8,
+            default                               => 3, // Cantidad mínima para recintos no especificados
+        };
     }
 }

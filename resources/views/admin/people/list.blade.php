@@ -27,7 +27,7 @@
                 @forelse ($data as $item)
                 <tr>
                     <td>{{ $item->id }}</td>
-                    <td>{{ $item->ci }}</td>
+                    <td>{{ $item->ci }}{{ $item->ci_complemento ? '-' . $item->ci_complemento : '' }}</td>
                     <td>
                         <table>
                             @php
@@ -59,25 +59,32 @@
                     </td>
                     <td style="text-align: center">{{ $item->phone?$item->phone:'SN' }}</td>
                     <td style="text-align: center">
-                       <span class="label label-{{ $item->status == 1 ? 'success' : 'warning' }}">
-                            {{ $item->status == 1 ? 'Activo' : 'Inactivo' }}
+                        @php
+                            $statusLabel = \App\Models\Person::getStatusLabel($item->status);
+                            $labelColor = match($item->status) {
+                                \App\Models\Person::STATUS_ACTIVE => 'success',
+                                \App\Models\Person::STATUS_INACTIVE => 'danger',
+                                \App\Models\Person::STATUS_PENDING => 'warning',
+                                default => 'default'
+                            };
+                        @endphp
+                       <span class="label label-{{ $labelColor }}">
+                            {{ $statusLabel }}
                         </span>
-
-
                     </td>
                     <td style="width: 18%" class="no-sort no-click bread-actions text-right">
                         @if (auth()->user()->hasPermission('read_people'))
-                            <a href="{{ route('voyager.people.show', ['id' => $item->id]) }}" title="Ver" class="btn btn-sm btn-warning view">
+                            <a href="{{ route('admin.people.show', $item->id) }}" title="Ver" class="btn btn-sm btn-warning view">
                                 <i class="voyager-eye"></i> <span class="hidden-xs hidden-sm">Ver</span>
                             </a>
                         @endif
                         @if (auth()->user()->hasPermission('edit_people'))
-                            <a href="{{ route('voyager.people.edit', ['id' => $item->id]) }}" title="Editar" class="btn btn-sm btn-primary edit">
+                            <a href="{{ route('admin.people.edit', $item->id) }}" title="Editar" class="btn btn-sm btn-primary edit">
                                 <i class="voyager-edit"></i> <span class="hidden-xs hidden-sm">Editar</span>
                             </a>
                         @endif
                         @if (auth()->user()->hasPermission('delete_people'))
-                            <a href="#" onclick="deleteItem('{{ route('voyager.people.destroy', ['id' => $item->id]) }}')" title="Eliminar" data-toggle="modal" data-target="#modal-delete" class="btn btn-sm btn-danger delete">
+                            <a href="#" onclick="deleteItem('{{ route('admin.people.destroy', $item->id) }}')" title="Eliminar" data-toggle="modal" data-target="#modal-delete" class="btn btn-sm btn-danger delete">
                                 <i class="voyager-trash"></i> <span class="hidden-xs hidden-sm">Eliminar</span>
                             </a>
                         @endif
@@ -118,10 +125,9 @@
     $(document).ready(function(){
         $('.page-link').click(function(e){
             e.preventDefault();
-            // let link = $(this).attr('href');
-            let url = new URL($(this).attr('href'));
+            let link = $(this).attr('href');
             if(link){
-                // page = link.split('=')[1];
+                let url = new URL(link);
                 let page = url.searchParams.get('page') || 1;
                 list(page);
             }

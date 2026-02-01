@@ -16,6 +16,7 @@ class Candidato extends Model
     protected $fillable = [
         'nombre_completo',
         'ci',
+        'imagen',
         'id_partido',
         'id_cargo',
         'id_geografia_postulacion',

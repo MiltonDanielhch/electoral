@@ -2,232 +2,65 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class RecintoSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $municipios = DB::table('geografias')->where('tipo', 'Municipio')->pluck('id_geografia', 'nombre')->toArray();
+        // Obtenemos los municipios con sus IDs para la relación
+        $municipios = DB::table('geografias')
+            ->where('tipo', 'Municipio')
+            ->pluck('id_geografia', 'nombre')
+            ->toArray();
 
-        $recintosTrinidad = [
-            [
-                'nombre' => 'Unidad Educativa 6 de Junio',
-                'codigo_tse' => '001',
-                'direccion' => 'Calle Sucre esquina Ballivián',
+        // Estructura de datos con coordenadas para que el mapa funcione de entrada
+        $datosRecintos = [
+            'Trinidad' => [
+                ['nombre' => 'U.E. 6 de Junio', 'tse' => '001', 'dir' => 'Calle Sucre esq. Ballivián', 'lat' => -14.8308, 'lng' => -64.9041],
+                ['nombre' => 'U.E. Bolivia', 'tse' => '002', 'dir' => 'Av. Principal s/n', 'lat' => -14.8350, 'lng' => -64.9000],
+                ['nombre' => 'Col. Nac. San Ignacio', 'tse' => '003', 'dir' => 'Calle 6 de Agosto', 'lat' => -14.8280, 'lng' => -64.9060],
+                ['nombre' => 'U.E. Petrolera', 'tse' => '004', 'dir' => 'Av. Petrolera', 'lat' => -14.8410, 'lng' => -64.9100],
+                ['nombre' => 'Centro Cultural René Moreno', 'tse' => '005', 'dir' => 'Plaza Principal', 'lat' => -14.8333, 'lng' => -64.9022],
             ],
-            [
-                'nombre' => 'Unidad Educativa Bolivia',
-                'codigo_tse' => '002',
-                'direccion' => 'Av. Principal s/n',
+            'San Ignacio de Moxos' => [
+                ['nombre' => 'U.E. San Ignacio', 'tse' => '006', 'dir' => 'Plaza Principal', 'lat' => -14.9961, 'lng' => -65.6403],
+                ['nombre' => 'Colegio Técnico Humanístico', 'tse' => '007', 'dir' => 'Calle Principal', 'lat' => -14.9980, 'lng' => -65.6420],
             ],
-            [
-                'nombre' => 'Colegio Nacional San Ignacio',
-                'codigo_tse' => '003',
-                'direccion' => 'Calle 6 de Agosto',
+            'Rurrenabaque' => [
+                ['nombre' => 'U.E. General Ballivián', 'tse' => '008', 'dir' => 'Av. Principal', 'lat' => -14.4414, 'lng' => -67.5278],
+                ['nombre' => 'Colegio Sagrado Corazón', 'tse' => '009', 'dir' => 'Calle 16 de Julio', 'lat' => -14.4430, 'lng' => -67.5300],
             ],
-            [
-                'nombre' => 'Unidad Educativa Petrolera',
-                'codigo_tse' => '004',
-                'direccion' => 'Av. Petrolera',
+            'Santa Ana del Yacuma' => [
+                ['nombre' => 'U.E. Santa Ana', 'tse' => '014', 'dir' => 'Calle Principal', 'lat' => -13.7444, 'lng' => -65.4264],
+                ['nombre' => 'Colegio Yacuma', 'tse' => '015', 'dir' => 'Av. 9 de Febrero', 'lat' => -13.7460, 'lng' => -65.4280],
             ],
-            [
-                'nombre' => 'Centro Cultural René Moreno',
-                'codigo_tse' => '005',
-                'direccion' => 'Plaza Principal',
-            ],
+            // Puedes seguir agregando el resto de municipios aquí...
         ];
 
-        $recintosSanIgnacio = [
-            [
-                'nombre' => 'Unidad Educativa San Ignacio',
-                'codigo_tse' => '006',
-                'direccion' => 'Plaza Principal',
-            ],
-            [
-                'nombre' => 'Colegio Técnico Humanístico',
-                'codigo_tse' => '007',
-                'direccion' => 'Calle Principal',
-            ],
-        ];
-
-        $recintosRurrenabaque = [
-            [
-                'nombre' => 'Unidad Educativa General Ballivián',
-                'codigo_tse' => '008',
-                'direccion' => 'Av. Principal',
-            ],
-            [
-                'nombre' => 'Colegio Sagrado Corazón',
-                'codigo_tse' => '009',
-                'direccion' => 'Calle 16 de Julio',
-            ],
-        ];
-
-        $recintosSanJavier = [
-            [
-                'nombre' => 'Unidad Educativa San Javier',
-                'codigo_tse' => '010',
-                'direccion' => 'Plaza de Armas',
-            ],
-            [
-                'nombre' => 'Centro Educativo Franciscano',
-                'codigo_tse' => '011',
-                'direccion' => 'Calle Misiones',
-            ],
-        ];
-
-        $recintosReyes = [
-            [
-                'nombre' => 'Unidad Educativa Reyes',
-                'codigo_tse' => '012',
-                'direccion' => 'Calle Principal',
-            ],
-            [
-                'nombre' => 'Centro Cultural Municipal',
-                'codigo_tse' => '013',
-                'direccion' => 'Plaza de Reyes',
-            ],
-        ];
-
-        $recintosSantaAna = [
-            [
-                'nombre' => 'Unidad Educativa Santa Ana',
-                'codigo_tse' => '014',
-                'direccion' => 'Calle Principal',
-            ],
-            [
-                'nombre' => 'Colegio Yacuma',
-                'codigo_tse' => '015',
-                'direccion' => 'Av. 9 de Febrero',
-            ],
-        ];
-
-        $recintosLoreto = [
-            [
-                'nombre' => 'Unidad Educativa Loreto',
-                'codigo_tse' => '016',
-                'direccion' => 'Plaza Principal',
-            ],
-            [
-                'nombre' => 'Centro Educativo Marbán',
-                'codigo_tse' => '017',
-                'direccion' => 'Calle Central',
-            ],
-        ];
-
-        $recintosMagdalena = [
-            [
-                'nombre' => 'Unidad Educativa Magdalena',
-                'codigo_tse' => '018',
-                'direccion' => 'Calle Principal',
-            ],
-            [
-                'nombre' => 'Centro Cultural Iténez',
-                'codigo_tse' => '019',
-                'direccion' => 'Av. Iténez',
-            ],
-        ];
-
-        $recintosBaures = [
-            [
-                'nombre' => 'Unidad Educativa Baures',
-                'codigo_tse' => '020',
-                'direccion' => 'Calle Principal',
-            ],
-            [
-                'nombre' => 'Colegio Etnoeducativo',
-                'codigo_tse' => '021',
-                'direccion' => 'Plaza Baures',
-            ],
-        ];
-
-        $recintosSanJoaquin = [
-            [
-                'nombre' => 'Unidad Educativa San Joaquín',
-                'codigo_tse' => '022',
-                'direccion' => 'Calle Principal',
-            ],
-            [
-                'nombre' => 'Centro Cultural Mamoré',
-                'codigo_tse' => '023',
-                'direccion' => 'Av. San Joaquín',
-            ],
-        ];
-
-        $recintosSanRamon = [
-            [
-                'nombre' => 'Unidad Educativa San Ramón',
-                'codigo_tse' => '024',
-                'direccion' => 'Plaza Principal',
-            ],
-            [
-                'nombre' => 'Colegio San Ramón',
-                'codigo_tse' => '025',
-                'direccion' => 'Calle 6 de Agosto',
-            ],
-        ];
-
-        $recintosPuertoSiles = [
-            [
-                'nombre' => 'Unidad Educativa Puerto Siles',
-                'codigo_tse' => '026',
-                'direccion' => 'Calle Principal',
-            ],
-            [
-                'nombre' => 'Centro Cultural Vaca Díez',
-                'codigo_tse' => '027',
-                'direccion' => 'Plaza Municipal',
-            ],
-        ];
-
-        $todosRecintos = array_merge(
-            $recintosTrinidad,
-            $recintosSanIgnacio,
-            $recintosRurrenabaque,
-            $recintosSanJavier,
-            $recintosReyes,
-            $recintosSantaAna,
-            $recintosLoreto,
-            $recintosMagdalena,
-            $recintosBaures,
-            $recintosSanJoaquin,
-            $recintosSanRamon,
-            $recintosPuertoSiles
-        );
-
-        foreach ($todosRecintos as $recinto) {
-            $municipioNombre = match (true) {
-                in_array($recinto['codigo_tse'], ['001', '002', '003', '004', '005']) => 'Trinidad',
-                in_array($recinto['codigo_tse'], ['006', '007']) => 'San Ignacio de Moxos',
-                in_array($recinto['codigo_tse'], ['008', '009']) => 'Rurrenabaque',
-                in_array($recinto['codigo_tse'], ['010', '011']) => 'San Javier',
-                in_array($recinto['codigo_tse'], ['012', '013']) => 'Reyes',
-                in_array($recinto['codigo_tse'], ['014', '015']) => 'Santa Ana del Yacuma',
-                in_array($recinto['codigo_tse'], ['016', '017']) => 'Loreto',
-                in_array($recinto['codigo_tse'], ['018', '019']) => 'Magdalena',
-                in_array($recinto['codigo_tse'], ['020', '021']) => 'Baures',
-                in_array($recinto['codigo_tse'], ['022', '023']) => 'San Joaquín',
-                in_array($recinto['codigo_tse'], ['024', '025']) => 'San Ramón',
-                in_array($recinto['codigo_tse'], ['026', '027']) => 'Puerto Siles',
-                default => 'Trinidad',
-            };
-
-            $municipioId = $municipios[$municipioNombre] ?? $municipios['Trinidad'] ?? null;
+        foreach ($datosRecintos as $municipioNombre => $recintos) {
+            // Buscamos el ID del municipio en el array que plockeamos al inicio
+            $municipioId = $municipios[$municipioNombre] ?? null;
 
             if ($municipioId) {
-                DB::table('recintos')->insert([
-                    'codigo_tse' => $recinto['codigo_tse'],
-                    'id_geografia' => $municipioId,
-                    'nombre' => $recinto['nombre'],
-                    'direccion' => $recinto['direccion'],
-                ]);
+                foreach ($recintos as $r) {
+                    DB::table('recintos')->updateOrInsert(
+                        ['codigo_tse' => $r['tse']], // Si el código existe, lo actualiza (evita duplicados)
+                        [
+                            'id_geografia' => $municipioId,
+                            'nombre'       => $r['nombre'],
+                            'direccion'    => $r['dir'],
+                            'latitud'      => $r['lat'] ?? null,
+                            'longitud'     => $r['lng'] ?? null,
+                            'created_at'   => now(),
+                            'updated_at'   => now(),
+                        ]
+                    );
+                }
             }
         }
+
+        $this->command->info('Sintonía completada: Recintos del Beni cargados con éxito.');
     }
 }

@@ -31,6 +31,9 @@
                             </span>
                         </td>
                         <td class="no-sort no-click bread-actions text-right">
+                            <a href="{{ route('admin.organizaciones_politicas.show', $organizacion->id_partido) }}" title="Ver" class="btn btn-sm btn-warning view">
+                                <i class="voyager-eye"></i> <span class="hidden-xs hidden-sm">Ver</span>
+                            </a>
                             <a href="{{ route('admin.organizaciones_politicas.edit', $organizacion->id_partido) }}" title="Editar" class="btn btn-sm btn-primary edit">
                                 <i class="voyager-edit"></i> <span class="hidden-xs hidden-sm">Editar</span>
                             </a>

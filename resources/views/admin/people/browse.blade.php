@@ -15,7 +15,7 @@
                         </div>
                         <div class="col-md-4 text-right" style="margin-top: 30px">
                             @if (auth()->user()->hasPermission('add_people'))
-                            <a href="{{ route('voyager.people.create') }}" class="btn btn-success">
+                            <a href="{{ route('admin.people.create') }}" class="btn btn-success">
                                 <i class="voyager-plus"></i> <span>Crear</span>
                             </a>
                             @endif
@@ -71,10 +71,10 @@
         var countPage = 10, order = 'id', typeOrder = 'desc';
         var timeout = null;
         var isLoading = false;
-        
+
         $(document).ready(() => {
             list();
-            
+
             $('#input-search').on('keyup', function(e){
                 if(e.keyCode == 13) {
                     clearTimeout(timeout);
@@ -94,10 +94,10 @@
                 }, 500); // Reducido de 2000ms a 500ms para mejor UX
             });
         });
-        
+
         function list(page = 1){
             if(isLoading) return;
-            
+
             isLoading = true;
             $('#div-results').loading({message: 'Cargando...'});
 
@@ -108,23 +108,23 @@
                 url: `${url}?search=${search}&paginate=${countPage}&page=${page}`,
                 type: 'get',
                 timeout: 10000, // Timeout de 10 segundos
-                
+
                 success: function(result){
                     $("#div-results").html(result);
                     $('#div-results').loading('toggle');
                 },
-                
+
                 error: function(xhr, status, error){
                     $('#div-results').loading('toggle');
                     $('#div-results').html('<div class="alert alert-danger">Error al cargar los datos: ' + error + '</div>');
                 },
-                
+
                 complete: function(){
                     isLoading = false;
                 }
             });
         }
-        
+
         function deleteItem(url){
             $('#delete_form').attr('action', url);
         }

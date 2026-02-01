@@ -19,6 +19,16 @@
                         <td>{{ $candidato->id_candidato }}</td>
                     </tr>
                     <tr>
+                        <th>Imagen</th>
+                        <td>
+                            @if($candidato->imagen)
+                                <img src="{{ \Illuminate\Support\Facades\Storage::url($candidato->imagen) }}" alt="Imagen Candidato" style="max-width: 300px; border-radius: 5px;">
+                            @else
+                                -
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
                         <th>CI</th>
                         <td>{{ $candidato->ci }}</td>
                     </tr>

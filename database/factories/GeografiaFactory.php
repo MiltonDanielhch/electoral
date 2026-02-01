@@ -16,7 +16,7 @@ class GeografiaFactory extends Factory
      */
     public function definition(): array
     {
-        $tipo = fake()->randomElement(['Departamento', 'Provincia', 'Municipio', 'Cantón', 'Localidad']);
+        $tipo = fake()->randomElement(['Departamento', 'Provincia', 'Municipio', 'Localidad']);
 
         return [
             'codigo_tse' => str_pad(fake()->unique()->randomNumber(6), 9, '0', STR_PAD_LEFT),

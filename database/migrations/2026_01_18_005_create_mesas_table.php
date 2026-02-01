@@ -13,7 +13,10 @@ return new class extends Migration
             $table->id('id_mesa');
             $table->char('codigo_tse', 11)->unique();
             $table->foreignId('id_recinto')->constrained('recintos', 'id_recinto');
+            $table->integer('numero_mesa');
             $table->enum('estado', ['Habilitada', 'Escrutada', 'Anulada', 'Observada'])->default('Habilitada');
+            $table->softDeletes();
+            $table->timestamps();
 
             $table->index(['id_recinto', 'estado'], 'idx_mesa_recinto_estado');
             $table->index('codigo_tse');

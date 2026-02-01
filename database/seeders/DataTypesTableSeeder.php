@@ -14,12 +14,12 @@ class DataTypesTableSeeder extends Seeder
      */
     public function run()
     {
-        
+
 
         \DB::table('data_types')->delete();
-        
+
         \DB::table('data_types')->insert(array (
-            0 => 
+            0 =>
             array (
                 'id' => 1,
                 'name' => 'users',
@@ -37,7 +37,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2024-10-18 14:28:26',
                 'updated_at' => '2025-04-07 16:18:35',
             ),
-            1 => 
+            1 =>
             array (
                 'id' => 2,
                 'name' => 'menus',
@@ -55,7 +55,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2024-10-18 14:28:26',
                 'updated_at' => '2024-10-18 14:28:26',
             ),
-            2 => 
+            2 =>
             array (
                 'id' => 3,
                 'name' => 'roles',
@@ -73,7 +73,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2024-10-18 14:28:26',
                 'updated_at' => '2024-10-18 14:28:26',
             ),
-            3 => 
+            3 =>
             array (
                 'id' => 4,
                 'name' => 'categories',
@@ -91,7 +91,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2024-10-18 14:28:45',
                 'updated_at' => '2024-10-18 14:28:45',
             ),
-            4 => 
+            4 =>
             array (
                 'id' => 5,
                 'name' => 'posts',
@@ -109,7 +109,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2024-10-18 14:28:45',
                 'updated_at' => '2024-10-18 14:28:45',
             ),
-            5 => 
+            5 =>
             array (
                 'id' => 6,
                 'name' => 'pages',
@@ -127,7 +127,7 @@ class DataTypesTableSeeder extends Seeder
                 'created_at' => '2024-10-18 14:28:45',
                 'updated_at' => '2024-10-18 14:28:45',
             ),
-            6 => 
+            6 =>
             array (
                 'id' => 8,
                 'name' => 'people',
@@ -146,7 +146,7 @@ class DataTypesTableSeeder extends Seeder
                 'updated_at' => '2025-04-07 10:25:25',
             ),
         ));
-        
-        
+
+
     }
 }

@@ -15,7 +15,13 @@ return new class extends Migration
             $table->foreignId('id_geografia')->constrained('geografias', 'id_geografia');
             $table->string('nombre', 150);
             $table->string('direccion', 255)->nullable();
+            $table->decimal('latitud', 10, 8)->nullable();
+            $table->decimal('longitud', 11, 8)->nullable();
 
+            $table->softDeletes();
+            $table->timestamps();
+
+            $table->index(['latitud', 'longitud'], 'idx_recintos_coords');
             $table->index('id_geografia');
             $table->index('codigo_tse');
         });

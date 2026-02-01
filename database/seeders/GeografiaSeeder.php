@@ -9,64 +9,94 @@ class GeografiaSeeder extends Seeder
 {
     public function run()
     {
-        $beniDepartamento = DB::table('geografias')->insertGetId([
-            'codigo_tse' => '800000000',
+        // 1. Limpieza de datos previa
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('geografias')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+        // 2. DEPARTAMENTO: BENI
+        $beniId = DB::table('geografias')->insertGetId([
+            'codigo_tse' => '08',
             'nombre' => 'Beni',
             'tipo' => 'Departamento',
             'parent_id' => null,
-            'nivel_jerarquico' => 1
+            'latitud' => -14.50000000,
+            'longitud' => -65.50000000,
         ]);
 
+        // 3. PROVINCIAS (Sintonizadas con códigos TSE de 4 dígitos)
         $provincias = [
-            ['nombre' => 'Cercado', 'codigo' => '801000000'],
-            ['nombre' => 'Vaca Díez', 'codigo' => '802000000'],
-            ['nombre' => 'José Ballivián', 'codigo' => '803000000'],
-            ['nombre' => 'Yacuma', 'codigo' => '804000000'],
-            ['nombre' => 'Moxos', 'codigo' => '805000000'],
-            ['nombre' => 'Marbán', 'codigo' => '806000000'],
-            ['nombre' => 'Mamoré', 'codigo' => '807000000'],
-            ['nombre' => 'Iténez', 'codigo' => '808000000'],
+            ['cod' => '0801', 'nom' => 'Cercado', 'lat' => -14.8333, 'lng' => -64.9167],
+            ['cod' => '0802', 'nom' => 'Vaca Díez', 'lat' => -11.0167, 'lng' => -66.0667],
+            ['cod' => '0803', 'nom' => 'José Ballivián', 'lat' => -14.5000, 'lng' => -66.5000],
+            ['cod' => '0804', 'nom' => 'Yacuma', 'lat' => -13.5000, 'lng' => -65.5000],
+            ['cod' => '0805', 'nom' => 'Moxos', 'lat' => -15.0833, 'lng' => -65.7500],
+            ['cod' => '0806', 'nom' => 'Marbán', 'lat' => -15.6667, 'lng' => -64.3333],
+            ['cod' => '0807', 'nom' => 'Mamoré', 'lat' => -13.0000, 'lng' => -64.7500],
+            ['cod' => '0808', 'nom' => 'Iténez', 'lat' => -13.6667, 'lng' => -63.6667],
         ];
 
-        $provinciaIds = [];
-        foreach ($provincias as $provincia) {
-            $provinciaIds[$provincia['nombre']] = DB::table('geografias')->insertGetId([
-                'codigo_tse' => $provincia['codigo'],
-                'nombre' => $provincia['nombre'],
+        $provIds = [];
+        foreach ($provincias as $p) {
+            $provIds[$p['nom']] = DB::table('geografias')->insertGetId([
+                'codigo_tse' => $p['cod'],
+                'nombre' => $p['nom'],
                 'tipo' => 'Provincia',
-                'parent_id' => $beniDepartamento,
-                'nivel_jerarquico' => 2
+                'parent_id' => $beniId,
+                'latitud' => $p['lat'],
+                'longitud' => $p['lng'],
             ]);
         }
 
+        // 4. MUNICIPIOS (Los 19 municipios del Beni con coordenadas y códigos reales)
         $municipios = [
-            ['nombre' => 'Trinidad', 'provincia' => 'Cercado', 'codigo' => '801010000'],
-            ['nombre' => 'San Javier', 'provincia' => 'Cercado', 'codigo' => '801020000'],
-            ['nombre' => 'San Andrés', 'provincia' => 'Cercado', 'codigo' => '801030000'],
-            ['nombre' => 'San Ignacio de Moxos', 'provincia' => 'Moxos', 'codigo' => '805010000'],
-            ['nombre' => 'Santa Ana del Yacuma', 'provincia' => 'Yacuma', 'codigo' => '804010000'],
-            ['nombre' => 'Reyes', 'provincia' => 'José Ballivián', 'codigo' => '803010000'],
-            ['nombre' => 'Rurrenabaque', 'provincia' => 'José Ballivián', 'codigo' => '803020000'],
-            ['nombre' => 'San Borja', 'provincia' => 'José Ballivián', 'codigo' => '803030000'],
-            ['nombre' => 'Loreto', 'provincia' => 'Marbán', 'codigo' => '806010000'],
-            ['nombre' => 'Magdalena', 'provincia' => 'Iténez', 'codigo' => '808010000'],
-            ['nombre' => 'Baures', 'provincia' => 'Iténez', 'codigo' => '808020000'],
-            ['nombre' => 'Huacaraje', 'provincia' => 'Iténez', 'codigo' => '808030000'],
-            ['nombre' => 'San Joaquín', 'provincia' => 'Mamoré', 'codigo' => '807010000'],
-            ['nombre' => 'San Ramón', 'provincia' => 'Mamoré', 'codigo' => '807020000'],
-            ['nombre' => 'Puerto Siles', 'provincia' => 'Vaca Díez', 'codigo' => '802010000'],
+            // CERCADO
+            ['cod' => '080101', 'nom' => 'Trinidad', 'prov' => 'Cercado', 'lat' => -14.8333, 'lng' => -64.9167],
+            ['cod' => '080102', 'nom' => 'San Javier', 'prov' => 'Cercado', 'lat' => -14.6000, 'lng' => -64.8833],
+            ['cod' => '080103', 'nom' => 'San Andrés', 'prov' => 'Cercado', 'lat' => -15.5833, 'lng' => -64.4167],
+
+            // VACA DÍEZ
+            ['cod' => '080201', 'nom' => 'Riberalta', 'prov' => 'Vaca Díez', 'lat' => -11.0167, 'lng' => -66.0667],
+            ['cod' => '080202', 'nom' => 'Guayaramerín', 'prov' => 'Vaca Díez', 'lat' => -10.8167, 'lng' => -65.3667],
+
+            // JOSÉ BALLIVIÁN
+            ['cod' => '080301', 'nom' => 'Reyes', 'prov' => 'José Ballivián', 'lat' => -14.2958, 'lng' => -67.3358],
+            ['cod' => '080302', 'nom' => 'San Borja', 'prov' => 'José Ballivián', 'lat' => -14.8167, 'lng' => -66.8500],
+            ['cod' => '080303', 'nom' => 'Santa Rosa de Yacuma', 'prov' => 'José Ballivián', 'lat' => -13.2833, 'lng' => -65.9333],
+            ['cod' => '080304', 'nom' => 'Rurrenabaque', 'prov' => 'José Ballivián', 'lat' => -14.4333, 'lng' => -67.5333],
+
+            // YACUMA
+            ['cod' => '080401', 'nom' => 'Santa Ana del Yacuma', 'prov' => 'Yacuma', 'lat' => -13.5000, 'lng' => -65.5000],
+            ['cod' => '080402', 'nom' => 'Exaltación', 'prov' => 'Yacuma', 'lat' => -13.2667, 'lng' => -65.2333],
+
+            // MOXOS
+            ['cod' => '080501', 'nom' => 'San Ignacio de Moxos', 'prov' => 'Moxos', 'lat' => -15.0833, 'lng' => -65.7500],
+
+            // MARBÁN
+            ['cod' => '080601', 'nom' => 'Loreto', 'prov' => 'Marbán', 'lat' => -15.1917, 'lng' => -64.7583],
+            ['cod' => '080602', 'nom' => 'San Andrés (Marbán)', 'prov' => 'Marbán', 'lat' => -15.1500, 'lng' => -64.4000],
+
+            // MAMORÉ
+            ['cod' => '080701', 'nom' => 'San Joaquín', 'prov' => 'Mamoré', 'lat' => -13.0000, 'lng' => -64.7500],
+            ['cod' => '080702', 'nom' => 'San Ramón', 'prov' => 'Mamoré', 'lat' => -13.2833, 'lng' => -64.7167],
+            ['cod' => '080703', 'nom' => 'Puerto Siles', 'prov' => 'Mamoré', 'lat' => -12.8333, 'lng' => -64.9167],
+
+            // ITÉNEZ
+            ['cod' => '080801', 'nom' => 'Magdalena', 'prov' => 'Iténez', 'lat' => -13.2667, 'lng' => -64.0500],
+            ['cod' => '080802', 'nom' => 'Baures', 'prov' => 'Iténez', 'lat' => -13.5833, 'lng' => -63.5833],
+            ['cod' => '080803', 'nom' => 'Huacaraje', 'prov' => 'Iténez', 'lat' => -13.6667, 'lng' => -63.6667],
         ];
 
-        foreach ($municipios as $municipio) {
-            if (isset($provinciaIds[$municipio['provincia']])) {
-                DB::table('geografias')->insert([
-                    'codigo_tse' => $municipio['codigo'],
-                    'nombre' => $municipio['nombre'],
-                    'tipo' => 'Municipio',
-                    'parent_id' => $provinciaIds[$municipio['provincia']],
-                    'nivel_jerarquico' => 3
-                ]);
-            }
+        foreach ($municipios as $m) {
+            DB::table('geografias')->insert([
+                'codigo_tse' => $m['cod'],
+                'nombre' => $m['nom'],
+                'tipo' => 'Municipio',
+                'parent_id' => $provIds[$m['prov']],
+                'latitud' => $m['lat'],
+                'longitud' => $m['lng'],
+                // 'created_at' => now(),
+            ]);
         }
     }
 }

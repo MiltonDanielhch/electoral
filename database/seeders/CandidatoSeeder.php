@@ -60,7 +60,7 @@ class CandidatoSeeder extends Seeder
                         'id_partido' => $partidoId,
                         'id_cargo' => $cargoId,
                         'id_geografia_postulacion' => $geografia,
-                        'estado' => 'Postulado',
+                        'estado' => 'Activo',
                     ]);
                 }
             }

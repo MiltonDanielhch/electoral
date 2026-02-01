@@ -13,7 +13,7 @@ class ElectoralMenuSeeder extends Seeder
             'title'      => 'Personas',
             'order'      => 2,
             'icon_class' => 'voyager-person',
-            'route'      => 'voyager.people.index',
+            'route'      => 'admin.people.index',
             'url'        => '',
         ],
         [

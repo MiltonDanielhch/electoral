@@ -8,6 +8,7 @@
                     <th style="text-align: center;">Nombre</th>
                     <th style="text-align: center;">Dirección</th>
                     <th style="text-align: center;">Municipio</th>
+                    <th style="text-align: center; width: 150px;">Ubicación</th>
                     <th style="text-align: center; width: 200px;" class="actions text-right">Acciones</th>
                 </tr>
             </thead>
@@ -19,7 +20,20 @@
                         <td>{{ $recinto->nombre }}</td>
                         <td>{{ $recinto->direccion ?? '-' }}</td>
                         <td>{{ $recinto->geografia ? $recinto->geografia->nombre : '-' }}</td>
+                        <td style="text-align: center;">
+                            @if($recinto->latitud && $recinto->longitud)
+                                <div id="mini-map-{{ $recinto->id_recinto }}" style="height: 80px; width: 120px; margin: 0 auto; border-radius: 4px;"></div>
+                                <input type="hidden" data-lat="{{ $recinto->latitud }}" data-lon="{{ $recinto->longitud }}" data-id="{{ $recinto->id_recinto }}" class="mini-map-data">
+                            @else
+                                <span class="badge badge-default">
+                                    <i class="voyager-x"></i> Sin ubicación
+                                </span>
+                            @endif
+                        </td>
                         <td class="no-sort no-click bread-actions text-right">
+                            <a href="{{ route('admin.recintos.show', $recinto->id_recinto) }}" title="Ver" class="btn btn-sm btn-success view">
+                                <i class="voyager-eye"></i> <span class="hidden-xs hidden-sm">Ver</span>
+                            </a>
                             <a href="{{ route('admin.recintos.edit', $recinto->id_recinto) }}" title="Editar" class="btn btn-sm btn-primary edit">
                                 <i class="voyager-edit"></i> <span class="hidden-xs hidden-sm">Editar</span>
                             </a>
@@ -30,7 +44,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center">No se encontraron recintos.</td>
+                        <td colspan="7" class="text-center">No se encontraron recintos.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -50,3 +64,48 @@
         </nav>
     </div>
 </div>
+
+@section('css')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+@endsection
+
+@push('javascript')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const miniMaps = document.querySelectorAll('.mini-map-data');
+
+    miniMaps.forEach(function(input) {
+        const lat = parseFloat(input.getAttribute('data-lat'));
+        const lon = parseFloat(input.getAttribute('data-lon'));
+        const id = input.getAttribute('data-id');
+
+        if (!isNaN(lat) && !isNaN(lon)) {
+            const map = L.map('mini-map-' + id, {
+                center: [lat, lon],
+                zoom: 15,
+                zoomControl: false,
+                attributionControl: false,
+                scrollWheelZoom: false,
+                dragging: false,
+                doubleClickZoom: false
+            });
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: ''
+            }).addTo(map);
+
+            L.marker([lat, lon], {
+                icon: L.divIcon({
+                    className: 'custom-div-icon',
+                    html: '<div style="background-color: #26e07f; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>',
+                    iconSize: [12, 12],
+                    iconAnchor: [6, 6]
+                })
+            }).addTo(map);
+        }
+    });
+});
+</script>
+@endpush
+

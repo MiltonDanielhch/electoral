@@ -17,7 +17,7 @@
      │ UK  codigo_tse           CHAR(9)                              │
      │     nombre               VARCHAR(100)                         │
      │     tipo                 ENUM(Departamento, Provincia,       │
-     │                           Municipio, Cantón, Localidad)       │
+     │                           Municipio, Localidad)       │
      │ FK  parent_id            BIGINT  ──────────────┐              │
      │     nivel_jerarquico     TINYINT               │              │
      └──────────────────────────────────────────────────────────────┘

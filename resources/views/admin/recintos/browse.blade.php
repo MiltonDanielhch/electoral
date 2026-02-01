@@ -60,6 +60,7 @@
 @stop
 
 @section('css')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
     .loading-icon {
         animation: spin 1.5s linear infinite;
@@ -70,6 +71,9 @@
     }
     .voyager-spin {
         animation: spin 1.5s linear infinite;
+    }
+    .custom-div-icon {
+        background: transparent;
     }
 </style>
 @endsection
@@ -104,4 +108,56 @@ document.addEventListener('DOMContentLoaded', function() {
 
 @push('javascript')
     @include('admin.partials.list-browse-script', ['listUrl' => route('admin.recintos.ajax.list')])
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+    function initMiniMaps() {
+        const miniMaps = document.querySelectorAll('.mini-map-data');
+
+        miniMaps.forEach(function(input) {
+            const lat = parseFloat(input.getAttribute('data-lat'));
+            const lon = parseFloat(input.getAttribute('data-lon'));
+            const id = input.getAttribute('data-id');
+            const mapContainer = document.getElementById('mini-map-' + id);
+
+            if (!isNaN(lat) && !isNaN(lon) && mapContainer) {
+                try {
+                    const map = L.map('mini-map-' + id, {
+                        center: [lat, lon],
+                        zoom: 15,
+                        zoomControl: false,
+                        attributionControl: false,
+                        scrollWheelZoom: false,
+                        dragging: false,
+                        doubleClickZoom: false,
+                        tap: false
+                    });
+
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: ''
+                    }).addTo(map);
+
+                    L.marker([lat, lon], {
+                        icon: L.divIcon({
+                            className: 'custom-div-icon',
+                            html: '<div style="background-color: #26e07f; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 4px rgba(0,0,0,0.3);"></div>',
+                            iconSize: [12, 12],
+                            iconAnchor: [6, 6]
+                        })
+                    }).addTo(map);
+                } catch (e) {
+                    console.error('Error inicializando mini mapa ' + id + ':', e);
+                }
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initMiniMaps();
+    });
+
+    document.addEventListener('list-loaded', function() {
+        setTimeout(initMiniMaps, 100);
+    });
+    </script>
 @endpush

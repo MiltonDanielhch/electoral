@@ -20,12 +20,34 @@ class Recinto extends Model
         'id_geografia',
         'nombre',
         'direccion',
+        'latitud',
+        'longitud',
     ];
 
     protected $casts = [
+        'latitud' => 'decimal:8',
+        'longitud' => 'decimal:8',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    protected $appends = ['lat_lon'];
+
+    public function getLatLonAttribute(): ?array
+    {
+        if (!$this->latitud || !$this->longitud) {
+            return null;
+        }
+
+        if ($this->latitud == 0 && $this->longitud == 0) {
+            return null;
+        }
+
+        return [
+            'lat' => (float)$this->latitud,
+            'lon' => (float)$this->longitud,
+        ];
+    }
 
     public function geografia()
     {

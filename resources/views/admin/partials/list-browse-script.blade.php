@@ -54,7 +54,11 @@
         $.ajax({
             url: `${listUrl}?${urlParams.toString()}`,
             type: 'GET',
-            success: response => $('#list-container').html(response),
+            success: response => {
+                $('#list-container').html(response);
+                const event = new CustomEvent('list-loaded');
+                document.dispatchEvent(event);
+            },
             error: (xhr) => {
                 console.error('Error al cargar la lista:', xhr);
                 $('#list-container').html(`<div class="alert alert-danger text-center">Error al cargar los datos. Por favor, intenta de nuevo.</div>`);
