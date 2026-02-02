@@ -42,9 +42,13 @@
                             <a href="{{ route('admin.candidatos.edit', $candidato->id_candidato) }}" title="Editar" class="btn btn-sm btn-primary edit">
                                 <i class="voyager-edit"></i> <span class="hidden-xs hidden-sm">Editar</span>
                             </a>
-                            <button title="Borrar" class="btn btn-sm btn-danger delete" data-id="{{ $candidato->id_candidato }}" data-toggle="modal" data-target="#delete_modal" onclick="deleteItem('{{ route('admin.candidatos.destroy', $candidato->id_candidato) }}', '{{ $candidato->nombre_completo }}')">
-                                <i class="voyager-trash"></i> <span class="hidden-xs hidden-sm">Borrar</span>
-                            </button>
+                            <form action="{{ route('admin.candidatos.destroy', $candidato->id_candidato) }}" method="POST" style="display:inline-block">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger" title="Borrar" onclick="return confirm('¿Está seguro de eliminar a {{ addslashes($candidato->nombre_completo) }}?')">
+                                    <i class="voyager-trash"></i> <span class="hidden-xs hidden-sm">Borrar</span>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 @empty

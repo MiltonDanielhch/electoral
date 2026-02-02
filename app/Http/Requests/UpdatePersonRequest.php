@@ -13,19 +13,28 @@ class UpdatePersonRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'status' => $this->status == 'on' || $this->status == '1' ? 1 : 0,
+        ]);
+    }
+
     public function rules()
     {
-        $id = $this->route('id');
+        $routeParam = $this->route('person') ?? $this->route('id');
+        $id = is_object($routeParam) ? $routeParam->id : $routeParam;
 
         return [
-            'tipo_doc' => 'required|string|max:10|in:CI,Pasaporte',
+            'tipo_doc' => 'required|string|max:10',
             'ci' => [
                 'required',
                 'string',
                 'max:20',
-                // Valida unicidad ignorando el registro actual
+                // Valida unicidad compuesta ignorando el registro actual
                 Rule::unique('people')->ignore($id)->where(function ($query) {
-                    return $query->where('ci_complemento', $this->ci_complemento);
+                    return $query->where('tipo_doc', $this->tipo_doc)
+                                 ->where('ci_complemento', $this->ci_complemento);
                 }),
             ],
             'ci_complemento' => 'nullable|string|max:5',
@@ -37,36 +46,32 @@ class UpdatePersonRequest extends FormRequest
 
             'email' => 'nullable|email|unique:people,email,' . $id . '|max:255',
             'phone' => 'nullable|string|regex:/^[0-9+\s\-]{7,20}$/|max:20',
-            'gender' => 'required|string|in:Masculino,Femenino',
-            'birth_date' => 'required|date|before:today',
+            'gender' => 'nullable|string|in:Masculino,Femenino',
+            'birth_date' => 'nullable|date|before:today',
             'address' => 'nullable|string|max:1000',
-            'image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,bmp,webp|max:10240',
             'padron' => 'nullable|string|max:50',
             'status' => 'boolean',
-            'remove_image' => 'boolean',
         ];
     }
 
     public function messages()
     {
         return [
-            'tipo_doc.required' => 'El tipo de documento es obligatorio.',
-            'tipo_doc.in' => 'El tipo de documento debe ser CI o Pasaporte.',
-            'ci.required' => 'El número de documento es obligatorio.',
-            'ci.unique' => 'Este documento de identidad ya está registrado (verifique el complemento).',
+            'ci.required' => 'El CI es obligatorio.',
+            'ci.unique' => 'Este documento de identidad ya está registrado (verifique tipo y complemento).',
             'first_name.required' => 'El nombre es obligatorio.',
             'first_name.max' => 'El nombre no debe superar 255 caracteres.',
             'paternal_surname.required' => 'El apellido paterno es obligatorio.',
             'paternal_surname.max' => 'El apellido paterno no debe superar 255 caracteres.',
             'email.email' => 'El email debe ser válido.',
             'email.unique' => 'El email ya está registrado.',
-            'phone.regex' => 'El teléfono debe contener entre 7 y 20 caracteres numéricos.',
-            'gender.required' => 'El género es obligatorio.',
+            'phone.regex' => 'El teléfono debe contener entre 7 y 20 caracteres alfanuméricos.',
             'gender.in' => 'El género debe ser Masculino o Femenino.',
-            'birth_date.required' => 'La fecha de nacimiento es obligatoria.',
             'birth_date.before' => 'La fecha de nacimiento debe ser anterior a hoy.',
-            'image.mimes' => 'La imagen debe ser JPG o PNG.',
-            'image.max' => 'La imagen no debe superar 2MB.',
+            'image.mimes' => 'La imagen debe ser jpeg, jpg, png, bmp o webp.',
+            'image.max' => 'La imagen no debe superar 10MB.',
+            'status.boolean' => 'El campo estado debe ser verdadero o falso.',
         ];
     }
 }

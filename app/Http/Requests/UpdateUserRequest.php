@@ -4,11 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+use App\Models\User;
+
 class UpdateUserRequest extends FormRequest
 {
     public function authorize()
     {
-        return auth()->user()->can('edit_users');
+        $userToUpdate = User::findOrFail($this->route('id'));
+        return $this->user()->can('update', $userToUpdate);
     }
 
     public function rules()

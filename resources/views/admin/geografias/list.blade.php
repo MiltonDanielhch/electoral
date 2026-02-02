@@ -43,10 +43,13 @@
                                 {{-- <i class="voyager-edit"></i> --}}
                                 <i class="voyager-edit"></i> <span class="hidden-xs hidden-sm">Editar</span>
                             </a>
-                            <button title="Borrar" class="btn btn-sm btn-danger delete" data-id="{{ $geografia->id_geografia }}" data-toggle="modal" data-target="#delete_modal" onclick="deleteItem('{{ route('admin.geografias.destroy', $geografia->id_geografia) }}', '{{ $geografia->nombre }}')">
-                                {{-- <i class="voyager-trash"></i> --}}
-                                <i class="voyager-trash"></i> <span class="hidden-xs hidden-sm">Borrar</span>
-                            </button>
+                            <form action="{{ route('admin.geografias.destroy', $geografia->id_geografia) }}" method="POST" style="display:inline-block">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger" title="Borrar" onclick="return confirm('¿Está seguro de eliminar a {{ addslashes($geografia->nombre) }}?')">
+                                    <i class="voyager-trash"></i> <span class="hidden-xs hidden-sm">Borrar</span>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 @empty

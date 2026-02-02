@@ -41,46 +41,48 @@ class User extends \TCG\Voyager\Models\User
     }
 
     /**
-     * Verifica si el usuario tiene un rol específico
+     * Checks if User has a Role.
      *
-     * @param string|array $role Nombre del rol o array de roles
-     * @return bool True si tiene el rol, false en caso contrario
+     * @param string|array $name The role to check.
      */
-    public function hasRole($role)
+    public function hasRole($name)
     {
-        if (!$this->role) {
+        if (is_null($this->role)) {
             return false;
         }
 
-        if (is_array($role)) {
-            return in_array($this->role->name, $role);
+        $roles = $this->role->pluck('name')->toArray();
+
+        foreach ((is_array($name) ? $name : [$name]) as $role) {
+            if (in_array($role, $roles)) {
+                return true;
+            }
         }
 
-        return $this->role->name === $role;
+        return false;
     }
 
-    /**
-     * Verifica si el usuario tiene un permiso específico
-     *
-     * @param string $permission Llave del permiso
-     * @return bool True si tiene el permiso, false en caso contrario
-     */
-    public function hasPermission($permission)
+    public function hasPermission($name)
     {
-        if (!$this->role) {
-            return false;
-        }
-
-        // Los admins tienen todos los permisos
-        if ($this->role->name === 'admin') {
+        // The admin role has all permissions.
+        if ($this->hasRole('admin')) {
             return true;
         }
 
-        // Verificar si el rol tiene el permiso
-        return $this->role->permissions->contains('key', $permission);
+        if (is_null($this->role)) {
+            return false;
+        }
+
+        $permissions = $this->role->permissions->pluck('key')->toArray();
+
+        foreach ((is_array($name) ? $name : [$name]) as $permission) {
+            if (in_array($permission, $permissions)) {
+                return true;
+            }
+        }
+
+        return false;
     }
-
-
 
     protected $hidden = [
         'password',

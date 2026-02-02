@@ -4,11 +4,13 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+use App\Models\User;
+
 class StoreUserRequest extends FormRequest
 {
     public function authorize()
     {
-        return auth()->user()->can('add_users');
+        return $this->user()->can('create', User::class);
     }
 
     public function rules()
@@ -16,7 +18,7 @@ class StoreUserRequest extends FormRequest
         return [
             'person_id' => 'required|exists:people,id,deleted_at,NULL,status,1',
             'email' => 'required|email|unique:users|max:255',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8',
             'role_id' => 'required|exists:roles,id',
         ];
     }

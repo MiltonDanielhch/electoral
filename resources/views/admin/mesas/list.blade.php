@@ -53,12 +53,13 @@
                             <a href="{{ route('admin.mesas.edit', $mesa->id_mesa) }}" title="Editar" class="btn btn-sm btn-primary edit">
                                 <i class="voyager-edit"></i> <span class="hidden-xs">Editar</span>
                             </a>
-                            <button title="Borrar" class="btn btn-sm btn-danger delete"
-                                    data-url="{{ route('admin.mesas.destroy', $mesa->id_mesa) }}"
-                                    data-name="Mesa {{ $mesa->numero_mesa }} - {{ $mesa->codigo_tse }}"
-                                    onclick="deleteItem(this.dataset.url, this.dataset.name)">
-                                <i class="voyager-trash"></i> <span class="hidden-xs">Borrar</span>
-                            </button>
+                            <form action="{{ route('admin.mesas.destroy', $mesa->id_mesa) }}" method="POST" style="display:inline-block">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger" title="Borrar" onclick="return confirm('¿Está seguro de eliminar la Mesa {{ $mesa->numero_mesa }} - {{ $mesa->codigo_tse }}?')">
+                                    <i class="voyager-trash"></i> <span class="hidden-xs">Borrar</span>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 @empty

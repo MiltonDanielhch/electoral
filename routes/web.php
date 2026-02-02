@@ -6,7 +6,7 @@ use App\Http\Controllers\ErrorController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AjaxController;
- use App\Http\Controllers\RoleController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\CargoController;
 use App\Http\Controllers\OrganizacionPoliticaController;
 use App\Http\Controllers\GeografiaController;
@@ -29,15 +29,14 @@ Route::redirect('/', 'admin');
 // Rutas públicas
 Route::get('/mapa-resultados', function () {
     return view('dashboard.mapa-resultados');
-    })->name('mapa.resultados');
+})->name('mapa.resultados');
 
-    // Rutas de Voyager (no tocar)
+// Grupo principal con middleware personalizado
+Route::prefix('admin')->middleware(['loggin', 'system'])->group(function () {
+
+    // Rutas de Voyager (Colocadas al final para que no sobrescriban tus rutas personalizadas como 'people')
     Voyager::routes();
-
-    // Grupo principal con middleware personalizado
-    Route::prefix('admin')->middleware(['loggin', 'system'])->group(function () {
-
-        // ──────────────── PERSONAS ────────────────
+    // ──────────────── PERSONAS ────────────────
     Route::get('people', [PersonController::class, 'index'])->name('admin.people.index');
     Route::get('people/create', [PersonController::class, 'create'])->name('admin.people.create');
     Route::post('people', [PersonController::class, 'store'])->name('admin.people.store');
@@ -152,4 +151,3 @@ Route::get('/mapa-resultados', function () {
         ]);
     })->name('clear.cache');
 });
-
