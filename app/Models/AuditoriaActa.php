@@ -12,6 +12,8 @@ class AuditoriaActa extends Model
     protected $table = 'auditoria_actas';
     protected $primaryKey = 'id_auditoria';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'id_acta',
         'campo_modificado',

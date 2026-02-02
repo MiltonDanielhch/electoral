@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
         // $this->call(ActaEscrutinioSeeder::class);
 
         $this->call(ElectoralMenuSeeder::class);
-
+        $this->call(GeografiaLimiteSeeder::class);
         // $this->call(MenuItemsTableSeeder::class);
         // $this->call(DataTypesTableSeeder::class);
         // $this->call(DataRowsTableSeeder::class);

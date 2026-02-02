@@ -2,94 +2,52 @@
 
 namespace Database\Seeders;
 
-use App\Models\Geografia;
-use App\Models\GeografiaLimite;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use App\Models\Geografia;
 
 class GeografiaLimitesSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
     public function run()
     {
-        $departamentos = Geografia::where('tipo', 'Departamento')->get();
+        // GeoJSON simplificados (Cajas delimitadoras aproximadas) para pruebas
+        $departamentos = [
+            'Beni' => '{"type":"Polygon","coordinates":[[[-67.5,-10.5],[-63.0,-10.5],[-63.0,-16.0],[-67.5,-16.0],[-67.5,-10.5]]]}',
+            'La Paz' => '{"type":"Polygon","coordinates":[[[-69.5,-12.5],[-66.5,-12.5],[-66.5,-17.5],[-69.5,-17.5],[-69.5,-12.5]]]}',
+            'Santa Cruz' => '{"type":"Polygon","coordinates":[[[-65.0,-13.0],[-57.5,-13.0],[-57.5,-20.5],[-65.0,-20.5],[-65.0,-13.0]]]}',
+            'Cochabamba' => '{"type":"Polygon","coordinates":[[[-67.5,-16.0],[-64.5,-16.0],[-64.5,-18.5],[-67.5,-18.5],[-67.5,-16.0]]]}',
+            'Chuquisaca' => '{"type":"Polygon","coordinates":[[[-65.5,-18.5],[-63.5,-18.5],[-63.5,-21.0],[-65.5,-21.0],[-65.5,-18.5]]]}',
+            'Tarija' => '{"type":"Polygon","coordinates":[[[-65.5,-21.0],[-62.5,-21.0],[-62.5,-22.5],[-65.5,-22.5],[-65.5,-21.0]]]}',
+            'Potosí' => '{"type":"Polygon","coordinates":[[[-68.5,-18.0],[-65.0,-18.0],[-65.0,-22.5],[-68.5,-22.5],[-68.5,-18.0]]]}',
+            'Oruro' => '{"type":"Polygon","coordinates":[[[-69.0,-17.0],[-66.5,-17.0],[-66.5,-19.5],[-69.0,-19.5],[-69.0,-17.0]]]}',
+            'Pando' => '{"type":"Polygon","coordinates":[[[-69.5,-9.5],[-65.0,-9.5],[-65.0,-12.5],[-69.5,-12.5],[-69.5,-9.5]]]}',
+        ];
 
-        foreach ($departamentos as $geografia) {
-            $geojson = $this->getGeojsonForDepartamento($geografia->nombre);
+        foreach ($departamentos as $nombre => $geojson) {
+            // Buscamos la geografía por nombre
+            $geo = Geografia::where('nombre', $nombre)->first();
 
-            if ($geojson) {
-                GeografiaLimite::updateOrCreate(
-                    ['id_geografia' => $geografia->id_geografia],
+            if ($geo) {
+                // Insertamos o actualizamos el límite geográfico
+                DB::table('geografias_limites')->updateOrInsert(
+                    ['id_geografia' => $geo->id_geografia],
                     [
                         'geojson' => $geojson,
-                        'centro_latitud' => $this->getCentroLat($geografia->nombre),
-                        'centro_longitud' => $this->getCentroLon($geografia->nombre),
-                        'area_km2' => rand(50000, 200000),
+                        'centro_latitud' => 0, // Se podría calcular el centroide real
+                        'centro_longitud' => 0,
+                        'created_at' => now(),
+                        'updated_at' => now(),
                     ]
                 );
+                $this->command->info("Mapa cargado para: $nombre");
+            } else {
+                $this->command->warn("No se encontró el departamento: $nombre (Asegúrate de tener cargadas las geografías)");
             }
         }
-    }
-
-    private function getCentroLat($nombre)
-    {
-        $coords = [
-            'La Paz' => -16.290154,
-            'Cochabamba' => -17.3895,
-            'Santa Cruz' => -17.7863,
-            'Oruro' => -17.9687,
-            'Potosí' => -19.5837,
-            'Chuquisaca' => -19.0333,
-            'Tarija' => -21.5356,
-            'Beni' => -14.8333,
-            'Pando' => -11.7533,
-        ];
-        return $coords[$nombre] ?? -16.290154;
-    }
-
-    private function getCentroLon($nombre)
-    {
-        $coords = [
-            'La Paz' => -68.119854,
-            'Cochabamba' => -66.1568,
-            'Santa Cruz' => -63.1812,
-            'Oruro' => -67.1096,
-            'Potosí' => -65.7528,
-            'Chuquisaca' => -64.7167,
-            'Tarija' => -64.7296,
-            'Beni' => -64.9,
-            'Pando' => -68.2314,
-        ];
-        return $coords[$nombre] ?? -63.588653;
-    }
-
-    private function getGeojsonForDepartamento($nombre)
-    {
-        $offsets = [
-            'La Paz' => [-69.5, -68.5, -16.5, -15.5],
-            'Cochabamba' => [-67.5, -66.5, -17.5, -16.5],
-            'Santa Cruz' => [-64.5, -63.5, -18.5, -17.5],
-            'Oruro' => [-68.5, -67.5, -18.5, -17.5],
-            'Potosí' => [-66.5, -65.5, -20.5, -19.5],
-            'Chuquisaca' => [-65.5, -64.5, -19.5, -18.5],
-            'Tarija' => [-65.5, -64.5, -22.5, -21.5],
-            'Beni' => [-66.5, -65.5, -15.5, -14.5],
-            'Pando' => [-69.5, -68.5, -12.5, -11.5],
-        ];
-
-        if (!isset($offsets[$nombre])) {
-            return null;
-        }
-
-        $offset = $offsets[$nombre];
-
-        return [
-            'type' => 'Polygon',
-            'coordinates' => [[
-                [$offset[0], $offset[2]],
-                [$offset[1], $offset[2]],
-                [$offset[1], $offset[3]],
-                [$offset[0], $offset[3]],
-                [$offset[0], $offset[2]]
-            ]]
-        ];
     }
 }

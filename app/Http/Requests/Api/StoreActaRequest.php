@@ -14,6 +14,19 @@ class StoreActaRequest extends FormRequest
         return true;
     }
 
+    /**
+     * Preparamos los datos antes de validar.
+     * Esto convierte el texto JSON de Insomnia en un Array real.
+     */
+    protected function prepareForValidation()
+    {
+        if (is_string($this->votos_partido)) {
+            $this->merge([
+                'votos_partido' => json_decode($this->votos_partido, true),
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         return [

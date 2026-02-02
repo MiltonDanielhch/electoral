@@ -2,6 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\ActaController;
 use App\Http\Controllers\Api\MesaController;
 use App\Http\Controllers\Api\CatalogoController;
@@ -9,6 +12,24 @@ use App\Http\Controllers\MapaController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+// 🔐 Login para React/Insomnia (Emisión de Token)
+Route::post('/login', function (Request $request) {
+    if (!Auth::attempt($request->only('email', 'password'))) {
+        return response()->json([
+            'message' => 'Credenciales inválidas'
+        ], 401);
+    }
+
+    $user = User::where('email', $request['email'])->firstOrFail();
+    $token = $user->createToken('auth_token')->plainTextToken;
+
+    return response()->json([
+        'access_token' => $token,
+        'token_type' => 'Bearer',
+        'user' => $user
+    ]);
 });
 
 // Cambiamos el throttle de IP a Usuario Autenticado para el día de la elección
@@ -38,3 +59,7 @@ Route::prefix('public/mapas')
         Route::get('/resultados', [MapaController::class, 'resultados'])->name('api.public.mapas.resultados');
     });
 
+// 🛠️ Ruta Temporal para verificar que el Observer funciona (Borrar luego)
+Route::get('/debug/resumen', function () {
+    return DB::table('resumen_votos')->orderBy('ultima_actualizacion', 'desc')->get();
+});

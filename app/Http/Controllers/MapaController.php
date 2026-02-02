@@ -100,7 +100,7 @@ class MapaController extends Controller
         return response()->json($data);
     }
 
-    public function resultados(Request $request): JsonResponse
+   public function resultados(Request $request): JsonResponse
     {
         $tipo = $request->input('tipo', 'Departamento');
         $cargoId = $request->input('cargo_id');
@@ -111,14 +111,22 @@ class MapaController extends Controller
                     if ($cargoId) {
                         $q->where('id_cargo', $cargoId);
                     }
-                    $q->with('partido:id_partido,sigla,color_hex'); // Cargar colores dinámicos
-                }
+                    // Ordenamos por total_votos descendente para que el .first() sea el ganador
+                    $q->orderBy('total_votos', 'desc');
+                    $q->with('partido:id_partido,sigla,color_hex');
+                },
+                'limite' // Importante para la geometría
             ])
             ->get();
 
         $features = $geografias->map(function ($geo) {
-            $votos = $geo->resumenVotos->first();
-            $color = $this->getColorForResults($votos);
+            // El ganador es el primer registro (gracias al orderBy desc)
+            $votosGanador = $geo->resumenVotos->first();
+
+            // Calculamos el total de votos sumando todos los partidos en esa geo
+            $totalVotosGeo = $geo->resumenVotos->sum('total_votos');
+
+            $color = $this->getColorForResults($votosGanador);
 
             return [
                 'type' => 'Feature',
@@ -126,11 +134,10 @@ class MapaController extends Controller
                     'id' => $geo->id_geografia,
                     'nombre' => $geo->nombre,
                     'tipo' => $geo->tipo,
-                    'votos_validos' => $votos?->votos_validos ?? 0,
-                    'votos_blancos' => $votos?->votos_blancos ?? 0,
-                    'votos_nulos' => $votos?->votos_nulos ?? 0,
+                    'total_votos' => (int)$totalVotosGeo,
                     'color' => $color,
-                    'ganador' => $votos?->ganador ?? null,
+                    'ganador' => $votosGanador?->partido?->sigla ?? 'Sin datos',
+                    'id_partido_ganador' => $votosGanador?->id_partido,
                 ],
                 'geometry' => $geo->limite?->geojson ?? null,
             ];
@@ -140,6 +147,17 @@ class MapaController extends Controller
             'type' => 'FeatureCollection',
             'features' => $features->filter(fn($f) => $f['geometry'] !== null)->values(),
         ]);
+    }
+
+    private function getColorForResults($votosGanador): string
+    {
+        // Si no hay votos o el ganador tiene 0, devolvemos gris
+        if (!$votosGanador || $votosGanador->total_votos == 0) {
+            return '#cccccc';
+        }
+
+        // Retornamos el color hexadecimal del partido desde la relación
+        return $votosGanador->partido?->color_hex ?? '#666666';
     }
 
     public function recintosPorGeografia(Geografia $geografia): JsonResponse
@@ -172,22 +190,6 @@ class MapaController extends Controller
         return response()->json($data);
     }
 
-    private function getColorForResults($votos): string
-    {
-        if (!$votos) {
-            return '#cccccc';
-        }
-
-        $total = $votos->votos_validos;
-        if ($total == 0) {
-            return '#cccccc';
-        }
-
-        // Sintonía: Usar color dinámico desde el modelo OrganizacionPolitica
-        // en lugar de colores hardcoded
-        return $votos?->partido?->color_hex ?? '#666666';
-    }
-
     /**
      * Sintonía: Obtener recintos en cascada según el nivel jerárquico
      * - Municipio: Recintos directos
@@ -201,24 +203,24 @@ class MapaController extends Controller
         if ($geografia->tipo === 'Municipio') {
             // Municipio: recintos directos
             $query->where('id_geografia', $geografia->id_geografia);
-        } 
+        }
         elseif ($geografia->tipo === 'Provincia') {
             // Provincia: recintos de todos los municipios hijos
             $municipiosIds = Geografia::where('parent_id', $geografia->id_geografia)
                 ->where('tipo', 'Municipio')
                 ->pluck('id_geografia');
             $query->whereIn('id_geografia', $municipiosIds);
-        } 
+        }
         elseif ($geografia->tipo === 'Departamento') {
             // Departamento: recintos de todos los municipios de todas las provincias
             $provinciasIds = Geografia::where('parent_id', $geografia->id_geografia)
                 ->where('tipo', 'Provincia')
                 ->pluck('id_geografia');
-            
+
             $municipiosIds = Geografia::whereIn('parent_id', $provinciasIds)
                 ->where('tipo', 'Municipio')
                 ->pluck('id_geografia');
-            
+
             $query->whereIn('id_geografia', $municipiosIds);
         }
 

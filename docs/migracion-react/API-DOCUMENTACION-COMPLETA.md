@@ -6,6 +6,19 @@ Este documento explica en detalle toda la API del Sistema Electoral, cómo funci
 
 ---
 
+### 6. Herramientas de Depuración (DevTools)
+
+#### GET `/api/debug/resumen`
+
+**Descripción:** Endpoint temporal para verificar el contenido crudo de la tabla `resumen_votos` y confirmar que el Observer está sumando correctamente.
+
+**Uso:**
+```bash
+curl -X GET "http://localhost:8000/api/debug/resumen"
+```
+*Nota: Eliminar esta ruta antes de pasar a producción.*
+
+
 ## 📖 Índice
 
 1. [Arquitectura General](#arquitectura-general)
@@ -491,6 +504,7 @@ const enviarActa = async (formData) => {
    - Crea registros en votos_x_partido
    - Crea auditoría
    - Actualiza estado de mesa
+   - **Observer:** Actualiza `resumen_votos` y recalcula porcentajes automáticamente
    - Invalida caché de resultados
    ↓
 10. Respuesta de éxito al usuario

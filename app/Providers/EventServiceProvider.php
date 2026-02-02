@@ -27,7 +27,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        \App\Models\VotoXPartido::observe(\App\Observers\VotoXPartidoObserver::class);
     }
 
     /**

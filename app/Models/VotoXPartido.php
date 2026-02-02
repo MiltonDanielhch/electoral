@@ -19,6 +19,8 @@ class VotoXPartido extends Model
         'votos',
     ];
 
+    public $timestamps = false;
+
     protected $casts = [
         'votos' => 'integer',
     ];
