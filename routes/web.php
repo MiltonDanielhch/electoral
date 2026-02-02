@@ -87,6 +87,7 @@ Route::prefix('admin')->middleware(['loggin', 'system'])->group(function () {
     // ──────────────── GEOGRAFÍAS ────────────────
     Route::prefix('geografias')->group(function () {
         Route::get('/ajax/list', [GeografiaController::class, 'list'])->name('admin.geografias.ajax.list');
+        Route::get('/ajax/parents', [GeografiaController::class, 'ajaxParents'])->name('admin.geografias.parents');
         Route::get('/', [GeografiaController::class, 'index'])->name('admin.geografias.index');
         Route::post('/', [GeografiaController::class, 'store'])->name('admin.geografias.store');
         Route::get('/{geografia}/edit', [GeografiaController::class, 'edit'])->name('admin.geografias.edit');

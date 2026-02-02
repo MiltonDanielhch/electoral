@@ -34,53 +34,61 @@
                         </div>
                     @endif
 
-                    <div class="form-group">
-                        <label for="codigo_tse">Código TSE <span class="text-danger">*</span></label>
-                        <input type="text" name="codigo_tse" id="codigo_tse" class="form-control" value="{{ old('codigo_tse', $recinto->codigo_tse) }}" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="nombre">Nombre <span class="text-danger">*</span></label>
-                        <input type="text" name="nombre" id="nombre" class="form-control" value="{{ old('nombre', $recinto->nombre) }}" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="direccion">Dirección</label>
-                        <input type="text" name="direccion" id="direccion" class="form-control" value="{{ old('direccion', $recinto->direccion) }}">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="id_geografia">Municipio <span class="text-danger">*</span></label>
-                        <select name="id_geografia" id="id_geografia" class="form-control" required>
-                            <option value="">-- Seleccione un municipio --</option>
-                            @foreach($geografias ?? [] as $geografia)
-                                <option value="{{ $geografia->id_geografia }}" @if(old('id_geografia', $recinto->id_geografia) == $geografia->id_geografia) selected @endif>{{ $geografia->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Ubicación en el Mapa</label>
-                        <div id="mapaRecinto" style="height: 350px; border: 1px solid #ccc; border-radius: 4px;"></div>
-                        <small class="form-text text-muted">Haz clic en el mapa para seleccionar la ubicación</small>
-                    </div>
-
-                    <div class="row" style="margin-top: 10px;">
+                    <div class="row">
                         <div class="col-md-6">
-                            <label>Latitud</label>
-                            <input type="number" step="0.000001" name="latitud" id="latitud" class="form-control"
-                                   value="{{ old('latitud', $recinto->latitud) }}" placeholder="-16.290154">
+                            <div class="form-group">
+                                <label for="codigo_tse">Código TSE <span class="text-danger">*</span></label>
+                                <input type="text" name="codigo_tse" id="codigo_tse" class="form-control" value="{{ old('codigo_tse', $recinto->codigo_tse) }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="nombre">Nombre <span class="text-danger">*</span></label>
+                                <input type="text" name="nombre" id="nombre" class="form-control" value="{{ old('nombre', $recinto->nombre) }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="direccion">Dirección</label>
+                                <input type="text" name="direccion" id="direccion" class="form-control" value="{{ old('direccion', $recinto->direccion) }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="id_geografia">Municipio <span class="text-danger">*</span></label>
+                                <select name="id_geografia" id="id_geografia" class="form-control" required>
+                                    <option value="">-- Seleccione un municipio --</option>
+                                    @foreach($geografias ?? [] as $geografia)
+                                        <option value="{{ $geografia->id_geografia }}"
+                                            data-lat="{{ $geografia->latitud }}" data-lng="{{ $geografia->longitud }}"
+                                            @if(old('id_geografia', $recinto->id_geografia) == $geografia->id_geografia) selected @endif>{{ $geografia->nombre }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Latitud</label>
+                                    <input type="number" step="0.000001" name="latitud" id="latitud" class="form-control"
+                                           value="{{ old('latitud', $recinto->latitud) }}" placeholder="-16.290154">
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Longitud</label>
+                                    <input type="number" step="0.000001" name="longitud" id="longitud" class="form-control"
+                                           value="{{ old('longitud', $recinto->longitud) }}" placeholder="-63.588653">
+                                </div>
+                            </div>
+
+                            <button type="button" id="btnMiUbicacion" class="btn btn-info btn-sm" style="margin-top: 15px;">
+                                <i class="voyager-location"></i> Usar mi ubicación actual
+                            </button>
                         </div>
+
                         <div class="col-md-6">
-                            <label>Longitud</label>
-                            <input type="number" step="0.000001" name="longitud" id="longitud" class="form-control"
-                                   value="{{ old('longitud', $recinto->longitud) }}" placeholder="-63.588653">
+                            <div class="form-group">
+                                <label>Ubicación en el Mapa</label>
+                                <div id="mapaRecinto" style="height: 450px; border: 1px solid #ccc; border-radius: 4px;"></div>
+                                <small class="form-text text-muted">Haz clic en el mapa para seleccionar la ubicación</small>
+                            </div>
                         </div>
                     </div>
-
-                    <button type="button" id="btnMiUbicacion" class="btn btn-info btn-sm" style="margin-top: 10px;">
-                        <i class="voyager-location"></i> Usar mi ubicación actual
-                    </button>
                 </div>
                 <div class="panel-footer text-right">
                     <button type="submit" class="btn btn-primary">
@@ -129,6 +137,8 @@
 <script src="{{ asset('js/mapa-config.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    var isEdit = {{ $recinto->exists ? 'true' : 'false' }};
+    var initialLoad = true;
     // Sintonía: Geofencing - Límites del Departamento del Beni
     const LIMITES_BENI = {
         lat: { min: -16.5, max: -10.0 },
@@ -153,11 +163,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function actualizarValidacionUI(esValido, mensaje = '') {
         const latInput = document.getElementById('latitud');
         const lonInput = document.getElementById('longitud');
-        
+
         // Remover clases previas
         latInput.classList.remove('coordenadas-validas', 'coordenadas-invalidas');
         lonInput.classList.remove('coordenadas-validas', 'coordenadas-invalidas');
-        
+
         // Agregar nueva clase
         if (esValido) {
             latInput.classList.add('coordenadas-validas');
@@ -203,6 +213,33 @@ document.addEventListener('DOMContentLoaded', function() {
         return false;
     }
 
+    /**
+     * Actualiza inputs y valida tras movimiento del marcador
+     */
+    function onMarkerMove(lat, lng) {
+        if (!validarGeofencing(lat, lng)) {
+            actualizarValidacionUI(false, '⚠️ Ubicación fuera del Beni.');
+        } else {
+            document.getElementById('latitud').value = lat.toFixed(6);
+            document.getElementById('longitud').value = lng.toFixed(6);
+            actualizarValidacionUI(true);
+        }
+    }
+
+    /**
+     * Configura eventos para un marcador (arrastre)
+     */
+    function setupMarker(marker) {
+        if (marker.dragging) {
+            marker.dragging.enable();
+            marker.on('dragend', function(e) {
+                var pos = e.target.getLatLng();
+                onMarkerMove(pos.lat, pos.lng);
+            });
+        }
+        return marker;
+    }
+
     function initMapaRecinto() {
         // Usar SintoniaMap para inicialización modular
         sintoniaMap = new SintoniaMap('mapaRecinto', {
@@ -211,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
             zoomControl: true,
             attributionControl: true
         });
-        
+
         sintoniaMap.init();
 
         const lat = parseFloat(document.getElementById('latitud').value) || defaultCenter[0];
@@ -220,23 +257,25 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!isNaN(lat) && !isNaN(lon) && validarGeofencing(lat, lon)) {
             sintoniaMap.centrarEn(lat, lon, 13);
             markerRecinto = sintoniaMap.agregarMarcador(lat, lon);
+            setupMarker(markerRecinto);
         }
 
         sintoniaMap.map.on('click', function(ev) {
             const {lat, lng} = ev.latlng;
-            
+
             // Validar antes de asignar
             if (!validarGeofencing(lat, lng)) {
                 actualizarValidacionUI(false, '⚠️ No puedes seleccionar una ubicación fuera del Departamento del Beni');
                 return;
             }
-            
+
             document.getElementById('latitud').value = lat.toFixed(6);
             document.getElementById('longitud').value = lng.toFixed(6);
-            
+
             if (markerRecinto) sintoniaMap.map.removeLayer(markerRecinto);
             markerRecinto = sintoniaMap.agregarMarcador(lat, lng);
-            
+            setupMarker(markerRecinto);
+
             actualizarValidacionUI(true);
         });
 
@@ -245,6 +284,17 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('longitud').addEventListener('change', validarCoordenadas);
         document.getElementById('latitud').addEventListener('blur', validarCoordenadas);
         document.getElementById('longitud').addEventListener('blur', validarCoordenadas);
+
+        // Sintonía: Centrar mapa al cambiar Municipio
+        $('#id_geografia').on('change', function() {
+            var selected = $(this).find(':selected');
+            var lat = parseFloat(selected.data('lat'));
+            var lng = parseFloat(selected.data('lng'));
+
+            if (!isNaN(lat) && !isNaN(lng)) {
+                sintoniaMap.centrarEn(lat, lng, 13);
+            }
+        });
     }
 
     document.getElementById('btnMiUbicacion').addEventListener('click', function() {
@@ -257,17 +307,18 @@ document.addEventListener('DOMContentLoaded', function() {
             function(pos) {
                 const lat = pos.coords.latitude;
                 const lon = pos.coords.longitude;
-                
+
                 // Validar geofencing
                 if (!validarGeofencing(lat, lon)) {
                     actualizarValidacionUI(false, '⚠️ Tu ubicación actual está fuera del Departamento del Beni. Por favor, selecciona manualmente la ubicación correcta del recinto.');
                     return;
                 }
-                
+
                 document.getElementById('latitud').value = lat.toFixed(6);
                 document.getElementById('longitud').value = lon.toFixed(6);
                 if (markerRecinto) sintoniaMap.map.removeLayer(markerRecinto);
                 markerRecinto = sintoniaMap.agregarMarcador(lat, lon);
+                setupMarker(markerRecinto);
                 sintoniaMap.centrarEn(lat, lon, 15);
                 actualizarValidacionUI(true);
             },
@@ -279,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     initMapaRecinto();
-    
+
     // Validar coordenadas iniciales
     validarCoordenadas();
 });

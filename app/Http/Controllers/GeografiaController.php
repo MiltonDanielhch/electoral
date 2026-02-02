@@ -7,6 +7,7 @@ use App\Http\Requests\StoreGeografiaRequest;
 use App\Http\Requests\UpdateGeografiaRequest;
 use App\Traits\ManagesCrud;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
 class GeografiaController extends Controller
 {
@@ -26,6 +27,19 @@ class GeografiaController extends Controller
     {
         return $query->where('nombre', 'like', "%$search%")
             ->orWhere('codigo_tse', 'like', "%$search%");
+    }
+
+    public function ajaxParents(Request $request)
+    {
+        $tipo = $request->input('tipo');
+
+        if (!$tipo) {
+            return response()->json([]);
+        }
+
+        return response()->json(Geografia::where('tipo', $tipo)
+            ->orderBy('nombre', 'ASC')
+            ->get(['id_geografia', 'nombre', 'latitud', 'longitud']));
     }
 
     public function create()

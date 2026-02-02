@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
 
         const data = await response.json();
-        
+
         // Debug: Ver datos recibidos
         console.log('Datos recibidos:', data);
         console.log('Total recintos:', data.total);

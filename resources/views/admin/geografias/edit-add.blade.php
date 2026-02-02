@@ -109,24 +109,57 @@
 @section('javascript')
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        var isEdit = {{ $geografia->exists ? 'true' : 'false' }};
+        var initialLoad = true;
+
         $('#tipo').on('change', function() {
             var tipo = $(this).val();
             var label = $('#label_parent');
             var help = $('#parent_help');
+            var parentSelect = $('#parent_id');
+            var tipoPadre = '';
 
             if (tipo == 'Provincia') {
                 label.html('Departamento al que pertenece <span class="text-danger">*</span>');
                 help.text('Las provincias siempre pertenecen a un Departamento (Ej: Beni).');
+                tipoPadre = 'Departamento';
             } else if (tipo == 'Municipio') {
                 label.html('Provincia a la que pertenece <span class="text-danger">*</span>');
                 help.text('Los municipios siempre pertenecen a una Provincia (Ej: Cercado).');
+                tipoPadre = 'Provincia';
             } else if (tipo == 'Localidad') {
                 label.html('Municipio al que pertenece <span class="text-danger">*</span>');
                 help.text('Las localidades pertenecen a un Municipio.');
+                tipoPadre = 'Municipio';
             } else {
                 label.text('Ubicación Superior');
                 help.text('Selecciona la ubicación de nivel superior.');
+                parentSelect.html('<option value="">-- Es una ubicación principal --</option>');
+                return;
             }
+
+            // Carga dinámica de padres vía AJAX
+            $.get('{{ url("admin/geografias/ajax/parents") }}', { tipo: tipoPadre }, function(data) {
+                parentSelect.empty();
+                parentSelect.append('<option value="">-- Seleccione --</option>');
+
+                // Preservar selección anterior si existe (Edición o Error de validación)
+                var selectedId = "{{ old('parent_id', $geografia->parent_id) }}";
+
+                $.each(data, function(index, item) {
+                    var isSelected = (selectedId == item.id_geografia) ? 'selected' : '';
+                    // Agregamos data-lat y data-lng a las opciones
+                    parentSelect.append('<option value="'+item.id_geografia+'" data-lat="'+item.latitud+'" data-lng="'+item.longitud+'" '+isSelected+'>'+item.nombre+'</option>');
+                });
+
+                // Actualizar Select2 visualmente
+                parentSelect.trigger('change');
+
+                // Desactivar la bandera de carga inicial después de la primera carga
+                setTimeout(function(){ initialLoad = false; }, 500);
+            }).fail(function() {
+                console.error('Error: No se pudo cargar la lista de ubicaciones superiores. Verifique la ruta en web.php');
+            });
         });
 
         // Ejecutar al cargar para ediciones
@@ -159,6 +192,24 @@
                 marker.setLatLng(e.latlng);
                 $('#latitud').val(e.latlng.lat.toFixed(8));
                 $('#longitud').val(e.latlng.lng.toFixed(8));
+            });
+
+            // NUEVO: Actualizar mapa al seleccionar un padre
+            $('#parent_id').on('change', function() {
+                // Evitar mover el mapa al cargar la página en modo edición (para no perder la ubicación real del hijo)
+                if(isEdit && initialLoad) return;
+
+                var selected = $(this).find(':selected');
+                var lat = selected.data('lat');
+                var lng = selected.data('lng');
+
+                if(lat && lng) {
+                    var newLatLng = new L.LatLng(lat, lng);
+                    map.setView(newLatLng, 13); // Zoom un poco más cerca
+                    marker.setLatLng(newLatLng);
+                    $('#latitud').val(lat);
+                    $('#longitud').val(lng);
+                }
             });
         });
     </script>
