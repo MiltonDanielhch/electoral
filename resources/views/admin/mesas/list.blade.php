@@ -64,7 +64,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center">No se encontraron mesas en la sintonía actual.</td>
+                        <td colspan="7" class="text-center">No se encontraron mesas en la actual.</td>
                     </tr>
                 @endforelse
             </tbody>

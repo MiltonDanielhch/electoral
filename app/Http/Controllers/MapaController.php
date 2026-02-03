@@ -23,7 +23,7 @@ class MapaController extends Controller
         $tipo = $request->input('tipo');
         $parentId = $request->input('parent_id');
 
-        // Sintonía: Caché de GeoJSON - Los datos geográficos no cambian cada segundo
+        // Caché de GeoJSON - Los datos geográficos no cambian cada segundo
         $cacheKey = "geojson:{$tipo}:{$parentId}";
 
         $data = Cache::remember($cacheKey, 3600, function () use ($tipo, $parentId) {
@@ -66,11 +66,11 @@ class MapaController extends Controller
 
     public function recintosGeojson(Geografia $geografia): JsonResponse
     {
-        // Sintonía: Caché de GeoJSON - Cachear por geografía (versión 2 - con cascada)
+        // Caché de GeoJSON - Cachear por geografía (versión 2 - con cascada)
         $cacheKey = "recintos_geojson_v2:{$geografia->id_geografia}";
 
         $data = Cache::remember($cacheKey, 1800, function () use ($geografia) {
-            // Sintonía: Buscar recintos en cascada según el nivel jerárquico
+            // Buscar recintos en cascada según el nivel jerárquico
             $recintos = $this->obtenerRecintosEnCascada($geografia);
 
             $features = $recintos->map(function ($recinto) {
@@ -162,11 +162,11 @@ class MapaController extends Controller
 
     public function recintosPorGeografia(Geografia $geografia): JsonResponse
     {
-        // Sintonía: Caché de recintos por geografía (versión 2 - con cascada)
+        // Caché de recintos por geografía (versión 2 - con cascada)
         $cacheKey = "recintos_por_geo_v2:{$geografia->id_geografia}";
 
         $data = Cache::remember($cacheKey, 1800, function () use ($geografia) {
-            // Sintonía: Buscar recintos en cascada según el nivel jerárquico
+            // Buscar recintos en cascada según el nivel jerárquico
             $recintos = $this->obtenerRecintosEnCascada($geografia);
 
             return [
@@ -191,7 +191,7 @@ class MapaController extends Controller
     }
 
     /**
-     * Sintonía: Obtener recintos en cascada según el nivel jerárquico
+     *  Obtener recintos en cascada según el nivel jerárquico
      * - Municipio: Recintos directos
      * - Provincia: Recintos de todos sus municipios
      * - Departamento: Recintos de todos los municipios de todas sus provincias

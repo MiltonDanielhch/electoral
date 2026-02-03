@@ -80,7 +80,7 @@
                             <span class="label label-info">{{ $mesa->actasEscrutinio->count() }}</span>
                             @if($mesa->estado == 'Escrutada' && $mesa->actasEscrutinio->count() == 0)
                                 <span class="text-danger" style="margin-left: 10px;">
-                                    <i class="voyager-warning"></i> Error de sintonía: El estado es "Escrutada" pero no hay actas.
+                                    <i class="voyager-warning"></i> Error: El estado es "Escrutada" pero no hay actas.
                                 </span>
                             @endif
                         </td>

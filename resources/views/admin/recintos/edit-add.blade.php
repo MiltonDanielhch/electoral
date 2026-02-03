@@ -139,7 +139,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     var isEdit = {{ $recinto->exists ? 'true' : 'false' }};
     var initialLoad = true;
-    // Sintonía: Geofencing - Límites del Departamento del Beni
+    // Geofencing - Límites del Departamento del Beni
     const LIMITES_BENI = {
         lat: { min: -16.5, max: -10.0 },
         lon: { min: -68.0, max: -60.0 }
@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('latitud').addEventListener('blur', validarCoordenadas);
         document.getElementById('longitud').addEventListener('blur', validarCoordenadas);
 
-        // Sintonía: Centrar mapa al cambiar Municipio
+        // Centrar mapa al cambiar Municipio
         $('#id_geografia').on('change', function() {
             var selected = $(this).find(':selected');
             var lat = parseFloat(selected.data('lat'));

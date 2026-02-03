@@ -35,7 +35,7 @@
                 <div class="panel panel-bordered panel-primary">
                     <div class="panel-heading">
                         <h3 class="panel-title">
-                            <i class="voyager-pie-chart"></i> Sintonía de Transmisión - Estadísticas en Tiempo Real
+                            <i class="voyager-pie-chart"></i> Transmisión - Estadísticas en Tiempo Real
                         </h3>
                     </div>
                     <div class="panel-body" id="stats-container">
@@ -78,8 +78,8 @@
                             </div>
                         </div>
                         <div class="progress" style="margin-bottom: 0; margin-top: 10px;">
-                            <div id="progress-bar" class="progress-bar progress-bar-striped active" role="progressbar" 
-                                 style="width: 0%; background-color: #28a745;" 
+                            <div id="progress-bar" class="progress-bar progress-bar-striped active" role="progressbar"
+                                 style="width: 0%; background-color: #28a745;"
                                  aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                                 <span id="progress-text">0%</span>
                             </div>
@@ -171,7 +171,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('delete-modal-wrapper').style.display = '';
-    
+
     // Cargar estadísticas
     loadEstadisticas();
 });
@@ -193,7 +193,7 @@ function loadEstadisticas() {
             document.getElementById('stat-observadas').textContent = stats.observadas.toLocaleString();
             document.getElementById('stat-faltantes').textContent = stats.faltantes.toLocaleString();
             document.getElementById('stat-porcentaje').textContent = stats.porcentaje_escrutadas + '%';
-            
+
             // Actualizar barra de progreso
             const progressBar = document.getElementById('progress-bar');
             const progressText = document.getElementById('progress-text');

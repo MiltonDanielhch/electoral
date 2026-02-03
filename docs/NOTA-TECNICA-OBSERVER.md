@@ -18,7 +18,7 @@ Implementamos un **Observer** que "escucha" cada vez que se crea o modifica un r
    - Cuenta las mesas escrutadas.
    - Actualiza la tabla `resumen_votos` (Upsert).
    - Calcula el porcentaje de votos en tiempo real.
-5. **Sintonía:** Limpia la caché de Redis para que el mapa refleje los cambios al instante.
+5.  Limpia la caché de Redis para que el mapa refleje los cambios al instante.
 
 ## 3. Diagrama de Flujo
 

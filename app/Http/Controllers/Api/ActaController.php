@@ -68,7 +68,7 @@ class ActaController extends Controller
                 'ip_origen' => $request->ip(),
             ]);
 
-            // Sintonía: Actualizar ResumenVoto para que el mapa se pinte en tiempo real
+            // Actualizar ResumenVoto para que el mapa se pinte en tiempo real
             // COMENTADO: Ahora esto lo maneja automáticamente el VotoXPartidoObserver
             // $this->actualizarResumenVotos($acta, $request->votos_partido);
 

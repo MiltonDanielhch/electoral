@@ -6,7 +6,7 @@ Este módulo gestiona la infraestructura territorial jerárquica para el sistema
 
 ## 1. Arquitectura de Datos (Persistencia)
 
-La base del módulo reside en una estructura de **Auto-Relación (Self-Referencing)** que permite niveles infinitos de profundidad, aunque sintonizada específicamente para 3 niveles (DPTO > PROV > MUN).
+La base del módulo reside en una estructura de **Auto-Relación (Self-Referencing)** que permite niveles infinitos de profundidad, aunque específicamente para 3 niveles (DPTO > PROV > MUN).
 
 ### Esquema de Base de Datos
 - **Tabla:** `geografias`
@@ -40,7 +40,7 @@ El modelo utiliza **Accessors de Agregación en Cascada**, lo que permite obtene
 
 - **`contador_recintos`:** Atributo dinámico que suma todos los recintos según el nivel. Si es "Departamento", ejecuta una subconsulta para barrer todas las provincias y municipios dependientes.
 - **`todos_los_recintos`:** Retorna una colección de objetos `Recinto` filtrada por la jerarquía actual.
-- **Scopes de Sintonía:** Métodos `scopeDepartamentos()`, `scopeProvincias()` y `scopeMunicipios()` para filtrado rápido en controladores.
+- **Scopes:** Métodos `scopeDepartamentos()`, `scopeProvincias()` y `scopeMunicipios()` para filtrado rápido en controladores.
 
 ---
 
@@ -68,13 +68,13 @@ Para optimizar el rendimiento y la experiencia de usuario (UX):
 
 - **Validación Recursiva:** El `GeografiaRequest` impide que un territorio sea asignado como hijo de sí mismo, evitando bucles infinitos en el árbol jerárquico.
 - **Políticas de Acceso:** Integración con Laravel Policies para restringir la creación de niveles superiores solo a roles administrativos.
-- **Integridad TSE:** El `GeografiaSeeder` asegura que los códigos oficiales (ej. `080101` para Trinidad) sean la base de toda la sintonía de datos.
+- **Integridad TSE:** El `GeografiaSeeder` asegura que los códigos oficiales (ej. `080101` para Trinidad) sean la base de toda de datos.
 
 ---
 
 ## 5. Resumen de Capacidades del Módulo
 
-> **Nota de Sintonía:** Este módulo es el corazón del sistema; sin la correcta definición de la geografía, los módulos de Recintos y Votos no tendrían anclaje territorial.
+> **Nota:** Este módulo es el corazón del sistema; sin la correcta definición de la geografía, los módulos de Recintos y Votos no tendrían anclaje territorial.
 
 - ✅ CRUD Completo con búsqueda fonética.
 - ✅ Mapa Interactivo para precisión de recintos.
@@ -83,12 +83,12 @@ Para optimizar el rendimiento y la experiencia de usuario (UX):
 
 ---
 
-## 🔧 Implementación de Mejoras (Código 3026)
+## 🔧 Implementación de Mejoras 
 
 **Estado:** Todas las mejoras han sido implementadas exitosamente ✅
 
 ### ✅ 1. El Modelo: `app/Models/Geografia.php` (Optimización N+1) - COMPLETADO
-Actualmente, cada vez que pides el `contador_recintos` en una lista de 50 municipios, haces 50 consultas. Vamos a usar **Caché de Sintonía** para que solo se calcule una vez cada hora (o cuando cambie un dato).
+Actualmente, cada vez que pides el `contador_recintos` en una lista de 50 municipios, haces 50 consultas. Vamos a usar **Caché** para que solo se calcule una vez cada hora (o cuando cambie un dato).
 
 **Mejora sugerida:**
 ```php
@@ -119,7 +119,7 @@ public function up()
 {
     Schema::create('geografias_limites', function (Blueprint $table) {
         $table->id('id_limite');
-        // CAMBIO: onDelete('cascade') para mantener la sintonía al borrar
+        // CAMBIO: onDelete('cascade') para mantener borrar
         $table->foreignId('id_geografia')
               ->constrained('geografias', 'id_geografia')
               ->onDelete('cascade');
@@ -181,7 +181,7 @@ public function rules()
             // MEJORA: Impedir que el padre sea el mismo ID (solo en edición)
             function ($attribute, $value, $fail) {
                 if ($value == $this->route('geografia')) {
-                    $fail('Sintonía rota: Un territorio no puede ser su propio padre.');
+                    $fail('Un territorio no puede ser su propio padre.');
                 }
             },
         ],
@@ -189,7 +189,7 @@ public function rules()
 }
 ```
 
-### 📊 Resumen de Impacto en la Master Formula
+### 📊 Resumen de Impacto
 
 | Mejora | Ubicación | Resultado Final | Estado |
 | :--- | :--- | :--- | :--- |

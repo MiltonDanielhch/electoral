@@ -17,7 +17,7 @@ A diferencia de la tabla de geografías (que es administrativa), esta tabla es e
 ## 2. Motor de Inteligencia y Caché (`ResultsController`)
 Este componente es el cerebro analítico. Su función es procesar miles de votos sin degradar el rendimiento del servidor.
 
-### Sintonía de Rendimiento (High Availability)
+### Rendimiento (High Availability)
 - **Caché por Ventanas Temporales:** Implementación de `Cache::remember` con claves horarias (`Y-m-d-H`).
 - **Impacto:** Durante 5 minutos, el servidor no consulta la base de datos; sirve los resultados desde memoria ultra-rápida.
 - **Estrategia de Agregación:** Los datos se agrupan por `id_cargo` e `id_geografia` en una sola pasada de Eloquent, optimizando el uso de RAM.
@@ -50,13 +50,13 @@ Rutas optimizadas para el consumo de aplicaciones externas y dashboards público
 
 ---
 
-## 5. Resumen de Sintonía Técnica
+## 5. Resumen Técnica
 
-> **Nota de Master Formula:** Este ecosistema asegura que un usuario en Riberalta pueda ver el mismo resultado que un administrador en Trinidad en menos de 5 segundos de diferencia, gracias a la sintonía entre el Caché de Resultados y el GeoJSON Vectorial.
+> **Nota:** Este ecosistema asegura que un usuario en Riberalta pueda ver el mismo resultado que un administrador en Trinidad en menos de 5 segundos de diferencia, gracias entre el Caché de Resultados y el GeoJSON Vectorial.
 
 ---
 
-## 🔧 Implementación de Mejoras (Código 3026)
+## 🔧 Implementación de Mejoras
 
 **Estado:** Todas las mejoras han sido implementadas exitosamente ✅
 
@@ -71,7 +71,7 @@ Rutas optimizadas para el consumo de aplicaciones externas y dashboards público
 
 **Solución Técnica:** Usar la función `ST_Simplify` de MySQL/PostgreSQL si es posible, o procesar el JSON con una tolerancia de precisión menor.
 
-### ✅ 2. Sintonía de Caché de Resultados en `ResultsController.php` - COMPLETADO
+### ✅ 2. Caché de Resultados en `ResultsController.php` - COMPLETADO
 **Problema:** Usas `now()->format('Y-m-d-H')` como clave de caché. Esto significa que si un acta entra a las 10:05, el público no verá el cambio hasta las 11:00. La ventana es demasiado grande para un conteo "en vivo".
 
 **Ubicación:** `app/Http/Controllers/ResultsController.php`
@@ -107,7 +107,6 @@ Route::get('/resultados', [MapaController::class, 'resultados'])
 
 **Mejora:** Mover la lógica del color al Modelo `OrganizacionPolitica`.
 
-**Sintonía:**
 ```php
 // En el controlador, solo llamas al color del modelo
 'color' => $votos?->organizacionPolitica?->color_hex ?? '#cccccc',
@@ -118,7 +117,7 @@ Route::get('/resultados', [MapaController::class, 'resultados'])
 **Nota:** Esta mejora está documentada para futura implementación. Requiere migración de datos GeoJSON a formato TopoJSON para reducir el peso de archivos hasta en un 80%.
 Para que el mapa en el Beni vuele (especialmente con conexiones de internet inestables), la documentación debería sugerir el uso de **TopoJSON**.
 
-**Nota Técnica:** TopoJSON elimina la redundancia de fronteras compartidas, reduciendo el peso de los archivos geográficos hasta en un 80%. Esto asegura que nuestra Master Formula sea ligera y accesible.
+**Nota Técnica:** TopoJSON elimina la redundancia de fronteras compartidas, reduciendo el peso de los archivos geográficos hasta en un 80%. Esto asegura que nuestra sea ligera y accesible.
 
 ### 📊 Resumen de Mejoras SIG
 

@@ -52,7 +52,7 @@ class RecintoController extends Controller
         try {
             $recinto = Recinto::create($data);
 
-            // Sintonía: Invalidar cachés relacionados al crear recinto
+            // Invalidar cachés relacionados al crear recinto
             $this->invalidarCacheRecinto($data['id_geografia'] ?? null);
 
             return redirect()->route('admin.recintos.index')
@@ -77,16 +77,16 @@ class RecintoController extends Controller
     {
         $this->authorize('update', $recinto);
         $data = $request->validated();
-        
+
         // Guardar geografía anterior para invalidar caché si cambió
         $geoAnterior = $recinto->id_geografia;
 
         try {
             $recinto->update($data);
 
-            // Sintonía: Invalidar cachés relacionados al actualizar recinto
+            // Invalidar cachés relacionados al actualizar recinto
             $this->invalidarCacheRecinto($data['id_geografia'] ?? null);
-            
+
             // Si cambió de geografía, invalidar también la anterior
             if (isset($data['id_geografia']) && $geoAnterior != $data['id_geografia']) {
                 $this->invalidarCacheRecinto($geoAnterior);
@@ -119,10 +119,10 @@ class RecintoController extends Controller
         try {
             $geoId = $recinto->id_geografia;
             $recinto->delete();
-            
-            // Sintonía: Invalidar cachés relacionados al eliminar recinto
+
+            // Invalidar cachés relacionados al eliminar recinto
             $this->invalidarCacheRecinto($geoId);
-            
+
             return redirect()->route('admin.recintos.index')
                 ->with(['message' => 'Recinto eliminado exitosamente.', 'alert-type' => 'success']);
         } catch (\Exception $e) {
@@ -133,7 +133,7 @@ class RecintoController extends Controller
     }
 
     /**
-     * Sintonía: Invalidar cachés relacionados con recintos
+     * Invalidar cachés relacionados con recintos
      * Se llama después de crear, actualizar o eliminar
      */
     private function invalidarCacheRecinto(?int $idGeografia = null): void
@@ -145,7 +145,7 @@ class RecintoController extends Controller
             Cache::forget("geo_recintos_count_{$idGeografia}");
             Cache::forget("geo_children_{$idGeografia}");
         }
-        
+
         // Limpiar cachés globales
         Cache::forget('election_live_results');
         Cache::forget('cargos:all');

@@ -17,7 +17,7 @@ class ResultsController extends Controller
 
     public function index()
     {
-        // Sintonía: TTL reducido a 60 segundos para conteo "en vivo"
+        // TTL reducido a 60 segundos para conteo "en vivo"
         $cacheKey = 'election_live_results';
 
         $results = Cache::remember($cacheKey, 60, function () {
@@ -41,7 +41,7 @@ class ResultsController extends Controller
     {
         $cacheKey = "results:cargo:{$cargoId}";
 
-        // Sintonía: TTL reducido a 60 segundos para resultados en tiempo real
+        // TTL reducido a 60 segundos para resultados en tiempo real
         $results = Cache::remember($cacheKey, 60, function () use ($cargoId) {
             return ResumenVoto::query()
                 ->with(['geografia:id_geografia,nombre', 'organizacionPolitica:id_partido,nombre,sigla,color_hex'])
@@ -66,7 +66,7 @@ class ResultsController extends Controller
     {
         $cacheKey = "results:geografia:{$geografiaId}";
 
-        // Sintonía: TTL reducido a 60 segundos para resultados en tiempo real
+        // TTL reducido a 60 segundos para resultados en tiempo real
         $results = Cache::remember($cacheKey, 60, function () use ($geografiaId) {
             return ResumenVoto::query()
                 ->with(['cargo:id_cargo,descripcion,nivel', 'organizacionPolitica:id_partido,nombre,sigla,color_hex'])
@@ -90,7 +90,7 @@ class ResultsController extends Controller
 
     public function clearCache()
     {
-        // Sintonía: Limpiar la nueva clave de caché en vivo
+        // Limpiar la nueva clave de caché en vivo
         Cache::forget('election_live_results');
 
         return response()->json([

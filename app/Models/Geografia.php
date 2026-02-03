@@ -36,12 +36,12 @@ class Geografia extends Model
 
     /**
      * Atributo para obtener el conteo de recintos en cascada
-     * Optimizado con Caché de Sintonía (Evita N+1)
+     * Optimizado con Caché  (Evita N+1)
      */
     public function getContadorRecintosAttribute()
     {
         // Generamos una clave única para este territorio y su descendencia
-        // Sintonía: Manejar caso cuando updated_at es null (registros antiguos)
+        // Manejar caso cuando updated_at es null (registros antiguos)
         $timestamp = $this->updated_at ? $this->updated_at->timestamp : 'no_timestamp';
         $cacheKey = "geo_recintos_count_{$this->id_geografia}_{$timestamp}";
 
@@ -71,7 +71,7 @@ class Geografia extends Model
         // Caso 1: Municipio
         if ($this->tipo == 'Municipio') {
             return DB::table('candidatos')
-                ->where('id_geografia_postulacion', $this->id_geografia) // Sintonizado
+                ->where('id_geografia_postulacion', $this->id_geografia)
                 ->count();
         }
 
@@ -82,7 +82,7 @@ class Geografia extends Model
                 ->pluck('id_geografia');
 
             return DB::table('candidatos')
-                ->whereIn('id_geografia_postulacion', $municipiosIds) // Sintonizado
+                ->whereIn('id_geografia_postulacion', $municipiosIds)
                 ->count();
         }
 
@@ -100,7 +100,7 @@ class Geografia extends Model
 
             // Contamos candidatos usando la columna correcta
             return DB::table('candidatos')
-                ->whereIn('id_geografia_postulacion', $municipiosIds) // Sintonizado
+                ->whereIn('id_geografia_postulacion', $municipiosIds) 
                 ->count();
         }
 
@@ -152,7 +152,7 @@ class Geografia extends Model
 
     /**
      * Relación hijos (Departamento -> Provincias, Provincia -> Municipios)
-     * Sintonía: Caché de relación para evitar N+1 en árboles jerárquicos
+     * Caché de relación para evitar N+1 en árboles jerárquicos
      */
     public function children()
     {
@@ -165,7 +165,7 @@ class Geografia extends Model
     public function getChildrenCachedAttribute()
     {
         $cacheKey = "geo_children_{$this->id_geografia}";
-        
+
         return Cache::remember($cacheKey, 1800, function () {
             return $this->children()->get();
         });
@@ -197,7 +197,7 @@ class Geografia extends Model
 
     /**
      * Límites geográficos (GeoJSON) para esta geografía
-     * Sintonía: Caché de límites (no cambian frecuentemente)
+     * Caché de límites (no cambian frecuentemente)
      */
     public function limite()
     {
@@ -210,7 +210,7 @@ class Geografia extends Model
     public function getLimiteCachedAttribute()
     {
         $cacheKey = "geo_limite_{$this->id_geografia}";
-        
+
         return Cache::remember($cacheKey, 3600, function () {
             return $this->limite()->first();
         });

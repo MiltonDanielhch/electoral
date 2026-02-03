@@ -8,8 +8,7 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     * Sintonía: Optimización de índices para geofencing y búsquedas espaciales
-     * Código 3026-PLUS
+     * Optimización de índices para geofencing y búsquedas espaciales
      */
     public function up(): void
     {
@@ -19,12 +18,12 @@ return new class extends Migration
             if (!Schema::hasIndex('recintos', 'idx_recintos_geo_spatial')) {
                 $table->index(['latitud', 'longitud', 'id_geografia'], 'idx_recintos_geo_spatial');
             }
-            
+
             // Índice para búsquedas por municipio con coordenadas
             if (!Schema::hasIndex('recintos', 'idx_recintos_municipio_coords')) {
                 $table->index(['id_geografia', 'latitud', 'longitud'], 'idx_recintos_municipio_coords');
             }
-            
+
             // Índice para búsquedas de recintos eliminados (soft deletes)
             if (!Schema::hasIndex('recintos', 'idx_recintos_deleted_at')) {
                 $table->index('deleted_at', 'idx_recintos_deleted_at');

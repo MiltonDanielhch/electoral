@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 class MesaController extends Controller
 {
     /**
-     * Dashboard de Sintonía de Transmisión
+     * Dashboard de Transmisión
      * Retorna estadísticas en tiempo real de mesas
      */
     public function index()

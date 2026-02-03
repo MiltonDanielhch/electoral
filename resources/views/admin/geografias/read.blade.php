@@ -63,7 +63,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    {{-- Mini Resumen Electoral con Sintonía de Cascada --}}
+                    {{-- Mini Resumen Electoral de Cascada --}}
                     <div class="relation-card">
                         <h5><i class="voyager-group"></i> Resumen del Territorio</h5>
                         <p>Este <strong>{{ $geografia->tipo }}</strong> cuenta actualmente con:</p>
@@ -100,7 +100,7 @@
                         </li>
                         <li>
                             <a data-toggle="tab" href="#recintos">
-                                {{-- SINTONÍA: Usamos contador_recintos para el total en cascada --}}
+                                {{-- Usamos contador_recintos para el total en cascada --}}
                                 Puntos de Votación ({{ $geografia->contador_recintos }})
                             </a>
                         </li>

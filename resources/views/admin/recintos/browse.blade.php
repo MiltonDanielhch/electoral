@@ -116,9 +116,9 @@ document.addEventListener('DOMContentLoaded', function() {
     <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
     <script src="{{ asset('js/mapa-config.js') }}"></script>
     <script>
-    // Sintonía: Mapas inicializados (evitar doble inicialización)
+    // Mapas inicializados (evitar doble inicialización)
     const mapasInicializados = new Set();
-    
+
     /**
      * Inicializa un mini mapa individual
      */
@@ -127,12 +127,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const lon = parseFloat(input.getAttribute('data-lon'));
         const id = input.getAttribute('data-id');
         const containerId = 'mini-map-' + id;
-        
+
         // Evitar inicializar el mismo mapa dos veces
         if (mapasInicializados.has(containerId)) {
             return;
         }
-        
+
         const mapContainer = document.getElementById(containerId);
 
         if (!isNaN(lat) && !isNaN(lon) && mapContainer) {
@@ -148,17 +148,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     doubleClickZoom: false,
                     tap: false
                 });
-                
+
                 sintoniaMap.init();
-                
+
                 // Agregar marcador con icono personalizado
                 sintoniaMap.agregarMarcador(lat, lon, {
                     icono: SintoniaMap.crearIcono('punto', '#26e07f')
                 });
-                
+
                 // Marcar como inicializado
                 mapasInicializados.add(containerId);
-                
+
             } catch (e) {
                 console.error('Error inicializando mini mapa ' + id + ':', e);
             }
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
-     * Sintonía: Lazy Loading de mapas con Intersection Observer
+     * Lazy Loading de mapas con Intersection Observer
      * Los mapas solo se cargan cuando son visibles en el viewport
      */
     function initLazyLoadingMapas() {
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('list-loaded', function() {
         // Limpiar set de mapas inicializados para la nueva lista
         mapasInicializados.clear();
-        
+
         setTimeout(function() {
             if ('IntersectionObserver' in window && window.miniMapObserver) {
                 // Reconfigurar observer para nuevos elementos

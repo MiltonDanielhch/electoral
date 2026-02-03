@@ -100,7 +100,7 @@ Route::prefix('admin')->middleware(['loggin', 'system'])->group(function () {
 
     // ──────────────── RECINTOS ────────────────
     Route::prefix('recintos')->group(function () {
-        // Sintonía: Throttle para evitar abusos en AJAX (60 peticiones/min)
+        //  Throttle para evitar abusos en AJAX (60 peticiones/min)
         Route::get('/ajax/list', [RecintoController::class, 'list'])
             ->name('admin.recintos.ajax.list')
             ->middleware('throttle:60,1');

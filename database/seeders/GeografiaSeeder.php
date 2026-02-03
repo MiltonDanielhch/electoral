@@ -24,7 +24,7 @@ class GeografiaSeeder extends Seeder
             'longitud' => -65.50000000,
         ]);
 
-        // 3. PROVINCIAS (Sintonizadas con códigos TSE de 4 dígitos)
+        // 3. PROVINCIAS (TSE de 4 dígitos)
         $provincias = [
             ['cod' => '0801', 'nom' => 'Cercado', 'lat' => -14.8333, 'lng' => -64.9167],
             ['cod' => '0802', 'nom' => 'Vaca Díez', 'lat' => -11.0167, 'lng' => -66.0667],

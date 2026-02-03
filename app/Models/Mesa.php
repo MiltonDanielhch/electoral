@@ -19,7 +19,7 @@ class Mesa extends Model
     protected $fillable = [
         'codigo_tse',
         'id_recinto',
-        'numero_mesa', // Añadido para sintonía con el seeder
+        'numero_mesa', // Añadido  con el seeder
         'cantidad_electores',
         'estado',
     ];

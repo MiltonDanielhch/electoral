@@ -1,7 +1,7 @@
 # 🗳️ Documentación Técnica: Módulo de Candidatos
 
 **Componente:** Definición de Rutas y Endpoints (`web.php`)  
-**Estado:** ✅ Sintonía Completada - Todas las mejoras implementadas
+**Estado:** ✅ Completada - Todas las mejoras implementadas
 
 ---
 
@@ -41,7 +41,7 @@ Aunque no se visualiza en el snippet, estas rutas heredan el middleware de grupo
 
 ---
 
-## 4. Análisis de Mejoras y Optimización (Master Formula)
+## 4. Análisis de Mejoras y Optimización
 
 Tras auditar el mapa de rutas, identificamos los siguientes puntos para fortalecer la arquitectura:
 
@@ -105,7 +105,7 @@ DB::transaction(function() use ($request, $candidato, &$data) {
 
 ---
 
-## 🚀 Mejoras de Lógica (Master Formula) ✅ TODAS IMPLEMENTADAS
+## 🚀 Mejoras de Lógica ✅ TODAS IMPLEMENTADAS
 
 ### A. Validación de Unicidad Electoral (Índice Compuesto) ✅ MEJORA APLICADA
 **Ubicación:** `StoreCandidatoRequest.php` y `UpdateCandidatoRequest.php`
@@ -328,4 +328,3 @@ Route::put('/{candidato}', [CandidatoController::class, 'update'])
 ---
 
 **Última actualización:** Febrero 2026  
-**Sintonía:** 3026 Completada ✅

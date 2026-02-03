@@ -22,8 +22,10 @@
                         <td>{{ $recinto->geografia ? $recinto->geografia->nombre : '-' }}</td>
                         <td style="text-align: center;">
                             @if($recinto->latitud && $recinto->longitud)
-                                <div id="mini-map-{{ $recinto->id_recinto }}" style="height: 80px; width: 120px; margin: 0 auto; border-radius: 4px;"></div>
-                                <input type="hidden" data-lat="{{ $recinto->latitud }}" data-lon="{{ $recinto->longitud }}" data-id="{{ $recinto->id_recinto }}" class="mini-map-data">
+                                <div class="mini-map-container" style="height: 80px; width: 120px; margin: 0 auto;">
+                                    <div id="mini-map-{{ $recinto->id_recinto }}" style="height: 100%; width: 100%; border-radius: 4px;"></div>
+                                    <input type="hidden" data-lat="{{ $recinto->latitud }}" data-lon="{{ $recinto->longitud }}" data-id="{{ $recinto->id_recinto }}" class="mini-map-data">
+                                </div>
                             @else
                                 <span class="badge badge-default">
                                     <i class="voyager-x"></i> Sin ubicación
@@ -68,47 +70,3 @@
         </nav>
     </div>
 </div>
-
-@section('css')
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-@endsection
-
-@push('javascript')
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const miniMaps = document.querySelectorAll('.mini-map-data');
-
-    miniMaps.forEach(function(input) {
-        const lat = parseFloat(input.getAttribute('data-lat'));
-        const lon = parseFloat(input.getAttribute('data-lon'));
-        const id = input.getAttribute('data-id');
-
-        if (!isNaN(lat) && !isNaN(lon)) {
-            const map = L.map('mini-map-' + id, {
-                center: [lat, lon],
-                zoom: 15,
-                zoomControl: false,
-                attributionControl: false,
-                scrollWheelZoom: false,
-                dragging: false,
-                doubleClickZoom: false
-            });
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: ''
-            }).addTo(map);
-
-            L.marker([lat, lon], {
-                icon: L.divIcon({
-                    className: 'custom-div-icon',
-                    html: '<div style="background-color: #26e07f; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white;"></div>',
-                    iconSize: [12, 12],
-                    iconAnchor: [6, 6]
-                })
-            }).addTo(map);
-        }
-    });
-});
-</script>
-@endpush

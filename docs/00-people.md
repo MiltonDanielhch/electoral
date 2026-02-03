@@ -1,4 +1,4 @@
-# 👥 Módulo de Gestión de Personas - Documentación Técnica (Código 3026)
+# 👥 Módulo de Gestión de Personas - Documentación Técnica
 
 ## 1. Descripción General
 El Módulo de Personas es el núcleo de identidad del sistema. Gestiona exclusivamente **Personas Naturales** (ciudadanos/humanos) para el proceso de votación, eliminando completamente el soporte para Personas Jurídicas que podrían comprometer la integridad del sistema electoral (1 Humano = 1 Voto).
@@ -92,7 +92,7 @@ La integridad se mantiene mediante Laravel Policies.
 
 ---
 
-## 🔧 Implementación de Mejoras (Código 3026) - COMPLETADO
+## 🔧 Implementación de Mejoras - COMPLETADO
 
 ### ✅ 1. Eliminación de Persona Jurídica
 **Ubicación:** `app/Models/Person.php`, `resources/views/admin/people/edit-add.blade.php`
@@ -401,4 +401,4 @@ php artisan migrate
 
 ---
 
-**Código 3026 - Sistema Electoral Optimizado para "1 Humano = 1 Voto"**
+**Sistema Electoral Optimizado para "1 Humano = 1 Voto"**

@@ -31,7 +31,7 @@ class GeografiaRequest extends FormRequest
                 // MEJORA: Impedir que el padre sea el mismo ID (solo en edición)
                 function ($attribute, $value, $fail) {
                     if ($value == $this->route('geografia')) {
-                        $fail('Sintonía rota: Un territorio no puede ser su propio padre.');
+                        $fail('Un territorio no puede ser su propio padre.');
                     }
                 },
             ],

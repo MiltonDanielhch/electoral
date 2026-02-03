@@ -77,7 +77,7 @@ class VotoXPartidoObserver
                 ]
             );
 
-            // D. Recalcular porcentajes para esta geografía (Sintonía Fina)
+            // D. Recalcular porcentajes para esta geografía 
             $totalVotosGeo = DB::table('resumen_votos')
                 ->where('id_geografia', $geo->id_geografia)
                 ->where('id_cargo', $acta->id_cargo)
@@ -93,7 +93,7 @@ class VotoXPartidoObserver
             }
         }
 
-        // 3. Limpiar la sintonía del mapa para que el frontend vea los cambios
+        // 3. Limpiar del mapa para que el frontend vea los cambios
         Cache::flush();
     }
 }

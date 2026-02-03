@@ -61,6 +61,6 @@ class RecintoSeeder extends Seeder
             }
         }
 
-        $this->command->info('Sintonía completada: Recintos del Beni cargados con éxito.');
+        $this->command->info('completada: Recintos del Beni cargados con éxito.');
     }
 }

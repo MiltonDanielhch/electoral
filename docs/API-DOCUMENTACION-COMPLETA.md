@@ -172,7 +172,7 @@ const cargarCatalogos = async () => {
 
 #### GET `/api/v1/mesas/estadisticas`
 
-**Descripción:** Dashboard de sintonía - estadísticas en tiempo real de mesas.
+**Descripción:** Dashboard - estadísticas en tiempo real de mesas.
 
 **Autenticación:** Requerida
 

@@ -61,7 +61,7 @@ class Recinto extends Model
 
     /**
      * Scope para filtrar recintos con coordenadas válidas dentro del Beni
-     * Sintonía: Geofencing - Validación de Territorio
+     * Geofencing - Validación de Territorio
      */
     public function scopeConCoordenadasValidas($query)
     {
@@ -70,7 +70,7 @@ class Recinto extends Model
             ->whereNotNull('longitud')
             ->where('latitud', '!=', 0)
             ->where('longitud', '!=', 0)
-            // Sintonía: Rango válido para el Departamento del Beni
+            // Rango válido para el Departamento del Beni
             ->whereBetween('latitud', [-16.5, -10.0])
             ->whereBetween('longitud', [-68.0, -60.0]);
     }

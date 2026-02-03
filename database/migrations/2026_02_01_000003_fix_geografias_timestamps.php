@@ -10,13 +10,13 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     * Sintonía: Arreglar timestamps null en registros existentes de geografías
+     * Arreglar timestamps null en registros existentes de geografías
      * Esto evita errores al usar el caché que depende de updated_at
      */
     public function up(): void
     {
         $now = Carbon::now();
-        
+
         // Actualizar registros que tienen timestamps null
         DB::table('geografias')
             ->whereNull('created_at')

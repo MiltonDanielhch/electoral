@@ -9,7 +9,7 @@ class MesaSeeder extends Seeder
 {
     public function run(): void
     {
-        // Limpiar la tabla antes de sembrar para asegurar sintonía de datos fresca
+        // Limpiar la tabla antes de sembrar para asegurar datos fresca
         // Evita duplicados lógicos o mesas huérfanas si cambian recintos
         // Deshabilitamos claves foráneas temporalmente para permitir truncate
         DB::statement('SET FOREIGN_KEY_CHECKS = 0');
@@ -24,7 +24,6 @@ class MesaSeeder extends Seeder
             $cantidadMesas = $this->obtenerCantidadMesas($recinto->nombre);
 
             for ($i = 1; $i <= $cantidadMesas; $i++) {
-                // SINTONÍA DE CÓDIGO:
                 // Código Recinto (supongamos 3 dígitos) + relleno + número mesa
                 // Total: 11 dígitos para que el TRIGGER no lo rechace
                 $codigoMesa = str_pad($recinto->codigo_tse, 6, "0", STR_PAD_LEFT) . str_pad($i, 5, "0", STR_PAD_LEFT);
@@ -45,7 +44,7 @@ class MesaSeeder extends Seeder
     }
 
     /**
-     * Define la cantidad de mesas según el nombre del recinto (Sintonía Manual)
+     * Define la cantidad de mesas según el nombre del recinto 
      */
     private function obtenerCantidadMesas($nombre)
     {

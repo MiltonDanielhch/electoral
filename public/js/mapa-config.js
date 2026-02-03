@@ -1,7 +1,6 @@
 /**
- * SintoniaMap - Clase global para manejo modular de mapas Leaflet
+ * Map - Clase global para manejo modular de mapas Leaflet
  * Evita código repetido en browse, edit-add, read y mapa-geografia
- * Código 3026 - Sintonía de Datos
  */
 class SintoniaMap {
     constructor(containerId, options = {}) {
@@ -103,7 +102,7 @@ class SintoniaMap {
         };
 
         const icono = iconos[tipo] || iconos['default'];
-        
+
         if (icono.className) {
             return L.divIcon(icono);
         }
@@ -115,7 +114,7 @@ class SintoniaMap {
      */
     static crearPopup(datos, titulo = null) {
         let html = '<div style="min-width: 200px; font-family: Arial, sans-serif;">';
-        
+
         if (titulo) {
             html += `<h5 style="margin: 0 0 8px 0; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">${titulo}</h5>`;
         }
@@ -234,7 +233,7 @@ class SintoniaMap {
         if (this.clusterGroup) {
             this.clusterGroup.clearLayers();
         }
-        
+
         this.markers.forEach(marker => {
             if (this.map && marker) {
                 this.map.removeLayer(marker);
@@ -263,7 +262,7 @@ window.MapaConfig = {
         zoom: 6
     },
 
-    // Sintonía: Colores dinámicos desde OrganizacionPolitica
+    // Colores dinámicos desde OrganizacionPolitica
     coloresPartidos: {
         'MAS': '#009739',
         'CC': '#0066cc',

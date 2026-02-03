@@ -1,7 +1,7 @@
 # 📑 Documentación Técnica: Módulo de Mesas (v1.0)
 
 **Proyecto:** Sistema de Gestión Electoral - Beni 2026
-**Estado:** Sintonía Completa (Producción)
+**Estado:** Completa (Producción)
 **Dependencias:** Módulo de Recintos, Módulo de Geografía.
 
 ---
@@ -18,7 +18,7 @@ La mesa representa la unidad mínima de escrutinio. Su integridad está protegid
 - **Seguridad:** Implementa `SoftDeletes` para trazabilidad forense.
 
 ### 🛡️ Disparadores (Triggers SQL)
-Para asegurar que el `codigo_tse` cumpla estrictamente con la Master Formula, se ha implementado el trigger:
+Para asegurar que el `codigo_tse` cumpla estrictamente, se ha implementado el trigger:
 
 - **`trg_mesas_validacion`:** Bloquea cualquier inserción (`BEFORE INSERT`) que no contenga exactamente 11 dígitos numéricos, devolviendo el error SQLSTATE '45000'.
 
@@ -29,11 +29,11 @@ Para asegurar que el `codigo_tse` cumpla estrictamente con la Master Formula, se
 ### 🧠 Modelo `Mesa.php`
 - **Relación Inversa:** `belongsTo(Recinto::class)`.
 - **Relación Descendente:** `hasMany(ActaEscrutinio::class)`.
-- **Scopes de Sintonía:** `scopeHabilitadas()` permite filtrar rápidamente las mesas aptas para recibir votos.
+- **Scopes:** `scopeHabilitadas()` permite filtrar rápidamente las mesas aptas para recibir votos.
 - **Casts:** Garantiza que el `numero_mesa` sea siempre un entero para cálculos matemáticos precisos.
 
 ### 🕹️ Controlador `MesaController.php`
-- **Sintonía AJAX:** Implementa el Trait `ManagesCrud` para cargas de listas ultra rápidas sin recarga de página.
+- **AJAX:** Implementa el Trait `ManagesCrud` para cargas de listas ultra rápidas sin recarga de página.
 - **Protección de Eliminación:** El método `destroy` valida si existen actas vinculadas antes de permitir el borrado, evitando la pérdida de integridad electoral.
 - **Búsqueda Multidimensional:** Permite buscar mesas por su número, por el código oficial o por el nombre del recinto asociado.
 
@@ -59,11 +59,11 @@ La interfaz se ha diseñado para la eficiencia bajo presión:
 
 - **Browse:** Tabla dinámica con etiquetas de colores (Labels) para identificar el estado de la mesa al instante.
 - **Formularios:** Implementación de Select2 para la búsqueda rápida entre cientos de recintos del departamento.
-- **Read:** Vista de auditoría que alerta si existe una incoherencia de sintonía (ej. mesa escrutada sin actas).
+- **Read:** Vista de auditoría que alerta si existe una incoherencia (ej. mesa escrutada sin actas).
 
 ---
 
-## 5. Reporte de Bugs y Mejoras Técnicas (Código 3026) ✅ COMPLETADO
+## 5. Reporte de Bugs y Mejoras Técnicas  ✅ COMPLETADO
 
 ### 🛠️ Reporte de Bugs
 #### 1. Inconsistencia de Validación (Backend vs DB) ✅ RESUELTO
@@ -81,7 +81,7 @@ La interfaz se ha diseñado para la eficiencia bajo presión:
 #### 3. Falta de Restricción Lógica en el Seeder ✅ RESUELTO
 - **Ubicación:** `database/seeders/MesaSeeder.php`.
 - **Problema:** El seeder usaba `updateOrInsert` basado solo en `codigo_tse`.
-- **Solución:** Implementado `DB::table('mesas')->truncate()` antes de sembrar para asegurar sintonía de datos fresca y evitar duplicados o mesas huérfanas.
+- **Solución:** Implementado `DB::table('mesas')->truncate()` antes de sembrar para asegurar de datos fresca y evitar duplicados o mesas huérfanas.
 - **Estado:** ✅ Implementado. Lógica cambiada a `insert()` puro tras truncado.
 
 #### 4. Vulnerabilidad de Carga en la API (N+1) ✅ RESUELTO
@@ -92,7 +92,7 @@ La interfaz se ha diseñado para la eficiencia bajo presión:
 
 ---
 
-## 6. Sugerencias de Expansión (Sintonía Futura) ✅ IMPLEMENTADO
+## 6. Sugerencias de Expansión (Futura) ✅ IMPLEMENTADO
 
 ### 🚀 Mejoras Propuestas
 #### 1. Registro de "Fotos de Actas" ✅ IMPLEMENTADO
@@ -101,7 +101,7 @@ La interfaz se ha diseñado para la eficiencia bajo presión:
 - **Solución:** La tabla de actas ya incluye `foto_frontal` y `foto_reverso` (string 255, nullable). El Api/MesaResource incluye estas URLs en la respuesta.
 - **Estado:** ✅ Implementado y funcional.
 
-#### 2. Dashboard de "Sintonía de Transmisión" ✅ IMPLEMENTADO
+#### 2. Dashboard de "Transmisión" ✅ IMPLEMENTADO
 - **Ubicación:** `app/Http/Controllers/Api/MesaController.php` y `routes/api.php`.
 - **Idea:** Contador en tiempo real: "Total Mesas: 1000 | Escrutadas: 450 (45%) | Faltantes: 550".
 - **Solución:** Creado endpoint `GET /api/v1/mesas/estadisticas` que retorna:
@@ -118,7 +118,7 @@ La interfaz se ha diseñado para la eficiencia bajo presión:
 
 ---
 
-## 7. Mejoras Adicionales Implementadas (Código 3026-Plus)
+## 7. Mejoras Adicionales Implementadas
 
 ### 🔧 Optimizaciones Técnicas
 #### 1. Validación Reforzada
