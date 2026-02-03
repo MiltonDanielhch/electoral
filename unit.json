@@ -4,6 +4,7 @@
             "pass": "routes"
         }
     },
+
     "routes": [
         {
             "match": {
@@ -17,16 +18,12 @@
             }
         }
     ],
+
     "applications": {
         "laravel": {
             "type": "php",
-            "root": "/var/www/electoral/public",
-            "script": "index.php",
-            "options": {
-                "admin": {
-                    "memory_limit": "512M"
-                }
-            }
+            "root": "/var/www/electoral/public/",
+            "script": "index.php"
         }
     }
 }

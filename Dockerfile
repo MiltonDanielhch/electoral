@@ -1,6 +1,6 @@
 FROM unit:1.33.0-php8.2
 
-# Instalación de dependencias
+# Instalación de dependencias del sistema y extensiones de PHP
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl unzip git libicu-dev libzip-dev libpng-dev libjpeg-dev \
     libfreetype6-dev libssl-dev libonig-dev \
@@ -9,13 +9,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         pcntl opcache pdo pdo_mysql intl zip gd exif ftp bcmath mbstring \
     && pecl install redis \
     && docker-php-ext-enable redis \
-    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Configuración PHP para Producción
+# Configuración optimizada de PHP para Producción
 RUN { \
     echo "opcache.enable=1"; \
-    echo "opcache.enable_cli=1"; \
     echo "opcache.memory_consumption=256"; \
     echo "opcache.interned_strings_buffer=16"; \
     echo "opcache.max_accelerated_files=20000"; \
@@ -23,39 +21,34 @@ RUN { \
     echo "opcache.validate_timestamps=0"; \
     echo "opcache.jit=tracing"; \
     echo "opcache.jit_buffer_size=128M"; \
-    echo "opcache.save_comments=1"; \
     echo "memory_limit=512M"; \
     echo "upload_max_filesize=64M"; \
     echo "post_max_size=64M"; \
-    echo "max_execution_time=30"; \
-    echo "max_input_vars=3000"; \
     } > /usr/local/etc/php/conf.d/custom.ini
 
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
 WORKDIR /var/www/electoral
 
-# Copiar dependencias primero (cacheo de capas)
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+# Directorios necesarios con permisos correctos ANTES de copiar
+RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
 
-# Copiar código fuente
+# Copiar el código del proyecto
 COPY . .
-# COPY --from=frontend /app/public/build /var/www/electoral/public/build
 
-# Generar autoloader
-RUN composer dump-autoload --optimize
+# Instalación de dependencias de Composer
+RUN composer install --prefer-dist --optimize-autoloader --no-interaction --no-dev
 
-# Permisos
-RUN mkdir -p storage/app/public storage/framework/cache storage/framework/sessions storage/framework/testing storage/framework/views storage/logs \
-    && chown -R unit:unit /var/www/electoral \
-    && chmod -R 775 storage bootstrap/cache
+# Asegurar permisos para el usuario 'unit'
+RUN chown -R unit:unit /var/www/electoral \
+    && chmod -R 775 /var/www/electoral/storage /var/www/electoral/bootstrap/cache
 
-# Configuración de Unit y scripts de inicio
-COPY unit.json /docker-entrypoint.d/config.json
-COPY laravel-setup.sh /docker-entrypoint.d/laravel-setup.sh
-RUN chmod +x /docker-entrypoint.d/laravel-setup.sh
+# Configuración de NGINX Unit (Copiamos directamente a la carpeta de auto-config)
+COPY unit.json /docker-entrypoint.d/unit.json
+
+# Preparación final
+RUN php artisan storage:link || true
 
 EXPOSE 8000
 
-CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
+CMD ["unitd", "--no-daemon"]
